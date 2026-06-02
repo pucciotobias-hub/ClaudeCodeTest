@@ -26,4 +26,11 @@ Everything lives in `tictactoe.html` as a single-file app with three co-located 
 
 ## Git workflow
 
-After every completed feature or fix: commit with a descriptive message and push to `origin/master` on GitHub (https://github.com/pucciotobias-hub/ClaudeCodeTest). Do not wait for the user to ask.
+**Commit and push after every completed feature or fix — do not wait to be asked.**
+
+- Stage only the relevant files (never `git add -A` blindly)
+- Write a short, descriptive commit message that explains the change
+- Push to `origin/master` on GitHub (https://github.com/pucciotobias-hub/ClaudeCodeTest) immediately after committing
+- For larger tasks, commit at meaningful checkpoints (e.g. after each sub-feature) rather than only at the very end
+
+The goal is that the remote always reflects the latest working state so progress is never lost and any change can be reverted.
