@@ -9,6 +9,12 @@ const CONFIG = {
   API_BASE:     'https://api.cocos.xoms.com.ar',      // auth + market data
   MATRIZ_BASE:  'https://matriz.cocos.xoms.com.ar',   // datos de cuenta
   ACCOUNT_NAME: '370111',                              // nombre de cuenta
+
+  // Cookie de sesión de Matriz. Cómo obtenerla (una vez por día):
+  //   1. Abrí Matriz en Chrome con Matriz abierto
+  //   2. F12 → pestaña "Application" → "Cookies" → "https://matriz.cocos.xoms.com.ar"
+  //   3. Buscá "_mtz_web_key" → copiá el valor (columna Value) → pegalo abajo
+  MTZ_COOKIE: '',
 };
 
 // ============================================================
@@ -27,42 +33,9 @@ function getToken_() {
   return token;
 }
 
-// Obtiene la cookie _mtz_web_key para las llamadas a matriz.cocos.xoms.com.ar
 function getMatrizCookie_() {
-  // Intento 1: login directo en Matriz con credenciales
-  const loginEndpoints = [
-    { url: CONFIG.MATRIZ_BASE + '/api/v2/auth/sign_in',
-      body: JSON.stringify({ email: CONFIG.USERNAME, password: CONFIG.PASSWORD }) },
-    { url: CONFIG.MATRIZ_BASE + '/api/v2/sessions',
-      body: JSON.stringify({ username: CONFIG.USERNAME, password: CONFIG.PASSWORD }) },
-    { url: CONFIG.MATRIZ_BASE + '/api/v2/auth',
-      body: JSON.stringify({ username: CONFIG.USERNAME, password: CONFIG.PASSWORD }) },
-  ];
-
-  for (const ep of loginEndpoints) {
-    try {
-      const res = UrlFetchApp.fetch(ep.url, {
-        method: 'post',
-        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-        payload: ep.body,
-        muteHttpExceptions: true,
-        followRedirects: false,
-      });
-      // Buscar la cookie en los headers de respuesta
-      const headers = res.getAllHeaders();
-      const setCookie = headers['Set-Cookie'] || headers['set-cookie'];
-      if (setCookie) {
-        const cookies = Array.isArray(setCookie) ? setCookie : [setCookie];
-        for (const c of cookies) {
-          if (c.includes('_mtz_web_key')) {
-            const match = c.match(/_mtz_web_key=([^;]+)/);
-            if (match) return '_mtz_web_key=' + match[1];
-          }
-        }
-      }
-    } catch(e) {}
-    Utilities.sleep(200);
-  }
+  if (CONFIG.MTZ_COOKIE && CONFIG.MTZ_COOKIE.length > 10)
+    return '_mtz_web_key=' + CONFIG.MTZ_COOKIE;
   return null;
 }
 
