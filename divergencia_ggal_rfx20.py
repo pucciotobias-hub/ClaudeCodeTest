@@ -11,9 +11,9 @@ from pyRofex import MarketDataEntry  # Enum con los tipos de datos de mercado di
 
 # --- CONFIGURACIÓN -----------------------------------------------------------
 
-USUARIO   = ""   # Completar con tu usuario de Remarket (entorno de pruebas)
-PASSWORD  = ""   # Completar con tu contraseña de Remarket
-CUENTA    = ""   # Completar con tu número de comitente (ej. "REM0001")
+USUARIO   = "pucciotobias23427"
+PASSWORD  = "mndnoL2$"
+CUENTA    = "REM23427"
 
 # Los dos instrumentos que queremos monitorear
 TICKERS = ["GGAL/JUN26", "RFX20/JUN26"]
