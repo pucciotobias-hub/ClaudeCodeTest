@@ -1,30 +1,21 @@
 // ============================================================
 // DASHBOARD DE CUENTA — Posiciones, Operaciones y P&L
 // Cocos Capital / Matriz — ROFEX Futuros
-//
-// SETUP (hacerlo una sola vez):
-//   1. Abrí un Google Sheets NUEVO en blanco
-//   2. Extensiones → Apps Script
-//   3. Borrá el código de ejemplo y pegá TODO este archivo
-//   4. Guardá (Ctrl+S)
-//   5. Completá USERNAME, PASSWORD y COMITENTE abajo
-//   6. Corré diagnosticarAPI() para verificar los endpoints
-//   7. Corré actualizarTodo() para cargar los datos
-//   8. Corré activarAutoRefresh() y activarTriggerCierre() (una sola vez)
 // ============================================================
 
 const CONFIG = {
-  USERNAME:  'TU_USUARIO',          // mismo usuario que usás en Matriz
-  PASSWORD:  'TU_CONTRASEÑA',       // misma contraseña que usás en Matriz
-  BASE_URL:  'https://api.cocos.xoms.com.ar',
-  // El ID numérico de cuenta se descubre automáticamente desde /rest/account
+  USERNAME:     'TU_USUARIO',   // mismo usuario que usás en Matriz
+  PASSWORD:     'TU_CONTRASEÑA', // misma contraseña
+  API_BASE:     'https://api.cocos.xoms.com.ar',      // auth + market data
+  MATRIZ_BASE:  'https://matriz.cocos.xoms.com.ar',   // datos de cuenta
+  ACCOUNT_NAME: '370111',                              // nombre de cuenta
 };
 
 // ============================================================
-// AUTH
+// AUTH — dos capas: token para market data, cookie para Matriz
 // ============================================================
 function getToken_() {
-  const res = UrlFetchApp.fetch(CONFIG.BASE_URL + '/auth/getToken', {
+  const res = UrlFetchApp.fetch(CONFIG.API_BASE + '/auth/getToken', {
     method: 'post',
     headers: { 'X-Username': CONFIG.USERNAME, 'X-Password': CONFIG.PASSWORD },
     muteHttpExceptions: true
@@ -36,30 +27,58 @@ function getToken_() {
   return token;
 }
 
-// Obtiene el ID numérico de la cuenta (ej: 1367) desde /rest/account
-function getAccountId_(token) {
-  const res = UrlFetchApp.fetch(CONFIG.BASE_URL + '/rest/account', {
-    headers: { 'X-Auth-Token': token },
-    muteHttpExceptions: true
-  });
-  if (res.getResponseCode() !== 200) return null;
-  try {
-    const json = JSON.parse(res.getContentText());
-    if (json.status === 'OK' && json.accounts && json.accounts.length > 0)
-      return json.accounts[0].id;
-  } catch(e) {}
+// Obtiene la cookie _mtz_web_key para las llamadas a matriz.cocos.xoms.com.ar
+function getMatrizCookie_() {
+  // Intento 1: login directo en Matriz con credenciales
+  const loginEndpoints = [
+    { url: CONFIG.MATRIZ_BASE + '/api/v2/auth/sign_in',
+      body: JSON.stringify({ email: CONFIG.USERNAME, password: CONFIG.PASSWORD }) },
+    { url: CONFIG.MATRIZ_BASE + '/api/v2/sessions',
+      body: JSON.stringify({ username: CONFIG.USERNAME, password: CONFIG.PASSWORD }) },
+    { url: CONFIG.MATRIZ_BASE + '/api/v2/auth',
+      body: JSON.stringify({ username: CONFIG.USERNAME, password: CONFIG.PASSWORD }) },
+  ];
+
+  for (const ep of loginEndpoints) {
+    try {
+      const res = UrlFetchApp.fetch(ep.url, {
+        method: 'post',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        payload: ep.body,
+        muteHttpExceptions: true,
+        followRedirects: false,
+      });
+      // Buscar la cookie en los headers de respuesta
+      const headers = res.getAllHeaders();
+      const setCookie = headers['Set-Cookie'] || headers['set-cookie'];
+      if (setCookie) {
+        const cookies = Array.isArray(setCookie) ? setCookie : [setCookie];
+        for (const c of cookies) {
+          if (c.includes('_mtz_web_key')) {
+            const match = c.match(/_mtz_web_key=([^;]+)/);
+            if (match) return '_mtz_web_key=' + match[1];
+          }
+        }
+      }
+    } catch(e) {}
+    Utilities.sleep(200);
+  }
   return null;
 }
 
-function accountHeaders_(token) {
-  return { 'X-Auth-Token': token };
+function matrizHeaders_(cookie) {
+  return {
+    'Accept':          'application/json, text/plain, */*',
+    'Accept-Language': 'es-AR,es;q=0.9',
+    'Cookie':          cookie || '',
+  };
 }
 
 // ============================================================
-// PRECIO ACTUAL (para calcular P&L no realizado)
+// PRECIO ACTUAL para P&L no realizado (market data vía API original)
 // ============================================================
 function getMD_(symbol, marketId, token) {
-  const url = CONFIG.BASE_URL + '/rest/marketdata/get?symbol='
+  const url = CONFIG.API_BASE + '/rest/marketdata/get?symbol='
             + encodeURIComponent(symbol) + '&marketId=' + marketId
             + '&entries=LA,CL&depth=1';
   const res = UrlFetchApp.fetch(url, {
@@ -74,7 +93,6 @@ function getMD_(symbol, marketId, token) {
 }
 
 function getCurrentPrice_(symbol, token) {
-  // Intenta ROFX primero (futuros), luego MERV (acciones)
   let md = getMD_(symbol, 'ROFX', token);
   if (!md || !md.marketData || !md.marketData.LA)
     md = getMD_(symbol, 'MERV', token);
@@ -85,43 +103,46 @@ function getCurrentPrice_(symbol, token) {
 // ============================================================
 // DATOS DE CUENTA — POSICIONES
 // ============================================================
-function getPositions_(token) {
-  const accountId = getAccountId_(token);
-  if (!accountId) return null;
-  const res = UrlFetchApp.fetch(CONFIG.BASE_URL + '/rest/account/' + accountId + '/positions', {
-    headers: accountHeaders_(token),
+function getPositions_(cookie) {
+  if (!cookie) return null;
+  const ds  = Date.now() + '-' + Math.floor(Math.random() * 999999);
+  const url = CONFIG.MATRIZ_BASE + '/api/v2/accounts/' + CONFIG.ACCOUNT_NAME
+            + '/positions?_ds=' + ds;
+  const res = UrlFetchApp.fetch(url, {
+    headers: matrizHeaders_(cookie),
     muteHttpExceptions: true
   });
   if (res.getResponseCode() !== 200) return null;
   try { return JSON.parse(res.getContentText()); } catch(e) { return null; }
 }
 
-// Parseo defensivo: maneja distintos formatos de respuesta XOMS
 function parsePositions_(json) {
   if (!json) return [];
-  const arr = json.positions || json.portfolio || json.data || (Array.isArray(json) ? json : null);
+  const arr = json.positions || json.data || json.items
+           || (Array.isArray(json) ? json : null);
   if (!arr || !Array.isArray(arr)) return [];
   return arr.map(p => {
-    const symbol = p.symbol || (p.instrument && p.instrument.symbol) || p.ticker || '';
-    const qty    = Number(p.quantity    || p.qty         || p.size        || 0);
-    const avg    = Number(p.avgCost     || p.averageCost || p.precioProm  || p.openingPrice || 0);
-    const market = p.marketId || p.market || (symbol.includes('/') ? 'ROFX' : 'MERV');
+    const symbol = p.symbol || p.ticker || p.instrument
+                || (p.security && p.security.symbol) || '';
+    const qty    = Number(p.quantity  || p.qty    || p.size   || 0);
+    const avg    = Number(p.avgCost   || p.avgPrice || p.averageCost
+                       || p.openPrice || p.costBasis || 0);
+    const market = p.marketId || p.market
+                || (symbol.includes('/') ? 'ROFX' : 'MERV');
     return { symbol, qty, avg, market };
   }).filter(p => p.symbol && p.qty !== 0);
 }
 
 // ============================================================
-// DATOS DE CUENTA — OPERACIONES DEL DÍA
+// DATOS DE CUENTA — OPERACIONES DEL DÍA (endpoint "report")
 // ============================================================
-function getTodayTrades_(token) {
-  const accountId = getAccountId_(token);
-  if (!accountId) return null;
-  const tz    = 'America/Argentina/Buenos_Aires';
-  const today = Utilities.formatDate(new Date(), tz, 'yyyy-MM-dd');
-  const url   = CONFIG.BASE_URL + '/rest/account/' + accountId + '/orders'
-              + '?dateFrom=' + today + '&dateTo=' + today;
-  const res   = UrlFetchApp.fetch(url, {
-    headers: accountHeaders_(token),
+function getTodayTrades_(cookie) {
+  if (!cookie) return null;
+  const ds  = Date.now() + '-' + Math.floor(Math.random() * 999999);
+  const url = CONFIG.MATRIZ_BASE + '/api/v2/accounts/' + CONFIG.ACCOUNT_NAME
+            + '/report?_ds=' + ds;
+  const res = UrlFetchApp.fetch(url, {
+    headers: matrizHeaders_(cookie),
     muteHttpExceptions: true
   });
   if (res.getResponseCode() !== 200) return null;
@@ -130,21 +151,24 @@ function getTodayTrades_(token) {
 
 function parseTrades_(json) {
   if (!json) return [];
-  const arr = json.orders || json.trades || json.data || (Array.isArray(json) ? json : null);
+  const arr = json.orders  || json.trades || json.report
+           || json.data    || json.items
+           || (Array.isArray(json) ? json : null);
   if (!arr || !Array.isArray(arr)) return [];
   return arr.map(o => {
-    const symbol  = o.symbol || (o.instrument && o.instrument.symbol) || o.ticker || '';
-    const side    = (o.side || o.operationType || '').toString().toUpperCase();
+    const symbol  = o.symbol || o.ticker || o.instrument
+                 || (o.security && o.security.symbol) || '';
+    const side    = (o.side || o.type || o.operationType || '').toString().toUpperCase();
     const sideStr = (side === 'BUY' || side === 'C' || side === 'COMPRA') ? 'COMPRA' : 'VENTA';
-    const qty     = Number(o.quantity     || o.qty   || o.size    || 0);
-    const price   = Number(o.price        || o.executedPrice || o.precio || 0);
-    const amount  = Number(o.amount       || o.total || o.importe || qty * price || 0);
-    const status  = o.status || o.estado || '';
-    const rawTime = o.datetime || o.timestamp || o.fecha || o.time || '';
-    let timeStr = '';
+    const qty     = Number(o.quantity || o.qty || o.size  || 0);
+    const price   = Number(o.price    || o.executedPrice  || o.avgPrice || 0);
+    const amount  = Number(o.amount   || o.total || o.notional || qty * price || 0);
+    const status  = o.status || o.state || '';
+    const rawTime = o.datetime || o.timestamp || o.date || o.createdAt || '';
+    let timeStr   = '';
     if (rawTime) {
       try { timeStr = Utilities.formatDate(new Date(rawTime), 'America/Argentina/Buenos_Aires', 'HH:mm:ss'); }
-      catch(e) { timeStr = String(rawTime).substring(11, 19) || rawTime; }
+      catch(e) { timeStr = String(rawTime).substring(11,19) || String(rawTime); }
     }
     return { symbol, side: sideStr, qty, price, amount, status, time: timeStr };
   }).filter(o => o.symbol);
@@ -159,9 +183,10 @@ function actualizarPosiciones() {
   sheet.clearContents();
   sheet.clearFormats();
 
-  const token = getToken_();
-  const raw   = getPositions_(token);
-  const poses = parsePositions_(raw);
+  const token  = getToken_();
+  const cookie = getMatrizCookie_();
+  const raw    = getPositions_(cookie);
+  const poses  = parsePositions_(raw);
 
   sheet.getRange(1,1).setValue('POSICIONES ABIERTAS')
     .setFontWeight('bold').setFontSize(13).setBackground('#1a1a2e').setFontColor('#ffffff');
@@ -172,8 +197,14 @@ function actualizarPosiciones() {
   sheet.getRange(2,1,1,8).setValues([headers])
     .setFontWeight('bold').setBackground('#1a1a2e').setFontColor('#ffffff');
 
+  if (!cookie) {
+    sheet.getRange(3,1).setValue('No se pudo obtener sesión de Matriz — correr diagnosticarAuth().')
+      .setFontColor('#cc2222');
+    sheet.autoResizeColumns(1,8);
+    return;
+  }
   if (!raw) {
-    sheet.getRange(3,1).setValue('Sin datos — correr diagnosticarAPI() para verificar los endpoints.')
+    sheet.getRange(3,1).setValue('Sin respuesta del endpoint de posiciones.')
       .setFontColor('#cc2222');
     sheet.autoResizeColumns(1,8);
     return;
@@ -235,12 +266,12 @@ function actualizarOperaciones() {
   sheet.getRange(2,1,1,7).setValues([headers])
     .setFontWeight('bold').setBackground('#1a1a2e').setFontColor('#ffffff');
 
-  const token  = getToken_();
-  const raw    = getTodayTrades_(token);
+  const cookie = getMatrizCookie_();
+  const raw    = getTodayTrades_(cookie);
   const trades = parseTrades_(raw);
 
-  if (!raw) {
-    sheet.getRange(3,1).setValue('Sin datos — correr diagnosticarAPI() para verificar los endpoints.')
+  if (!cookie || !raw) {
+    sheet.getRange(3,1).setValue('Sin sesión de Matriz — correr diagnosticarAuth().')
       .setFontColor('#cc2222');
     sheet.autoResizeColumns(1,7);
     return;
@@ -260,7 +291,6 @@ function actualizarOperaciones() {
       .setFontColor(rows[i][2] === 'COMPRA' ? '#00aa44' : '#e94560')
       .setFontWeight('bold');
   }
-
   sheet.autoResizeColumns(1,7);
 }
 
@@ -280,10 +310,10 @@ function actualizarPnL() {
     .setFontWeight('bold').setFontSize(14).setBackground('#1a1a2e').setFontColor('#ffffff');
 
   const token  = getToken_();
-  const trades = parseTrades_(getTodayTrades_(token));
-  const poses  = parsePositions_(getPositions_(token));
+  const cookie = getMatrizCookie_();
+  const trades = parseTrades_(getTodayTrades_(cookie));
+  const poses  = parsePositions_(getPositions_(cookie));
 
-  // P&L realizado: cruza compras y ventas del día por ticker
   const tickerMap = {};
   for (const t of trades) {
     if (!tickerMap[t.symbol]) tickerMap[t.symbol] = { compras: [], ventas: [] };
@@ -294,17 +324,16 @@ function actualizarPnL() {
   let pnlRealizado = 0;
   const pnlDetalles = [];
   for (const [sym, ops] of Object.entries(tickerMap)) {
-    const totalQtyC = ops.compras.reduce((s, o) => s + o.qty, 0);
-    const totalQtyV = ops.ventas.reduce((s,  o) => s + o.qty, 0);
-    const avgC = totalQtyC ? ops.compras.reduce((s, o) => s + o.price * o.qty, 0) / totalQtyC : 0;
-    const avgV = totalQtyV ? ops.ventas.reduce((s,  o) => s + o.price * o.qty, 0) / totalQtyV : 0;
+    const totalQtyC = ops.compras.reduce((s,o) => s + o.qty, 0);
+    const totalQtyV = ops.ventas.reduce((s,o)  => s + o.qty, 0);
+    const avgC = totalQtyC ? ops.compras.reduce((s,o) => s + o.price*o.qty, 0) / totalQtyC : 0;
+    const avgV = totalQtyV ? ops.ventas.reduce((s,o)  => s + o.price*o.qty, 0) / totalQtyV : 0;
     const qMin = Math.min(totalQtyC, totalQtyV);
     const pnl  = qMin > 0 ? (avgV - avgC) * qMin : 0;
     pnlRealizado += pnl;
     if (qMin > 0) pnlDetalles.push([sym, qMin, avgC, avgV, pnl]);
   }
 
-  // P&L no realizado: posiciones abiertas vs precio actual
   let pnlNoReal = 0;
   for (const p of poses) {
     const cur = getCurrentPrice_(p.symbol, token);
@@ -313,15 +342,14 @@ function actualizarPnL() {
 
   const pnlTotal = pnlRealizado + pnlNoReal;
 
-  // Resumen ejecutivo (filas 2-6)
   sheet.getRange(2,1,1,2).setValues([['Métrica','Importe ($)']])
     .setFontWeight('bold').setBackground('#1a1a2e').setFontColor('#ffffff');
 
   const resumen = [
-    ['P&L Realizado hoy',                    pnlRealizado],
+    ['P&L Realizado hoy',                     pnlRealizado],
     ['P&L No Realizado (posiciones abiertas)', pnlNoReal],
-    ['P&L TOTAL',                             pnlTotal],
-    ['Operaciones del día',                   trades.length],
+    ['P&L TOTAL',                              pnlTotal],
+    ['Operaciones del día',                    trades.length],
   ];
   sheet.getRange(3,1,resumen.length,2).setValues(resumen);
   sheet.getRange(3,2,3,1).setNumberFormat('#,##0.00');
@@ -331,7 +359,6 @@ function actualizarPnL() {
   );
   sheet.getRange(5,1,1,2).setBackground('#0d3b5e').setFontColor('#ffffff').setFontWeight('bold');
 
-  // Detalle por ticker (fila 9+)
   if (pnlDetalles.length) {
     sheet.getRange(9,1).setValue('DETALLE REALIZADO POR TICKER')
       .setFontWeight('bold').setBackground('#1a1a2e').setFontColor('#ffffff');
@@ -347,7 +374,7 @@ function actualizarPnL() {
 }
 
 // ============================================================
-// HOJA: HISTORIAL (una fila por día, se acumula)
+// HOJA: HISTORIAL
 // ============================================================
 function registrarHistorial() {
   const ss    = SpreadsheetApp.getActiveSpreadsheet();
@@ -363,8 +390,9 @@ function registrarHistorial() {
   }
 
   const token  = getToken_();
-  const trades = parseTrades_(getTodayTrades_(token));
-  const poses  = parsePositions_(getPositions_(token));
+  const cookie = getMatrizCookie_();
+  const trades = parseTrades_(getTodayTrades_(cookie));
+  const poses  = parsePositions_(getPositions_(cookie));
 
   const tickerMap = {};
   for (const t of trades) {
@@ -377,8 +405,8 @@ function registrarHistorial() {
   for (const ops of Object.values(tickerMap)) {
     const totalQtyC = ops.compras.reduce((s,o) => s + o.qty, 0);
     const totalQtyV = ops.ventas.reduce((s,o)  => s + o.qty, 0);
-    const avgC = totalQtyC ? ops.compras.reduce((s,o) => s + o.price * o.qty, 0) / totalQtyC : 0;
-    const avgV = totalQtyV ? ops.ventas.reduce((s,o)  => s + o.price * o.qty, 0) / totalQtyV : 0;
+    const avgC = totalQtyC ? ops.compras.reduce((s,o) => s + o.price*o.qty, 0) / totalQtyC : 0;
+    const avgV = totalQtyV ? ops.ventas.reduce((s,o)  => s + o.price*o.qty, 0) / totalQtyV : 0;
     const qMin = Math.min(totalQtyC, totalQtyV);
     if (qMin > 0) pnlRealizado += (avgV - avgC) * qMin;
   }
@@ -389,10 +417,8 @@ function registrarHistorial() {
     if (cur && p.avg) pnlNoReal += (cur - p.avg) * p.qty;
   }
 
-  const pnlTotal = pnlRealizado + pnlNoReal;
-  const newRow   = [fecha, pnlRealizado, pnlNoReal, pnlTotal, trades.length];
-
-  // Si ya existe una fila para hoy la pisa; si no, agrega al final
+  const pnlTotal  = pnlRealizado + pnlNoReal;
+  const newRow    = [fecha, pnlRealizado, pnlNoReal, pnlTotal, trades.length];
   const lastRow   = sheet.getLastRow();
   const fechaCol  = lastRow > 1 ? sheet.getRange(2,1,lastRow-1,1).getValues().flat() : [];
   const existIdx  = fechaCol.indexOf(fecha);
@@ -403,104 +429,96 @@ function registrarHistorial() {
   sheet.getRange(targetRow,4).setFontColor(pnlTotal >= 0 ? '#00aa44' : '#cc2222').setFontWeight('bold');
 
   SpreadsheetApp.getActiveSpreadsheet().toast(
-    'Historial registrado: ' + fecha + ' | P&L Total: $' + pnlTotal.toFixed(2), '', 5
+    'Historial: ' + fecha + ' | P&L Total: $' + pnlTotal.toFixed(2), '', 5
   );
 }
 
 // ============================================================
-// DIAGNÓSTICO — correr UNA VEZ para encontrar los endpoints correctos
+// DIAGNÓSTICO DE AUTH — correr si las hojas muestran error de sesión
 // ============================================================
-function diagnosticarAPI() {
+function diagnosticarAuth() {
   const ss    = SpreadsheetApp.getActiveSpreadsheet();
   let sheet   = ss.getSheetByName('DIAGNOSTICO') || ss.insertSheet('DIAGNOSTICO');
   sheet.clearContents();
   sheet.clearFormats();
 
-  sheet.getRange(1,1).setValue('DIAGNÓSTICO — ' + new Date().toLocaleString('es-AR'))
+  sheet.getRange(1,1).setValue('DIAGNÓSTICO AUTH — ' + new Date().toLocaleString('es-AR'))
     .setFontWeight('bold').setBackground('#1a1a2e').setFontColor('#ffffff');
-  sheet.getRange(2,1,1,4)
-    .setValues([['Endpoint','HTTP Status','Bytes respuesta','Respuesta (primeros 300 chars)']])
+  sheet.getRange(2,1,1,4).setValues([['Paso','Status','Detalle','']])
     .setFontWeight('bold').setBackground('#2a2a4e').setFontColor('#ffffff');
 
-  const token = getToken_();
-  const tz    = 'America/Argentina/Buenos_Aires';
-  const today = Utilities.formatDate(new Date(), tz, 'yyyy-MM-dd');
-
-  const accountId   = getAccountId_(token) || 'UNKNOWN';
-  const accountName = '370111'; // nombre de cuenta visto en /rest/account
-
-  // GET candidates
-  const getCandidates = [
-    '/rest/account',
-    `/rest/account?id=${accountId}`,
-    `/rest/account?accountId=${accountId}`,
-    `/rest/portfolio?accountId=${accountId}`,
-    `/rest/portfolio?account=${accountName}`,
-    `/rest/order?accountId=${accountId}&dateFrom=${today}&dateTo=${today}`,
-    `/rest/order/list?accountId=${accountId}`,
-    `/rest/orders?accountId=${accountId}&dateFrom=${today}`,
-    `/rest/position?accountId=${accountId}`,
-    `/rest/position/list?accountId=${accountId}`,
-    `/rest/account/state?accountId=${accountId}`,
-  ];
-
   const results = [];
-  for (const ep of getCandidates) {
-    try {
-      const res  = UrlFetchApp.fetch(CONFIG.BASE_URL + ep, {
-        headers: accountHeaders_(token),
-        muteHttpExceptions: true
-      });
-      const code = res.getResponseCode();
-      const body = res.getContentText();
-      results.push(['GET ' + ep, code, body.length, body.substring(0, 300)]);
-    } catch(e) {
-      results.push(['GET ' + ep, 'ERROR', 0, e.message]);
-    }
-    Utilities.sleep(200);
+
+  // Paso 1: token API
+  let token = null;
+  try {
+    token = getToken_();
+    results.push(['1. Token API (api.cocos.xoms.com.ar)', 'OK', token.substring(0,40) + '...', '']);
+  } catch(e) {
+    results.push(['1. Token API', 'ERROR', e.message, '']);
   }
 
-  // POST candidates
-  const postCandidates = [
-    ['/rest/account/positions',  JSON.stringify({ accountId })],
-    ['/rest/account/orders',     JSON.stringify({ accountId, dateFrom: today, dateTo: today })],
-    ['/rest/portfolio/positions', JSON.stringify({ accountId })],
+  // Paso 2: intentos de login en Matriz
+  const loginAttempts = [
+    { label: '2a. POST /api/v2/auth/sign_in',
+      url: CONFIG.MATRIZ_BASE + '/api/v2/auth/sign_in',
+      body: JSON.stringify({ email: CONFIG.USERNAME, password: CONFIG.PASSWORD }) },
+    { label: '2b. POST /api/v2/sessions',
+      url: CONFIG.MATRIZ_BASE + '/api/v2/sessions',
+      body: JSON.stringify({ username: CONFIG.USERNAME, password: CONFIG.PASSWORD }) },
+    { label: '2c. POST /api/v2/auth',
+      url: CONFIG.MATRIZ_BASE + '/api/v2/auth',
+      body: JSON.stringify({ username: CONFIG.USERNAME, password: CONFIG.PASSWORD }) },
   ];
 
-  for (const [ep, payload] of postCandidates) {
+  for (const att of loginAttempts) {
     try {
-      const res = UrlFetchApp.fetch(CONFIG.BASE_URL + ep, {
+      const res     = UrlFetchApp.fetch(att.url, {
         method: 'post',
-        headers: { ...accountHeaders_(token), 'Content-Type': 'application/json' },
-        payload,
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        payload: att.body,
+        muteHttpExceptions: true,
+        followRedirects: false,
+      });
+      const code    = res.getResponseCode();
+      const headers = res.getAllHeaders();
+      const cookie  = headers['Set-Cookie'] || headers['set-cookie'] || 'none';
+      const body    = res.getContentText().substring(0, 150);
+      results.push([att.label, code, 'Cookie: ' + JSON.stringify(cookie).substring(0,80), body]);
+    } catch(e) {
+      results.push([att.label, 'ERROR', e.message, '']);
+    }
+    Utilities.sleep(300);
+  }
+
+  // Paso 3: probar endpoints de Matriz con el token existente como Bearer
+  if (token) {
+    const ds  = Date.now();
+    const url = CONFIG.MATRIZ_BASE + '/api/v2/accounts/' + CONFIG.ACCOUNT_NAME + '/positions?_ds=' + ds;
+    try {
+      const res  = UrlFetchApp.fetch(url, {
+        headers: { 'Authorization': 'Bearer ' + token, 'Accept': 'application/json' },
         muteHttpExceptions: true
       });
       const code = res.getResponseCode();
-      const body = res.getContentText();
-      results.push(['POST ' + ep, code, body.length, body.substring(0, 300)]);
+      const body = res.getContentText().substring(0, 200);
+      results.push(['3. positions con Bearer token', code, body, '']);
     } catch(e) {
-      results.push(['POST ' + ep, 'ERROR', 0, e.message]);
+      results.push(['3. positions con Bearer token', 'ERROR', e.message, '']);
     }
-    Utilities.sleep(200);
   }
-
-  const candidates = []; // vacío, ya procesamos arriba
 
   sheet.getRange(3,1,results.length,4).setValues(results);
   for (let i = 0; i < results.length; i++) {
-    const code = results[i][1];
-    sheet.getRange(i+3,2).setFontColor(code === 200 ? '#00aa44' : '#cc2222').setFontWeight('bold');
+    const ok = results[i][1] === 'OK' || results[i][1] === 200;
+    sheet.getRange(i+3,2).setFontColor(ok ? '#00aa44' : '#cc2222').setFontWeight('bold');
   }
   sheet.autoResizeColumns(1,4);
-
-  SpreadsheetApp.getActiveSpreadsheet().toast(
-    'Diagnóstico listo. Los que marcaron 200 (verde) son los endpoints válidos. ' +
-    'Actualizá CONFIG.EP_POSITIONS y CONFIG.EP_ORDERS con los correctos.', '', 15
-  );
+  SpreadsheetApp.getActiveSpreadsheet().toast('Diagnóstico auth listo.', '', 5);
 }
 
 // ============================================================
-// ACTUALIZAR TODO (llamado automáticamente cada 5 min)
+// ACTUALIZAR TODO
 // ============================================================
 function actualizarTodo() {
   try {
@@ -514,10 +532,8 @@ function actualizarTodo() {
 }
 
 // ============================================================
-// TRIGGERS — ejecutar UNA SOLA VEZ para activar la automatización
+// TRIGGERS
 // ============================================================
-
-// Actualiza POSICIONES, OPERACIONES y PNL_DIARIO cada 5 minutos
 function activarAutoRefresh() {
   ScriptApp.getProjectTriggers()
     .filter(t => t.getHandlerFunction() === 'actualizarTodo')
@@ -526,12 +542,10 @@ function activarAutoRefresh() {
   SpreadsheetApp.getActiveSpreadsheet().toast('Auto-refresh activado (cada 5 min) ✓', '', 5);
 }
 
-// Guarda una fila en HISTORIAL a las 18:15 hora Argentina, todos los días
-// IMPORTANTE: verificar que la timezone de tu cuenta Google sea America/Argentina/Buenos_Aires
 function activarTriggerCierre() {
   ScriptApp.getProjectTriggers()
     .filter(t => t.getHandlerFunction() === 'registrarHistorial')
     .forEach(t => ScriptApp.deleteTrigger(t));
   ScriptApp.newTrigger('registrarHistorial').timeBased().atHour(18).nearMinute(15).everyDays(1).create();
-  SpreadsheetApp.getActiveSpreadsheet().toast('Trigger de cierre activado (18:15 AR todos los días) ✓', '', 5);
+  SpreadsheetApp.getActiveSpreadsheet().toast('Trigger de cierre activado (18:15 AR) ✓', '', 5);
 }
