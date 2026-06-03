@@ -16,13 +16,8 @@
 const CONFIG = {
   USERNAME:  'TU_USUARIO',          // mismo usuario que usás en Matriz
   PASSWORD:  'TU_CONTRASEÑA',       // misma contraseña que usás en Matriz
-  COMITENTE: 'TU_NUMERO_COMITENTE', // número de cuenta comitente
   BASE_URL:  'https://api.cocos.xoms.com.ar',
-
-  // Endpoints de cuenta — correr diagnosticarAPI() primero para confirmar cuáles funcionan.
-  // Si los de abajo no traen datos, actualizarlos con los que marcó verde el diagnóstico.
-  EP_POSITIONS: '/rest/portfolio/positions',
-  EP_ORDERS:    '/rest/orders',
+  // El ID numérico de cuenta se descubre automáticamente desde /rest/account
 };
 
 // ============================================================
@@ -41,12 +36,23 @@ function getToken_() {
   return token;
 }
 
+// Obtiene el ID numérico de la cuenta (ej: 1367) desde /rest/account
+function getAccountId_(token) {
+  const res = UrlFetchApp.fetch(CONFIG.BASE_URL + '/rest/account', {
+    headers: { 'X-Auth-Token': token },
+    muteHttpExceptions: true
+  });
+  if (res.getResponseCode() !== 200) return null;
+  try {
+    const json = JSON.parse(res.getContentText());
+    if (json.status === 'OK' && json.accounts && json.accounts.length > 0)
+      return json.accounts[0].id;
+  } catch(e) {}
+  return null;
+}
+
 function accountHeaders_(token) {
-  return {
-    'X-Auth-Token':   token,
-    'X-Account-Id':   CONFIG.COMITENTE,
-    'X-Comitente-Id': CONFIG.COMITENTE,
-  };
+  return { 'X-Auth-Token': token };
 }
 
 // ============================================================
@@ -80,7 +86,9 @@ function getCurrentPrice_(symbol, token) {
 // DATOS DE CUENTA — POSICIONES
 // ============================================================
 function getPositions_(token) {
-  const res = UrlFetchApp.fetch(CONFIG.BASE_URL + CONFIG.EP_POSITIONS, {
+  const accountId = getAccountId_(token);
+  if (!accountId) return null;
+  const res = UrlFetchApp.fetch(CONFIG.BASE_URL + '/rest/account/' + accountId + '/positions', {
     headers: accountHeaders_(token),
     muteHttpExceptions: true
   });
@@ -106,10 +114,12 @@ function parsePositions_(json) {
 // DATOS DE CUENTA — OPERACIONES DEL DÍA
 // ============================================================
 function getTodayTrades_(token) {
+  const accountId = getAccountId_(token);
+  if (!accountId) return null;
   const tz    = 'America/Argentina/Buenos_Aires';
   const today = Utilities.formatDate(new Date(), tz, 'yyyy-MM-dd');
-  const url   = CONFIG.BASE_URL + CONFIG.EP_ORDERS
-              + '?dateFrom=' + today + '&dateTo=' + today + '&status=FILLED';
+  const url   = CONFIG.BASE_URL + '/rest/account/' + accountId + '/orders'
+              + '?dateFrom=' + today + '&dateTo=' + today;
   const res   = UrlFetchApp.fetch(url, {
     headers: accountHeaders_(token),
     muteHttpExceptions: true
@@ -416,17 +426,16 @@ function diagnosticarAPI() {
   const tz    = 'America/Argentina/Buenos_Aires';
   const today = Utilities.formatDate(new Date(), tz, 'yyyy-MM-dd');
 
+  const accountId = getAccountId_(token) || 'UNKNOWN';
+
   const candidates = [
-    '/rest/portfolio/positions',
-    '/rest/account/positions',
-    '/rest/portfolio',
-    '/rest/positions',
-    `/rest/orders?dateFrom=${today}&dateTo=${today}`,
-    `/rest/account/orders?dateFrom=${today}`,
-    `/rest/trades?dateFrom=${today}`,
-    '/rest/account/state',
-    '/rest/account/balance',
     '/rest/account',
+    `/rest/account/${accountId}/positions`,
+    `/rest/account/${accountId}/orders?dateFrom=${today}&dateTo=${today}`,
+    `/rest/account/${accountId}/trades?dateFrom=${today}`,
+    `/rest/account/${accountId}/portfolio`,
+    `/rest/account/${accountId}/state`,
+    `/rest/account/${accountId}`,
   ];
 
   const results = [];
