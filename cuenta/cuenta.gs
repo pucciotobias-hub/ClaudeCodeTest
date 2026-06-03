@@ -426,20 +426,26 @@ function diagnosticarAPI() {
   const tz    = 'America/Argentina/Buenos_Aires';
   const today = Utilities.formatDate(new Date(), tz, 'yyyy-MM-dd');
 
-  const accountId = getAccountId_(token) || 'UNKNOWN';
+  const accountId   = getAccountId_(token) || 'UNKNOWN';
+  const accountName = '370111'; // nombre de cuenta visto en /rest/account
 
-  const candidates = [
+  // GET candidates
+  const getCandidates = [
     '/rest/account',
-    `/rest/account/${accountId}/positions`,
-    `/rest/account/${accountId}/orders?dateFrom=${today}&dateTo=${today}`,
-    `/rest/account/${accountId}/trades?dateFrom=${today}`,
-    `/rest/account/${accountId}/portfolio`,
-    `/rest/account/${accountId}/state`,
-    `/rest/account/${accountId}`,
+    `/rest/account?id=${accountId}`,
+    `/rest/account?accountId=${accountId}`,
+    `/rest/portfolio?accountId=${accountId}`,
+    `/rest/portfolio?account=${accountName}`,
+    `/rest/order?accountId=${accountId}&dateFrom=${today}&dateTo=${today}`,
+    `/rest/order/list?accountId=${accountId}`,
+    `/rest/orders?accountId=${accountId}&dateFrom=${today}`,
+    `/rest/position?accountId=${accountId}`,
+    `/rest/position/list?accountId=${accountId}`,
+    `/rest/account/state?accountId=${accountId}`,
   ];
 
   const results = [];
-  for (const ep of candidates) {
+  for (const ep of getCandidates) {
     try {
       const res  = UrlFetchApp.fetch(CONFIG.BASE_URL + ep, {
         headers: accountHeaders_(token),
@@ -447,12 +453,38 @@ function diagnosticarAPI() {
       });
       const code = res.getResponseCode();
       const body = res.getContentText();
-      results.push([ep, code, body.length, body.substring(0, 300)]);
+      results.push(['GET ' + ep, code, body.length, body.substring(0, 300)]);
     } catch(e) {
-      results.push([ep, 'ERROR', 0, e.message]);
+      results.push(['GET ' + ep, 'ERROR', 0, e.message]);
     }
     Utilities.sleep(200);
   }
+
+  // POST candidates
+  const postCandidates = [
+    ['/rest/account/positions',  JSON.stringify({ accountId })],
+    ['/rest/account/orders',     JSON.stringify({ accountId, dateFrom: today, dateTo: today })],
+    ['/rest/portfolio/positions', JSON.stringify({ accountId })],
+  ];
+
+  for (const [ep, payload] of postCandidates) {
+    try {
+      const res = UrlFetchApp.fetch(CONFIG.BASE_URL + ep, {
+        method: 'post',
+        headers: { ...accountHeaders_(token), 'Content-Type': 'application/json' },
+        payload,
+        muteHttpExceptions: true
+      });
+      const code = res.getResponseCode();
+      const body = res.getContentText();
+      results.push(['POST ' + ep, code, body.length, body.substring(0, 300)]);
+    } catch(e) {
+      results.push(['POST ' + ep, 'ERROR', 0, e.message]);
+    }
+    Utilities.sleep(200);
+  }
+
+  const candidates = []; // vacío, ya procesamos arriba
 
   sheet.getRange(3,1,results.length,4).setValues(results);
   for (let i = 0; i < results.length; i++) {
