@@ -123,9 +123,9 @@ def verificar_divergencia():
     direccion = "GGAL sobrevaluada vs RFX20" if z > 0 else "GGAL subvaluada vs RFX20"
 
     msg = (
-        f"ALERTA DIVERGENCIA | Z: {z:+.2f}σ | "
+        f"ALERTA DIVERGENCIA | Z: {z:+.2f}s | "
         f"GGAL: {p_ggal:.2f} | RFX20: {p_rfx20:.2f} | "
-        f"Spread: {s:.4f} (μ={mu:.4f}) | {direccion}"
+        f"Spread: {s:.4f} (mu={mu:.4f}) | {direccion}"
     )
 
     log.warning(msg)
@@ -182,7 +182,7 @@ def mostrar_estado():
             mu    = mean(spread_history)
             sigma = stdev(spread_history)
             z     = (s - mu) / sigma if sigma else 0.0
-            z_str = f"{z:+.2f}σ"
+            z_str = f"{z:+.2f}s"
         else:
             z_str = f"acumulando {n}/{MIN_MUESTRAS}"
 
@@ -230,11 +230,11 @@ def conectar():
     )
 
     log.info(
-        f"Suscripción activa | Umbral: {ZSCORE_UMBRAL}σ | "
+        f"Suscripcion activa | Umbral: {ZSCORE_UMBRAL}s | "
         f"Ventana: {VENTANA_SPREAD} muestras | Cooldown: {COOLDOWN_ALERTA}s"
     )
     print(
-        f"\nMonitor activo — Umbral: {ZSCORE_UMBRAL}σ | "
+        f"\nMonitor activo - Umbral: {ZSCORE_UMBRAL}s | "
         f"Ventana: {VENTANA_SPREAD} muestras | Cooldown: {COOLDOWN_ALERTA}s\n"
         f"Alertas guardadas en: monitor_divergencia.log\n"
         f"Ctrl+C para detener.\n"
