@@ -10,7 +10,7 @@
 import streamlit as st
 import plotly.graph_objects as go
 
-from modules import macro, technical, fundamental, ui_components
+from modules import macro, technical, fundamental, ui_components, screener
 
 # --- CONFIGURACIÓN DE PÁGINA --------------------------------------------------
 
@@ -34,6 +34,14 @@ with st.sidebar:
         "El Módulo 2 usa datos intradiarios de Yahoo Finance como proxy del "
         "instrumento elegido (ver comentario en `modules/technical.py` sobre "
         "cómo conectar pyRofex en vivo más adelante)."
+    )
+
+    st.divider()
+    sector_seleccionado = st.selectbox("Sector a analizar (Screener)", list(screener.SECTORES.keys()))
+    st.caption(
+        "El Módulo 4 pondera cada métrica de forma distinta según el sector "
+        "elegido (ej. tolera P/E alto en IA/Semiconductores, exige solidez "
+        "de balance en Nuclear/Uranio)."
     )
 
 # =============================================================================
@@ -118,3 +126,44 @@ st.caption("Ratios de liquidez, apalancamiento (Debt/Equity) y P/E del último b
 
 tabla_fundamental = fundamental.obtener_metricas_fundamentales()
 st.dataframe(tabla_fundamental, use_container_width=True)
+
+st.divider()
+
+# =============================================================================
+# MÓDULO 4 — Screener Sectorial Inteligente
+# =============================================================================
+
+st.subheader(f"🔬 Módulo 4 — Screener Sectorial Inteligente · {sector_seleccionado}")
+st.caption(
+    "Compara los tickers del sector elegido por valuación, rentabilidad y "
+    "solidez financiera, y calcula un score 0-100 con ponderaciones "
+    "específicas para el ADN de cada sector."
+)
+
+tickers_sector = screener.SECTORES[sector_seleccionado]
+metricas_sector = screener.obtener_metricas_sectoriales(tickers_sector)
+tabla_scores = screener.calcular_score_sectorial(metricas_sector, sector_seleccionado)
+
+st.markdown("**Comparativa del sector** _(verde = mejor ratio, rojo = peor ratio de cada columna)_")
+st.dataframe(screener.estilo_mejores_ratios(tabla_scores), use_container_width=True)
+
+ganador = screener.obtener_ganador_sectorial(tabla_scores)
+
+st.markdown("**🏆 El Ganador del Sector**")
+if ganador is not None:
+    col_ticker, col_score, col_pe, col_margen = st.columns(4)
+    col_ticker.metric("Ticker", ganador["ticker"])
+    col_score.metric("Score Sectorial", f"{ganador['score']}/100")
+    col_pe.metric(
+        "P/E Trailing",
+        f"{ganador['pe_trailing']:.1f}x" if ganador["pe_trailing"] is not None else "Sin datos",
+    )
+    col_margen.metric(
+        "Margen Bruto",
+        f"{ganador['margen_bruto']:.1%}" if ganador["margen_bruto"] is not None else "Sin datos",
+    )
+else:
+    st.info("Yahoo Finance no devolvió métricas suficientes para calcular un ganador en este sector.")
+
+st.markdown("**🧠 Veredicto del Asistente Quant**")
+st.markdown(screener.generar_veredicto(ganador, sector_seleccionado))
