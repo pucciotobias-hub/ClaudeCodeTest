@@ -30,17 +30,27 @@ python -m venv .venv
 pip install -r requirements.txt
 ```
 
-### 2. WeasyPrint en Windows (importante)
+### 2. WeasyPrint en Windows (GTK3)
 
-WeasyPrint necesita las librerias nativas **GTK3**. En Windows:
+WeasyPrint necesita las librerias nativas **GTK3**. La forma mas simple en
+Windows es via winget (ya instalado en este equipo):
 
-1. Descarga e instala el *GTK3 Runtime*:
-   https://github.com/tschoonj/GTK-for-Windows-Runtime-Environment-Installer/releases
-2. Reinicia la terminal.
+```powershell
+winget install --id GtkD.GtkPlusRuntime.x64 --source winget `
+    --accept-source-agreements --accept-package-agreements
+```
 
-Si no instalas GTK, el bot **no crashea**: genera el reporte como `.html` en
-`outputs/reports/` y lo envia igual por Telegram. (Para PDF nativo sin dolores
-de cabeza, tambien podes correrlo en WSL/Linux.)
+> El instalador agrega GTK al PATH del sistema. **Abri una terminal nueva**
+> despues de instalar para que Python encuentre las DLLs (`libgtk-3-0.dll`).
+> Verificacion rapida: `python -c "import weasyprint; print(weasyprint.__version__)"`
+> (los warnings `GLib-GIO-WARNING` son inofensivos).
+
+Alternativa: el *GTK3 Runtime* de tschoonj
+(https://github.com/tschoonj/GTK-for-Windows-Runtime-Environment-Installer/releases).
+
+Si por algun motivo GTK no esta disponible, el bot **no crashea**: genera el
+reporte como `.html` en `outputs/reports/` y lo envia igual por Telegram. (Para
+PDF nativo sin dolores de cabeza, tambien podes correrlo en WSL/Linux.)
 
 ### 3. Credenciales de Telegram
 
