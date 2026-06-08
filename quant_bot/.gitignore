@@ -1,0 +1,7 @@
+.env
+bot_activity.log
+bot_activity.log.*
+outputs/reports/*.pdf
+outputs/reports/*.html
+__pycache__/
+*.pyc

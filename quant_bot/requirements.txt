@@ -1,0 +1,18 @@
+# --- Datos de mercado y analisis ---
+yfinance>=0.2.40
+pandas>=2.0.0
+vaderSentiment>=3.3.2
+
+# --- Scheduling / daemon ---
+schedule>=1.2.0
+
+# --- Generacion de PDF ---
+# WeasyPrint requiere librerias nativas GTK/Pango/Cairo.
+#   Linux:   sudo apt install libpango-1.0-0 libpangocairo-1.0-0 libgdk-pixbuf2.0-0
+#   macOS:   brew install pango gdk-pixbuf libffi
+#   Windows: instalar GTK3 runtime (ver README). Si no, el bot cae a HTML.
+weasyprint>=60.0
+
+# --- Telegram + entorno ---
+requests>=2.31.0
+python-dotenv>=1.0.0
