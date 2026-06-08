@@ -10,7 +10,7 @@
 import streamlit as st
 import plotly.graph_objects as go
 
-from modules import macro, technical, fundamental, ui_components, screener
+from modules import macro, technical, ui_components, screener
 
 # --- CONFIGURACIÓN DE PÁGINA --------------------------------------------------
 
@@ -120,22 +120,10 @@ with col_grafico:
 st.divider()
 
 # =============================================================================
-# MÓDULO 3 — Análisis Fundamental
+# MÓDULO 3 — Screener Sectorial Inteligente
 # =============================================================================
 
-st.subheader("🏦 Módulo 3 — Análisis Fundamental (Bancos)")
-st.caption("Ratios de liquidez, apalancamiento (Debt/Equity) y P/E del último balance disponible en Yahoo Finance.")
-
-tabla_fundamental = fundamental.obtener_metricas_fundamentales()
-st.dataframe(tabla_fundamental, use_container_width=True)
-
-st.divider()
-
-# =============================================================================
-# MÓDULO 4 — Screener Sectorial Inteligente
-# =============================================================================
-
-st.subheader(f"🔬 Módulo 4 — Screener Sectorial Inteligente · {sector_seleccionado}")
+st.subheader(f"🔬 Módulo 3 — Screener Sectorial Inteligente · {sector_seleccionado}")
 st.caption(
     "Compara los tickers del sector elegido por valuación, rentabilidad y "
     "solidez financiera, y calcula un score 0-100 con ponderaciones "

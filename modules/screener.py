@@ -132,8 +132,7 @@ def obtener_metricas_sectoriales(tickers: list) -> pd.DataFrame:
     operativo) como proxy de generación de caja, usado en el scoring del
     sector nuclear.
 
-    NOTA: igual que en `fundamental.obtener_metricas_fundamentales`,
-    `Ticker.info` puede traer campos incompletos o nulos según el emisor;
+    NOTA: `Ticker.info` puede traer campos incompletos o nulos según el emisor;
     se manejan los `None` explícitamente para que la tabla y el score se
     calculen sin romper aunque falten datos — es el comportamiento
     esperado, no un error.
