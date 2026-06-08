@@ -20,6 +20,8 @@ st.set_page_config(
     layout="wide",
 )
 
+ui_components.inyectar_estilos_futuristas()
+
 st.title("📊 Asistente Cuantitativo Personal")
 st.caption("Termómetro macro + motor técnico MTF + análisis fundamental, en un solo screener.")
 
@@ -151,16 +153,30 @@ ganador = screener.obtener_ganador_sectorial(tabla_scores)
 
 st.markdown("**🏆 El Ganador del Sector**")
 if ganador is not None:
-    col_ticker, col_score, col_pe, col_margen = st.columns(4)
+    col_ticker, col_score, col_pe, col_peg = st.columns(4)
     col_ticker.metric("Ticker", ganador["ticker"])
     col_score.metric("Score Sectorial", f"{ganador['score']}/100")
     col_pe.metric(
         "P/E Trailing",
         f"{ganador['pe_trailing']:.1f}x" if ganador["pe_trailing"] is not None else "Sin datos",
     )
+    col_peg.metric(
+        "PEG Ratio",
+        f"{ganador['peg_ratio']:.2f}" if ganador["peg_ratio"] is not None else "Sin datos",
+    )
+
+    col_margen, col_crecimiento, col_momentum = st.columns(3)
     col_margen.metric(
         "Margen Bruto",
         f"{ganador['margen_bruto']:.1%}" if ganador["margen_bruto"] is not None else "Sin datos",
+    )
+    col_crecimiento.metric(
+        "Crecimiento Ingresos",
+        f"{ganador['crecimiento_ingresos']:.1%}" if ganador["crecimiento_ingresos"] is not None else "Sin datos",
+    )
+    col_momentum.metric(
+        "Momentum 3M",
+        f"{ganador['momentum_3m']:+.1f}%" if ganador["momentum_3m"] is not None else "Sin datos",
     )
 else:
     st.info("Yahoo Finance no devolvió métricas suficientes para calcular un ganador en este sector.")

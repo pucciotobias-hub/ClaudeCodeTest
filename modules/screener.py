@@ -19,45 +19,66 @@ SECTORES: dict = {
 
 CACHE_TTL_SCREENER = 3600  # segundos — los múltiplos fundamentales no cambian intradía
 
-# Métricas crudas que se extraen de yfinance, e indicación de si para esa
-# métrica "menor es mejor" (True, ej. P/E, P/S, Debt/Equity) o "mayor es
-# mejor" (False, ej. márgenes, crecimiento). Se usa tanto al normalizar como
-# al resaltar los mejores/peores ratios en la tabla comparativa.
+# Métricas crudas que entran al motor de scoring, e indicación de si para
+# esa métrica "menor es mejor" (True, ej. P/E, PEG, Debt/Equity) o "mayor es
+# mejor" (False, ej. márgenes, crecimiento, momentum). Se usa tanto al
+# normalizar como al resaltar los mejores/peores ratios en la tabla.
+#
+# NOTA: "Beta" y "Market Cap (B USD)" se extraen y se muestran en la tabla,
+# pero quedan FUERA de este diccionario a propósito — son datos de contexto
+# (tamaño, volatilidad relativa) sin una dirección universal de "mejor/peor"
+# para un score de calidad fundamental, así que no se normalizan ni resaltan.
 METRICAS_MENOR_ES_MEJOR: dict = {
     "P/E Trailing": True,
     "P/E Forward": True,
+    "PEG Ratio": True,
     "Price/Sales": True,
     "Margen Bruto": False,
     "Crecimiento Ingresos": False,
+    "ROE": False,
     "Debt/Equity": True,
+    "Dividend Yield": False,
+    "Momentum 3M (%)": False,
 }
 
 # Tablas de ponderación por sector (cada una suma 1.0). "_default" se usa
 # para cualquier sector sin tabla propia (ej. Fintech/Latam).
 PESOS_POR_SECTOR: dict = {
     "IA/Semiconductores": {
-        "P/E Trailing": 0.0,           # se tolera P/E alto: sin peso
+        "P/E Trailing": 0.0,           # se tolera P/E alto: sin peso...
         "P/E Forward": 0.0,
+        "PEG Ratio": 0.05,             # ...pero el PEG sí entra: valuación vs. crecimiento
         "Price/Sales": 0.05,
-        "Margen Bruto": 0.30,          # doble peso
-        "Crecimiento Ingresos": 0.55,  # doble peso — motor de la tesis IA
-        "Debt/Equity": 0.10,
+        "Margen Bruto": 0.20,          # peso reforzado
+        "Crecimiento Ingresos": 0.35,  # peso reforzado — motor de la tesis IA
+        "ROE": 0.10,
+        "Debt/Equity": 0.05,
+        "Dividend Yield": 0.0,         # irrelevante: las growth tech no suelen repartir
+        "Momentum 3M (%)": 0.20,       # confirmación técnica en un sector momentum-driven
     },
     "Nuclear/Uranio": {
+        "P/E Trailing": 0.05,
+        "P/E Forward": 0.05,
+        "PEG Ratio": 0.05,
+        "Price/Sales": 0.05,
+        "Margen Bruto": 0.05,
+        "Crecimiento Ingresos": 0.10,
+        "ROE": 0.05,
+        "Debt/Equity": 0.35,           # foco en solidez del balance
+        "Dividend Yield": 0.10,        # sector más maduro: el ingreso importa
+        "Momentum 3M (%)": 0.15,
+    },
+    "_default": {
         "P/E Trailing": 0.10,
         "P/E Forward": 0.10,
+        "PEG Ratio": 0.10,
         "Price/Sales": 0.10,
         "Margen Bruto": 0.10,
         "Crecimiento Ingresos": 0.15,
-        "Debt/Equity": 0.45,           # foco en solidez del balance
-    },
-    "_default": {
-        "P/E Trailing": 0.15,
-        "P/E Forward": 0.15,
-        "Price/Sales": 0.15,
-        "Margen Bruto": 0.20,
-        "Crecimiento Ingresos": 0.20,
-        "Debt/Equity": 0.15,
+        "ROE": 0.10,
+        "Debt/Equity": 0.10,
+        "Dividend Yield": 0.05,
+        "Momentum 3M (%)": 0.10,
     },
 }
 
@@ -65,14 +86,51 @@ PENALIZACION_CAJA_NUCLEAR = 15  # puntos a restar si no genera caja (solo Nuclea
 
 # --- OBTENCIÓN DE DATOS -------------------------------------------------------
 
+def _calcular_momentum_3m(simbolo: str) -> float | None:
+    """
+    Variación porcentual del precio de cierre entre el primer y el último
+    cierre disponible de los últimos 3 meses — usada como sub-score técnico
+    de "momentum" dentro del scoring sectorial (confirma o contradice la
+    tesis fundamental con la tendencia de precio reciente). Devuelve `None`
+    si Yahoo Finance falla o no hay historial suficiente, igual que el resto
+    de las métricas de este módulo.
+    """
+    try:
+        historial = yf.Ticker(simbolo).history(period="3mo")
+    except Exception:
+        return None
+
+    if historial.empty or len(historial) < 2:
+        return None
+
+    primero = float(historial["Close"].iloc[0])
+    ultimo = float(historial["Close"].iloc[-1])
+    if primero == 0:
+        return None
+
+    return round((ultimo - primero) / primero * 100, 2)
+
+
 @st.cache_data(ttl=CACHE_TTL_SCREENER)
 def obtener_metricas_sectoriales(tickers: list) -> pd.DataFrame:
     """
-    Descarga de Yahoo Finance los múltiplos de valuación y rentabilidad clave
-    de cada ticker: P/E trailing/forward, Price-to-Sales, margen bruto,
-    crecimiento de ingresos y apalancamiento (Debt/Equity). También guarda
-    el flujo de caja libre (o, si no está disponible, el operativo) como
-    proxy de generación de caja, usado en el scoring del sector nuclear.
+    Descarga de Yahoo Finance los múltiplos de valuación, rentabilidad y
+    contexto de cada ticker del sector:
+
+      - Valuación: P/E trailing/forward, PEG Ratio (valuación vs.
+        crecimiento — clave para no penalizar a una IA cara que crece
+        rápido), Price-to-Sales.
+      - Rentabilidad y solidez: margen bruto, crecimiento de ingresos, ROE,
+        Debt/Equity.
+      - Ingreso: Dividend Yield.
+      - Técnico: Momentum 3M — variación % de precio en los últimos 3 meses
+        (vía `_calcular_momentum_3m`, vuelco directo de `Ticker.history`).
+      - Contexto (informativo, no entran al score): Beta y Market Cap en
+        miles de millones de USD.
+
+    También guarda el flujo de caja libre (o, si no está disponible, el
+    operativo) como proxy de generación de caja, usado en el scoring del
+    sector nuclear.
 
     NOTA: igual que en `fundamental.obtener_metricas_fundamentales`,
     `Ticker.info` puede traer campos incompletos o nulos según el emisor;
@@ -92,14 +150,23 @@ def obtener_metricas_sectoriales(tickers: list) -> pd.DataFrame:
         if flujo_caja is None:
             flujo_caja = info.get("operatingCashflow")
 
+        market_cap = info.get("marketCap")
+        market_cap_b = round(market_cap / 1e9, 2) if market_cap is not None else None
+
         filas.append({
             "Ticker": simbolo,
             "P/E Trailing": info.get("trailingPE"),
             "P/E Forward": info.get("forwardPE"),
+            "PEG Ratio": info.get("pegRatio"),
             "Price/Sales": info.get("priceToSalesTrailing12Months"),
             "Margen Bruto": info.get("grossMargins"),
             "Crecimiento Ingresos": info.get("revenueGrowth"),
+            "ROE": info.get("returnOnEquity"),
             "Debt/Equity": info.get("debtToEquity"),
+            "Dividend Yield": info.get("dividendYield"),
+            "Momentum 3M (%)": _calcular_momentum_3m(simbolo),
+            "Beta": info.get("beta"),
+            "Market Cap (B USD)": market_cap_b,
             "Flujo de Caja (proxy)": flujo_caja,
         })
 
@@ -208,16 +275,35 @@ def obtener_ganador_sectorial(scores: pd.DataFrame) -> dict | None:
         "ticker": fila.name,
         "score": fila["Score Sectorial"],
         "pe_trailing": fila["P/E Trailing"],
+        "peg_ratio": fila["PEG Ratio"],
         "margen_bruto": fila["Margen Bruto"],
         "crecimiento_ingresos": fila["Crecimiento Ingresos"],
+        "momentum_3m": fila["Momentum 3M (%)"],
     }
+
+
+def _comentario_momentum(momentum: float | None) -> str:
+    """
+    Frase corta que cruza el momentum técnico (variación de precio a 3
+    meses) con el veredicto fundamental: si el precio acompaña la tesis
+    (momentum positivo) la confirma; si va en contra (negativo), advierte
+    que el mercado todavía no lo está validando — útil para timing de entrada.
+    """
+    if momentum is None:
+        return "No hay datos de momentum de precio para confirmar la tendencia reciente."
+    if momentum > 5:
+        return f"El precio además acompaña la tesis: sube **{momentum:+.1f}%** en 3 meses, confirmando el momentum."
+    if momentum < -5:
+        return f"Ojo: el precio cae **{momentum:+.1f}%** en 3 meses — el mercado todavía no convalida esta historia."
+    return f"El precio se mantiene relativamente estable (**{momentum:+.1f}%** en 3 meses), sin una tendencia marcada que confirme o contradiga la tesis."
 
 
 def generar_veredicto(ganador: dict | None, sector: str) -> str:
     """
     Redacta un párrafo en español que cruza el score del ganador del sector
     con su nivel de valuación (P/E trailing) para emitir un veredicto
-    cualitativo del Asistente Quant:
+    cualitativo del Asistente Quant, y le agrega una lectura del momentum
+    de precio reciente (3 meses) como confirmación o advertencia técnica:
 
       - Score alto (>= 70) + P/E elevado (> 30): alcista con cautela —
         la calidad es real pero el precio ya la refleja en gran parte.
@@ -240,9 +326,10 @@ def generar_veredicto(ganador: dict | None, sector: str) -> str:
 
     ticker, score, pe = ganador["ticker"], ganador["score"], ganador["pe_trailing"]
     pe_texto = f"{pe:.1f}x" if pe is not None else "no disponible"
+    comentario_momentum = _comentario_momentum(ganador["momentum_3m"])
 
     if score >= 70 and pe is not None and pe > 30:
-        return (
+        cuerpo = (
             f"**{ticker}** lidera el sector **{sector}** con un score de "
             f"**{score}/100**, respaldado por fundamentos sólidos. Sin embargo, "
             f"su P/E trailing de {pe_texto} sugiere una valuación exigente: "
@@ -251,7 +338,7 @@ def generar_veredicto(ganador: dict | None, sector: str) -> str:
             f"esperar una mejora en el punto de entrada antes de aumentar exposición."
         )
     elif score >= 70:
-        return (
+        cuerpo = (
             f"**{ticker}** lidera el sector **{sector}** con un score de "
             f"**{score}/100** y una valuación razonable (P/E trailing de "
             f"{pe_texto}). Esta combinación de fundamentos sólidos a un "
@@ -259,7 +346,7 @@ def generar_veredicto(ganador: dict | None, sector: str) -> str:
             f"**señal de compra fuerte**."
         )
     elif score >= 40:
-        return (
+        cuerpo = (
             f"**{ticker}** se posiciona como el mejor del sector **{sector}**, "
             f"pero con un score de **{score}/100** que refleja un perfil mixto: "
             f"ni domina claramente a sus pares ni presenta señales de alarma. "
@@ -267,7 +354,7 @@ def generar_veredicto(ganador: dict | None, sector: str) -> str:
             f"análisis cualitativo antes de tomar una posición relevante."
         )
     else:
-        return (
+        cuerpo = (
             f"Incluso el mejor posicionado del sector **{sector}**, **{ticker}**, "
             f"obtiene un score bajo de **{score}/100**, lo que indica que el "
             f"sector en su conjunto no muestra una combinación atractiva de "
@@ -275,6 +362,8 @@ def generar_veredicto(ganador: dict | None, sector: str) -> str:
             f"Veredicto: **evitar exposición** hasta que mejoren los fundamentos "
             f"relativos."
         )
+
+    return f"{cuerpo} {comentario_momentum}"
 
 # --- ESTILO DE TABLA -----------------------------------------------------------
 
