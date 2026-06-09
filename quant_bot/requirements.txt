@@ -1,7 +1,11 @@
 # --- Datos de mercado y analisis ---
 yfinance>=0.2.40
 pandas>=2.0.0
-vaderSentiment>=3.3.2
+
+# --- Sentimiento financiero (FinBERT / HuggingFace) ---
+# Reemplaza a vaderSentiment: ProsusAI/finbert entiende contexto financiero.
+transformers>=4.40.0
+torch>=2.2.0
 
 # --- Scheduling / daemon ---
 schedule>=1.2.0

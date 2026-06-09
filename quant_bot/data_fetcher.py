@@ -6,7 +6,7 @@ Extraccion de datos de mercado (yfinance) y analisis de sentimiento de noticias.
 Responsabilidades:
   - Descargar fundamentals, balances y cash flows de un universo sectorial.
   - Manejar de forma defensiva los rate-limits y los cambios de schema de yfinance.
-  - Leer titulares recientes y calcular un "Score de Sentimiento Social" via VADER.
+  - Leer titulares recientes y calcular un "Score de Sentimiento Social" via FinBERT.
 
 Todas las funciones devuelven estructuras tolerantes a fallos: si un dato no
 existe, se devuelve `None` (NUNCA se lanza la excepcion hacia arriba salvo que
@@ -22,13 +22,41 @@ from typing import Any, Dict, List, Optional
 import pandas as pd
 import yfinance as yf
 
-try:
-    from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
-    _VADER = SentimentIntensityAnalyzer()
-except Exception:  # pragma: no cover - si no esta instalado, el sentimiento queda neutro
-    _VADER = None
-
 log = logging.getLogger("quant_bot.data")
+
+# ---------------------------------------------------------------------------
+# Motor de sentimiento financiero: FinBERT (HuggingFace transformers)
+# ---------------------------------------------------------------------------
+# Se carga de forma PEREZOSA: el modelo pesa ~400MB y tarda en bajar/instanciarse,
+# asi que no queremos pagar ese costo al importar el modulo. Se instancia una sola
+# vez y se cachea. Si transformers/torch no estan instalados, _FINBERT_FAILED queda
+# en True y el sentimiento se reporta como "N/A" (nunca crashea el pipeline).
+_FINBERT = None
+_FINBERT_FAILED = False
+
+# FinBERT devuelve etiquetas; las mapeamos a un valor numerico en [-1, +1].
+_LABEL_TO_VALUE = {"positive": 1.0, "negative": -1.0, "neutral": 0.0}
+
+
+def _get_finbert():
+    """Carga perezosa (y cacheada) del pipeline ProsusAI/finbert."""
+    global _FINBERT, _FINBERT_FAILED
+    if _FINBERT is not None or _FINBERT_FAILED:
+        return _FINBERT
+    try:
+        from transformers import pipeline
+
+        _FINBERT = pipeline(
+            "sentiment-analysis",
+            model="ProsusAI/finbert",
+            tokenizer="ProsusAI/finbert",
+            truncation=True,
+        )
+        log.info("FinBERT (ProsusAI/finbert) cargado correctamente")
+    except Exception as exc:  # transformers/torch no instalados o sin red al hub
+        _FINBERT_FAILED = True
+        log.error("No se pudo cargar FinBERT (sentimiento ira como N/A): %s", exc)
+    return _FINBERT
 
 # ---------------------------------------------------------------------------
 # Universo de inversion: diccionario de sectores -> tickers
@@ -38,6 +66,8 @@ SECTORS: Dict[str, List[str]] = {
     "Fintech": ["MELI", "PYPL", "SOFI", "NU", "ADYEY"],
     "Energia": ["XOM", "CVX", "NEE", "ENPH", "FSLR"],
     "Mineria": ["BHP", "RIO", "FCX", "SCCO", "VALE"],
+    # Joyitas reales: empresas con Market Cap en torno o por debajo de $2B.
+    "Small-Caps & Growth": ["SPNS", "CRSR", "UPST", "HIMS", "MQ", "INMD", "DOCN", "BAND"],
 }
 
 # Cuantos reintentos hacemos cuando Yahoo nos tira rate-limit / red caida
@@ -215,21 +245,38 @@ def _fetch_headlines(ticker: str) -> List[str]:
 
 def get_news_sentiment(ticker: str) -> Dict[str, Any]:
     """
-    Calcula el Score de Sentimiento Social (-1 a +1) promediando el compound
-    de VADER sobre los titulares recientes.
+    Calcula el Score de Sentimiento Social (-1 a +1) corriendo los titulares
+    recientes por FinBERT (ProsusAI/finbert), un modelo entrenado para finanzas.
 
-    Devuelve siempre un dict (nunca crashea): score 0.0 si no hay datos/VADER.
+    Cada titular se clasifica en positive/negative/neutral; lo mapeamos a
+    +1/-1/0 y promediamos.
+
+    Devuelve SIEMPRE un dict (nunca crashea). Cuando no hay datos o falla la
+    inferencia, `score` es None y `status` es "N/A" -> el PDF muestra "N/A"
+    (fmt_num(None) == "N/A") y quant_models trata None como neutro sin romper.
     """
     headlines = _fetch_headlines(ticker)
-    if not headlines or _VADER is None:
-        if _VADER is None:
-            log.warning("vaderSentiment no disponible; sentimiento neutro para %s", ticker)
-        return {"score": 0.0, "n_headlines": len(headlines), "headlines": headlines[:5]}
+    if not headlines:
+        log.warning("Sin titulares para %s; sentimiento N/A", ticker)
+        return {"score": None, "status": "N/A", "n_headlines": 0, "headlines": []}
 
-    scores = [_VADER.polarity_scores(h)["compound"] for h in headlines]
-    avg = round(sum(scores) / len(scores), 3)
-    log.info("Sentimiento %s: %.3f sobre %d titulares", ticker, avg, len(headlines))
-    return {"score": avg, "n_headlines": len(headlines), "headlines": headlines[:5]}
+    nlp = _get_finbert()
+    if nlp is None:
+        log.warning("FinBERT no disponible; sentimiento N/A para %s", ticker)
+        return {"score": None, "status": "N/A", "n_headlines": len(headlines), "headlines": headlines[:5]}
+
+    # --- Inferencia protegida: si la API de Yahoo trajo basura o FinBERT falla,
+    #     devolvemos N/A en vez de un 0.00 enganioso. ---------------------------
+    try:
+        results = nlp(headlines)
+        values = [_LABEL_TO_VALUE.get(r["label"].lower(), 0.0) for r in results]
+        avg = round(sum(values) / len(values), 3)
+    except Exception as exc:
+        log.error("Fallo la inferencia FinBERT para %s: %s", ticker, exc)
+        return {"score": None, "status": "N/A", "n_headlines": len(headlines), "headlines": headlines[:5]}
+
+    log.info("Sentimiento %s: %.3f sobre %d titulares (FinBERT)", ticker, avg, len(headlines))
+    return {"score": avg, "status": "ok", "n_headlines": len(headlines), "headlines": headlines[:5]}
 
 
 # ---------------------------------------------------------------------------
