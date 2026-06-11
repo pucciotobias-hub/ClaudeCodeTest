@@ -1,8 +1,14 @@
 # =============================================================================
 # Monitor de Divergencia GGAL vs RFX20 — Matba Rofex / pyRofex
 # Detecta desfasajes de precio entre ambos futuros en tiempo real via WebSocket
+#
+# *** BORRADOR / DEPRECADO ***
+# Esta es la version 1 (comparacion de variaciones % a 1 minuto). Quedo superada
+# por monitor.py (v3), que usa z-score sobre el spread log y tiene reconexion
+# automatica. Se conserva solo como referencia. El ENTREGABLE es monitor.py.
 # =============================================================================
 
+import os                            # Para leer credenciales del entorno
 import time                          # Para timestamps y el loop principal
 from collections import deque        # Estructura de historial circular (FIFO, tamaño fijo)
 from datetime import datetime        # Para imprimir hora legible en los logs
@@ -11,9 +17,10 @@ from pyRofex import MarketDataEntry  # Enum con los tipos de datos de mercado di
 
 # --- CONFIGURACIÓN -----------------------------------------------------------
 
-USUARIO   = "pucciotobias23427"
-PASSWORD  = "mndnoL2$"
-CUENTA    = "REM23427"
+# Credenciales SIEMPRE desde el entorno. Nunca hardcodear en el codigo.
+USUARIO   = os.environ.get("ROFEX_USER")
+PASSWORD  = os.environ.get("ROFEX_PASSWORD")
+CUENTA    = os.environ.get("ROFEX_ACCOUNT")
 
 # Los dos instrumentos que queremos monitorear
 TICKERS = ["GGAL/JUN26", "RFX20/JUN26"]

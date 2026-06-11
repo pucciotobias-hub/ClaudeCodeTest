@@ -1,0 +1,5 @@
+# Dependencias del monitor de divergencia (monitor.py).
+# Instalar con:  pip install -r requirements-monitor.txt
+#
+# pyRofex ya incluye websocket-client y requests como dependencias.
+pyRofex>=0.4.6
