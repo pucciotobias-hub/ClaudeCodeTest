@@ -1,0 +1,222 @@
+/* =========================================================================
+   FRESIA S.A. A.G. - Estados Contables 2026
+   Sistema de diseño unico para todo el documento.
+   Una sola familia tipografica (Times), una sola escala de cuerpos,
+   un solo sistema de marcos y margenes.
+   ========================================================================= */
+
+/* ---------- Paginas ---------- */
+@page apaisada {
+  size: A4 landscape;          /* 297 x 210 mm */
+  margin: 11mm 12mm 9mm 12mm;
+}
+@page vertical {
+  size: A4 portrait;           /* 210 x 297 mm */
+  margin: 18mm 15mm 16mm 15mm;
+}
+
+/* ---------- Base tipografica ---------- */
+html, body {
+  font-family: "Times New Roman", Times, serif;
+  color: #000;
+  margin: 0;
+  padding: 0;
+  -weasy-hyphens: none;
+}
+
+/* Variables del sistema */
+:root {
+  --marco-borde: 0.75pt;
+  --marco-pad: 5mm;
+  --linea: 0.5pt;
+  --linea-fuerte: 1pt;
+}
+
+.hoja {
+  page-break-after: always;
+  position: relative;
+}
+.hoja:last-child { page-break-after: auto; }
+.hoja.apaisada { page: apaisada; }
+.hoja.vertical  { page: vertical; }
+
+/* ---------- Cabecera ---------- */
+.tag-anexo {
+  width: 99pt;
+  margin-left: auto;
+  border: var(--marco-borde) solid #000;
+  text-align: center;
+  font-size: 9pt;
+  font-weight: bold;
+  padding: 2.5pt 0;
+  margin-bottom: 4pt;
+}
+.tag-anexo.vacio { border: none; }
+
+.caja-empresa {
+  border: var(--marco-borde) solid #000;
+  text-align: center;
+  font-size: 13pt;
+  font-weight: bold;
+  padding: 5pt 0;
+  margin-bottom: 5pt;
+}
+
+/* ---------- Marco del cuadro ---------- */
+.marco {
+  border: var(--marco-borde) solid #000;
+  padding: 0 var(--marco-pad) 4mm var(--marco-pad);
+}
+
+/* El titulo vive dentro del marco y ocupa exactamente el ancho del cuadro,
+   de modo que queda centrado RESPECTO DEL CUADRO y no respecto de la pagina. */
+.titulo {
+  text-align: center;
+  font-size: 13pt;
+  font-weight: bold;
+  margin: 3mm 0 0 0;
+}
+.titulo.chico { font-size: 12pt; }
+
+.subtitulo {
+  text-align: center;
+  font-size: 8.5pt;
+  font-weight: normal;
+  margin: 1.8mm 0 2.8mm 0;
+}
+
+/* ---------- Cuadros (tablas) ---------- */
+table.cuadro {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+  font-size: 7.6pt;
+  border: var(--linea-fuerte) solid #000;   /* borde exterior visible */
+}
+table.cuadro th,
+table.cuadro td {
+  border: var(--linea) solid #000;          /* todas las lineas, H y V */
+  padding: 1.05pt 2.6mm;
+  vertical-align: middle;
+  overflow: hidden;
+}
+
+table.cuadro thead th {
+  font-weight: bold;
+  text-align: center;
+  vertical-align: middle;
+  line-height: 1.12;
+  padding: 2.4pt 1.5mm;
+}
+/* separacion clara encabezado / cuerpo */
+table.cuadro thead { border-bottom: var(--linea-fuerte) solid #000; }
+table.cuadro tbody tr:first-child td { border-top: var(--linea-fuerte) solid #000; }
+
+table.cuadro td.concepto { text-align: left; }
+table.cuadro td.num,
+table.cuadro th.num { text-align: right; }
+table.cuadro th.num  { text-align: center; }
+table.cuadro td.cls,
+table.cuadro th.cls  { text-align: center; }
+
+tr.r-head td            { font-weight: bold; }
+tr.r-data td.concepto   { font-weight: normal; }
+tr.r-data-i td.concepto { padding-left: 6.5mm; }
+tr.r-spacer td          { height: 4pt; }
+
+/* separacion clara cuerpo / totales */
+tr.r-total td {
+  font-weight: bold;
+  border-top: var(--linea-fuerte) solid #000;
+  border-bottom: var(--linea-fuerte) solid #000;
+}
+tr.r-grand td {
+  font-weight: bold;
+  border-top: var(--linea-fuerte) solid #000;
+  border-bottom: 2.5pt double #000;
+}
+
+/* ---------- Pie de pagina del cuadro ----------
+   Arranca exactamente en la coordenada X del borde izquierdo del cuadro:
+   margen de pagina + borde del marco + padding del marco. */
+.pie {
+  margin-top: 3mm;
+  padding-left: calc(var(--marco-pad) + var(--marco-borde));
+  padding-right: calc(var(--marco-pad) + var(--marco-borde));
+  font-size: 7.6pt;
+  text-align: left;
+}
+.pie div { margin-bottom: 1.2pt; }
+.pie .notas-anexo {
+  margin-top: 3.5pt;
+  font-size: 7.6pt;
+  text-align: justify;
+  line-height: 1.25;
+}
+.pie .notas-anexo p { margin: 0 0 1.5pt 0; }
+
+/* ---------- Firmas ---------- */
+.firmas {
+  margin-top: 4mm;
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+  font-size: 7.6pt;
+}
+.firmas td {
+  text-align: center;
+  border: none;
+  padding: 0;
+  line-height: 1.35;
+}
+.firmas .nombre { height: 11pt; }
+
+/* =========================================================================
+   NOTAS (paginas verticales)
+   ========================================================================= */
+.notas-titulo-bloque { margin-bottom: 6mm; }
+
+.n-h1 {
+  font-size: 10.5pt;
+  font-weight: bold;
+  font-style: italic;
+  margin: 7mm 0 2.5mm 0;
+}
+.n-h2 {
+  font-size: 9pt;
+  font-weight: bold;
+  font-style: italic;
+  margin: 4.5mm 0 1.8mm 0;
+}
+.n-p {
+  font-size: 9pt;
+  text-align: justify;
+  margin: 0 0 2mm 0;
+  line-height: 1.28;
+}
+.n-li {
+  font-size: 9pt;
+  text-align: justify;
+  margin: 0 0 1.2mm 6mm;
+  line-height: 1.28;
+}
+
+/* Cuadros dentro de las notas: mismo sistema que los anexos */
+.n-cuadro-bloque { margin: 0 0 6mm 0; page-break-inside: avoid; }
+.n-cuadro-titulo {
+  font-size: 9pt;
+  font-weight: bold;
+  font-style: italic;
+  margin: 5mm 0 2mm 0;
+}
+.n-remision {
+  font-size: 9pt;
+  margin: 0 0 2mm 6mm;
+}
+table.cuadro.notas { font-size: 7.6pt; }
+table.cuadro.notas td.concepto { padding-left: 4mm; }
+table.cuadro.notas tr.r-label td.concepto { padding-left: 2mm; font-weight: normal; }
+
+.n-bloque-corto { page-break-inside: avoid; margin-bottom: 2mm; }
+.n-h1, .n-h2 { page-break-after: avoid; }
+.n-cuadro-titulo { page-break-after: avoid; }
