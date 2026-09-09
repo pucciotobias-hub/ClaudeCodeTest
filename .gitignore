@@ -7,3 +7,7 @@ __pycache__/
 # Logs locales
 *.log
 monitor_divergencia.log
+
+# Scratch de los calculos del estudio GGAL (la corrida desatendida los deja sueltos)
+scripts/ggal_bars.json
+scripts/ggal_calc.py
