@@ -1,4 +1,4 @@
-<#
+﻿<#
 .SYNOPSIS
     Registra (o borra) las Tareas Programadas del estudio diario de GGAL.
 
@@ -84,7 +84,11 @@ switch ($Accion) {
                 -StartWhenAvailable `
                 -DontStopIfGoingOnBatteries `
                 -AllowStartIfOnBatteries `
-                -ExecutionTimeLimit (New-TimeSpan -Minutes 20) `
+                # 20 min quedaba corto: la corrida del cierre del 2026-09-09 la mato
+                # el scheduler en el limite (0x41306 SCHED_S_TASK_TERMINATED) y la del
+                # 2026-09-10 tardo 11m37s. Con los reintentos por caida del CDP una
+                # corrida normal puede pasar los 20.
+                -ExecutionTimeLimit (New-TimeSpan -Minutes 45) `
                 -MultipleInstances IgnoreNew
 
             if (Get-ScheduledTask -TaskName $t.Nombre -ErrorAction SilentlyContinue) {
