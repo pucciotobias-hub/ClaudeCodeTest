@@ -8,6 +8,19 @@ informe escrito y commiteado.
 El wrapper ya se encargo de levantar Chrome con CDP en el puerto 9222 y te pasa,
 arriba de este texto, la fecha y el turno (`apertura` o `cierre`).
 
+**Nunca esperes.** Corres en modo headless (`claude -p`): cuando terminas tu turno
+se termina la corrida, no hay forma de "seguir despues". Si cortas el turno para
+que la vela junte mas operaciones, el proceso sale con codigo 0 **sin informe** y
+la corrida del dia se pierde. Paso el 2026-09-11 en la apertura: el unico output
+fue "Esperando ~2,5 min a que la vela del dia junte mas operaciones antes de la
+lectura final" y no quedo nada escrito.
+
+Entonces: **lee lo que hay cuando lo lees y segui.** En la apertura la vela va a
+tener pocos minutos y poco volumen — eso no es un problema a resolver esperando,
+es un dato: deci la edad de la vela y marca el volumen relativo como `N/D`. Lo
+mismo con cualquier otra tentacion de pausar. El informe escrito con datos de
+hace 3 minutos vale; el informe que no existe, no.
+
 ---
 
 ## 1. Verificar el chart
@@ -88,11 +101,24 @@ Si `data_get_study_values` no los devuelve, aplicá el fix del punto 2 y reinten
 - Los niveles salen de los maximos y minimos de swing de las ultimas ~30 ruedas
   mas el mapa vigente que esta en el informe anterior. Maximo **10 lineas
   horizontales**: si un nivel ya no marca nada, sacalo y decilo en el informe.
-- Colores: resistencias `#ef5350`, soporte `#26a69a`, pivote `#ffb300` (linewidth 3).
+- **Colores, siempre con opacidad baja.** Las lineas son referencia, no protagonistas:
+  a full color tapan las velas y molestan para leer el precio. Pasá el alfa dentro
+  del color, en `rgba(...)`, que es lo que acepta `linecolor` en los `overrides`:
+
+  | Que | `linecolor` | Notas |
+  |---|---|---|
+  | Resistencias | `rgba(239,83,80,0.45)` | |
+  | Soportes | `rgba(38,166,154,0.45)` | |
+  | Pivote | `rgba(255,179,0,0.75)` | linewidth 3. Va mas marcado a proposito: es el nivel que define |
+  | Directriz | `rgba(150,150,150,0.40)` | punteada |
+
   Etiquetá cada linea con `showLabel:true` y un `text` corto (ej. `S1 43.50 piso triple`).
-- **Zona critica** alrededor del pivote: un `rectangle` azul (`#2962ff`, fondo transparente).
+  **El `textcolor` va aparte y sin alfa** (`#ef5350`, `#26a69a`, `#ffb300`): la linea se
+  atenua, la etiqueta tiene que seguir legible.
+- **Zona critica** alrededor del pivote: un `rectangle` azul con borde
+  `rgba(41,98,255,0.35)` y fondo transparente.
 - **Directriz bajista** desde el maximo de 58.14 (18-jun-2026) hasta 40.63 (21-sep):
-  `trend_line` gris punteada. OJO: TradingView la plotea en espacio de **barras**,
+  `trend_line` gris punteada (`rgba(150,150,150,0.40)`, ver la tabla de arriba). OJO: TradingView la plotea en espacio de **barras**,
   no de tiempo lineal — para saber por donde pasa hoy, interpolá por indice de
   barra, no por dias calendario (interpolar por calendario da ~0.35 de mas).
 - Dejá el chart con un rango visible de las ultimas ~40 ruedas y sacá un

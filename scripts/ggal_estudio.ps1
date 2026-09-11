@@ -1,4 +1,4 @@
-<#
+﻿<#
 .SYNOPSIS
     Corre el estudio diario de GGAL ADR en TradingView via Claude Code headless.
 
@@ -57,6 +57,34 @@ function Test-Cdp {
 
 # --- 1. Preflight ----------------------------------------------------------
 Write-Log "=== INICIO estudio GGAL - turno: $Turno ==="
+
+# --- 1.b Bloquear la suspension -------------------------------------------
+# La corrida tarda ~12 min y nadie toca el teclado mientras tanto, asi que el
+# temporizador de inactividad de Windows se cumple siempre y se lleva puesto el
+# proceso. Paso el 2026-09-10: a las 10:27:28 la maquina entro en espera moderna
+# por "Idle Timeout" con claude -p corriendo y la tarea murio con 0xC000013A.
+# ES_CONTINUOUS mantiene el pedido vivo hasta que lo soltemos o muera el proceso,
+# asi que una salida temprana tampoco deja la maquina sin dormir.
+# ES_DISPLAY_REQUIRED va incluido a proposito: Chrome tiene que poder renderizar
+# el chart, asi que la pantalla queda prendida mientras dura el estudio.
+Add-Type -TypeDefinition @'
+using System;
+using System.Runtime.InteropServices;
+public static class GgalPower {
+    [DllImport("kernel32.dll", SetLastError = true)]
+    public static extern uint SetThreadExecutionState(uint esFlags);
+}
+'@
+
+$ES_CONTINUOUS       = [uint32]'0x80000000'
+$ES_SYSTEM_REQUIRED  = [uint32]'0x00000001'
+$ES_DISPLAY_REQUIRED = [uint32]'0x00000002'
+
+if ([GgalPower]::SetThreadExecutionState($ES_CONTINUOUS -bor $ES_SYSTEM_REQUIRED -bor $ES_DISPLAY_REQUIRED) -eq 0) {
+    Write-Log "No se pudo bloquear la suspension; si la maquina se duerme la corrida muere." 'WARN'
+} else {
+    Write-Log "Suspension bloqueada mientras dure la corrida."
+}
 
 foreach ($req in @(@{p = $ClaudeExe; n = 'claude.exe' }, @{p = $PromptFile; n = 'prompt' }, @{p = $McpConfig; n = '.mcp.json' }, @{p = $RelanzarScript; n = 'relanzar_chrome_cdp.ps1' })) {
     if (-not (Test-Path $req.p)) {
@@ -129,6 +157,8 @@ try {
     $code = $LASTEXITCODE
 } finally {
     Pop-Location
+    [GgalPower]::SetThreadExecutionState($ES_CONTINUOUS) | Out-Null
+    Write-Log "Suspension desbloqueada."
 }
 
 Add-Content -Path $LogFile -Value $out -Encoding utf8

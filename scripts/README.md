@@ -52,6 +52,29 @@ Verificar / borrar:
   porque Chrome necesita renderizar de verdad. Si la maquina esta apagada o con
   la sesion cerrada, la corrida se saltea (`-StartWhenAvailable` la dispara
   cuando volves, aunque con datos ya viejos).
+- **Suspension: la causa numero uno de corridas muertas.** Documentado con los
+  eventos de Kernel-Power del 9 al 11 de septiembre de 2026. Son dos fallas
+  distintas:
+  1. *La maquina duerme a la hora del trigger.* La tarea no corre; se pone al dia
+     en el instante del despertar. Si ese despertar es manual, el proceso arranca
+     en plena transicion y muere antes de escribir la primera linea del log
+     (11-sep 10:22:41, "motivo: Power Button", exit `0xC000013A`). Si el
+     despertar llega horas despues, el informe sale viejo: el cierre del 10-sep
+     corrio a las 00:55 del 11-sep.
+  2. *La maquina se duerme a mitad de la corrida.* El estudio tarda ~12 min y
+     nadie toca el teclado, asi que el Idle Timeout se cumple siempre
+     (10-sep 10:27:28, exit `0xC000013A`). **Esto lo arregla el wrapper**, que
+     ahora sostiene `SetThreadExecutionState` con `ES_SYSTEM_REQUIRED |
+     ES_DISPLAY_REQUIRED` mientras dura el estudio y lo suelta al terminar. La
+     pantalla queda prendida esas ~12 min, a proposito: Chrome tiene que renderizar.
+
+  La falla 1 **no esta arreglada por decision del usuario**: `WakeToRun` haria
+  que la laptop se despierte sola 10:20 y 17:15 L-V, y no se quiere eso. O sea:
+  **si la maquina duerme a esa hora, el informe no sale**. Para esos dias, correrlo
+  a mano (ver arriba).
+- **El limite de ejecucion es de 45 min.** Eran 20 y el scheduler mato la corrida
+  del cierre del 9-sep al llegar al limite (`0x41306`). Una corrida normal tarda
+  entre 7 y 12 min.
 - **Chrome + CDP en el puerto 9222.** Lo levanta `relanzar_chrome_cdp.ps1` con
   `Start-Process` sobre el perfil `~\tv-cdp-profile`. Ojo: `tv_launch` del MCP y
   `launch-tv.bat` **no funcionan** en esta maquina (es TradingView web, no la app
