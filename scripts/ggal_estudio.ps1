@@ -150,7 +150,7 @@ $allowed = @(
 Push-Location $RepoDir
 try {
     $out = $prompt | & $ClaudeExe -p `
-        --model claude-opus-5 `
+        --model claude-opus-5-5 `
         --mcp-config $McpConfig `
         --permission-mode acceptEdits `
         --allowedTools $allowed 2>&1 | Out-String
