@@ -84,14 +84,16 @@ switch ($Accion) {
                 -LogonType Interactive `
                 -RunLevel Limited
 
+            # Limite de 45 min: 20 quedaba corto. La corrida del cierre del 2026-09-09
+            # la mato el scheduler en el limite (0x41306 SCHED_S_TASK_TERMINATED) y la
+            # del 2026-09-10 tardo 11m37s. Con los reintentos por caida del CDP una
+            # corrida normal puede pasar los 20.
+            # (El comentario va aca arriba y no entre los parametros: una linea de
+            # comentario en medio de una continuacion con backtick corta el comando.)
             $settings = New-ScheduledTaskSettingsSet `
                 -StartWhenAvailable `
                 -DontStopIfGoingOnBatteries `
                 -AllowStartIfOnBatteries `
-                # 20 min quedaba corto: la corrida del cierre del 2026-09-09 la mato
-                # el scheduler en el limite (0x41306 SCHED_S_TASK_TERMINATED) y la del
-                # 2026-09-10 tardo 11m37s. Con los reintentos por caida del CDP una
-                # corrida normal puede pasar los 20.
                 -ExecutionTimeLimit (New-TimeSpan -Minutes 45) `
                 -MultipleInstances IgnoreNew
 
