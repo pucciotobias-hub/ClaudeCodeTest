@@ -9,6 +9,9 @@
       EstudioGGAL-Cierre     L-V 17:15, 17:50, 18:30 -> despues del cierre
       AuditoriaGGAL          V   19:30, 20:30        -> despues del ultimo
                                                         reintento del cierre
+      SenalesGGAL            L-V 10:25, 12:30        -> vigia de señales: espera
+                                                        a las 9:40 NY y mira hasta
+                                                        las 16:05 NY
 
     El primer disparo es el bueno; los otros son reintentos. Si el primero murio
     en el despertar de la maquina (0xC000013A, paso el 11 y el 23-sep), el
@@ -41,6 +44,9 @@ $Tareas = @(
     @{ Nombre = 'EstudioGGAL-Apertura'; Turno = 'apertura';  Horas = @('10:20', '10:50');          Dias = $LaV;       Desc = 'Estudio tecnico GGAL ADR - pre-apertura de NY' }
     @{ Nombre = 'EstudioGGAL-Cierre';   Turno = 'cierre';    Horas = @('17:15', '17:50', '18:30'); Dias = $LaV;       Desc = 'Estudio tecnico GGAL ADR - post-cierre de NY' }
     @{ Nombre = 'AuditoriaGGAL';        Turno = 'auditoria'; Horas = @('19:30', '20:30');          Dias = @('Friday'); Desc = 'Auditoria semanal de los estudios GGAL contra el precio' }
+    # El vigia no pasa por ggal_estudio.ps1: es un proceso de Python que dura toda
+    # la rueda (hasta ~7h40 con horario de invierno en NY), de ahi el limite de 8 h.
+    @{ Nombre = 'SenalesGGAL'; Script = 'ggal_senales_vigia.py'; Horas = @('10:25', '12:30'); Dias = $LaV; Limite = 480; Desc = 'Vigia de las señales intradia de GGAL (avisos y diario)' }
 )
 
 switch ($Accion) {
@@ -71,11 +77,21 @@ switch ($Accion) {
     'instalar' {
         if (-not (Test-Path $Runner)) { throw "No se encontro $Runner" }
 
+        # El python real, no el alias de la Microsoft Store que aparece primero en el PATH.
+        $Python = (& python -c "import sys; print(sys.executable)").Trim()
+
         foreach ($t in $Tareas) {
-            $action = New-ScheduledTaskAction `
-                -Execute 'powershell.exe' `
-                -Argument "-NoProfile -NonInteractive -ExecutionPolicy Bypass -File `"$Runner`" -Turno $($t.Turno)" `
-                -WorkingDirectory $WorkDir
+            if ($t.Script) {
+                $action = New-ScheduledTaskAction `
+                    -Execute $Python `
+                    -Argument "`"$(Join-Path $PSScriptRoot $t.Script)`"" `
+                    -WorkingDirectory $WorkDir
+            } else {
+                $action = New-ScheduledTaskAction `
+                    -Execute 'powershell.exe' `
+                    -Argument "-NoProfile -NonInteractive -ExecutionPolicy Bypass -File `"$Runner`" -Turno $($t.Turno)" `
+                    -WorkingDirectory $WorkDir
+            }
 
             $trigger = @($t.Horas | ForEach-Object {
                 New-ScheduledTaskTrigger -Weekly -DaysOfWeek $t.Dias -At $_
@@ -98,7 +114,7 @@ switch ($Accion) {
                 -StartWhenAvailable `
                 -DontStopIfGoingOnBatteries `
                 -AllowStartIfOnBatteries `
-                -ExecutionTimeLimit (New-TimeSpan -Minutes 45) `
+                -ExecutionTimeLimit (New-TimeSpan -Minutes $(if ($t.Limite) { $t.Limite } else { 45 })) `
                 -MultipleInstances IgnoreNew
 
             if (Get-ScheduledTask -TaskName $t.Nombre -ErrorAction SilentlyContinue) {

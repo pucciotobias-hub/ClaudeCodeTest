@@ -14,6 +14,23 @@ dos veces por dia habil, y deja el informe versionado en `estudios/ggal/`.
 | `ggal_auditoria_prompt.md` | Receta de la **auditoria semanal**: contrasta los estudios contra lo que hizo el precio y propone cambios a la receta del estudio. |
 | `ggal_auditoria.py` | La parte objetiva de la auditoria (niveles respetados/perforados/rotos, extremos anticipados contra una grilla, encabezados contra la barra). Se puede correr a mano: `python scripts/ggal_auditoria.py --barras scripts/ggal_bars.json`. |
 
+| `ggal_senales_vigia.py` | **Vigia de señales intradia.** Lee la estrategia `pine/ggal_senales.pine` del chart cada minuto durante la rueda, avisa cada entrada y salida (notificacion de Windows, y Telegram si hay credenciales en `.env`) y las anota en `senales/ggal/AAAA-MM.csv`, que commitea al cierre. |
+
+## Señales intradia (paper trading)
+
+La estrategia `pine/ggal_senales.pine` corre adentro de TradingView, en el mismo
+chart que el estudio, en velas de 15 minutos. Marca LONG o SHORT, posicion grande
+o chica, stop, objetivo y R:R, y cierra todo antes del cierre de NY. Las reglas y
+el backtest estan en el encabezado del script. **No opera nada.**
+
+- Las alertas de TradingView para estrategias son pagas (el plan actual tiene 0
+  alertas tecnicas); por eso los avisos los da `ggal_senales_vigia.py`.
+- El vigia y el estudio comparten el chart: mientras el estudio corre existe
+  `logs/estudio.lock` y el vigia no lo toca; despues lo vuelve a GGAL 15m.
+- Durante la rueda el vigia no deja que la maquina se suspenda por inactividad
+  (la pantalla si se puede apagar). Cerrar la tapa la suspende igual.
+- Probarlo sin esperar a la rueda: `python scripts/ggal_senales_vigia.py --una-vez`.
+
 ## Horarios (ART, UTC-3)
 
 | Tarea | Cuando | Por que |
@@ -21,6 +38,7 @@ dos veces por dia habil, y deja el informe versionado en `estudios/ggal/`.
 | `EstudioGGAL-Apertura` | L-V 10:20 (reintento 10:50) | 10 min antes de que abra NY (10:30 ART). Llegas con el mapa armado. |
 | `EstudioGGAL-Cierre` | L-V 17:15 (reintentos 17:50 y 18:30) | 15 min despues del cierre (17:00 ART). Vela diaria ya cerrada. |
 | `AuditoriaGGAL` | V 19:30 (reintento 20:30) | Despues del ultimo reintento del cierre del viernes. |
+| `SenalesGGAL` | L-V 10:25 (reintento 12:30) | Arranca antes de la rueda, espera a las 9:40 NY y mira hasta las 16:05 NY. |
 
 Los reintentos no duplican nada: si el informe del dia ya existe, el wrapper sale
 sin hacer nada. Tampoco corre fuera de su ventana (apertura 10:00-16:30, cierre

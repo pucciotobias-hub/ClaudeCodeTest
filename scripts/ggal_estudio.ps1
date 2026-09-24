@@ -107,6 +107,11 @@ if (-not $Forzar) {
     }
 }
 
+# Mientras exista, el vigia de señales (ggal_senales_vigia.py) no toca el chart.
+# Si la corrida muere sin borrarlo, el vigia lo ignora pasada una hora.
+$LockFile = Join-Path $LogDir 'estudio.lock'
+Set-Content -Path $LockFile -Value $PID
+
 # --- 1.b Bloquear la suspension -------------------------------------------
 # La corrida tarda ~12 min y nadie toca el teclado mientras tanto, asi que el
 # temporizador de inactividad de Windows se cumple siempre y se lleva puesto el
@@ -232,6 +237,7 @@ try {
 } finally {
     [GgalPower]::SetThreadExecutionState($ES_CONTINUOUS) | Out-Null
     Write-Log "Suspension desbloqueada."
+    Remove-Item $LockFile -ErrorAction SilentlyContinue
     foreach ($f in @($tmpOut, $tmpErr)) {
         if (Test-Path $f) { Add-Content -Path $LogFile -Value (Get-Content $f -Raw -Encoding utf8) -Encoding utf8 }
     }

@@ -141,6 +141,7 @@ var line lnTP = na
 var string ultSenal = "Sin posicion"
 
 f_fmt(float x) => str.tostring(x, "#.00")
+f_hora() => str.format_time(time_close, "HH:mm", "America/New_York")
 
 f_entrar(bool esLong, float sl, float tp, float rr, bool grande, bool alineado) =>
     float riesgo = math.abs(close - sl)
@@ -148,7 +149,7 @@ f_entrar(bool esLong, float sl, float tp, float rr, bool grande, bool alineado) 
     int qty = math.max(1, int(math.floor(strategy.equity * pct / 100 / riesgo)))
     string lado = esLong ? "LONG" : "SHORT"
     string tam = grande ? "GRANDE" : "CHICA"
-    string txt = lado + " · " + tam + "\nR:R 1:" + str.tostring(rr, "0.0") + "\nSL " + f_fmt(sl) + " · TP " + f_fmt(tp)
+    string txt = lado + " · " + tam + " · " + f_hora() + "\n@ " + f_fmt(close) + "\nR:R 1:" + str.tostring(rr, "0.0") + "\nSL " + f_fmt(sl) + " · TP " + f_fmt(tp)
     strategy.entry(lado, esLong ? strategy.long : strategy.short, qty = qty, comment = lado + " " + tam + (alineado ? " AF" : " CT"))
     strategy.exit(lado + " salida", lado, stop = sl, limit = tp)
     color c = esLong ? color.new(#26a69a, 0) : color.new(#ef5350, 0)
@@ -196,8 +197,12 @@ if strategy.closedtrades > strategy.closedtrades[1]
     float riesgo = math.abs(entPrecio - entSL)
     float r = riesgo > 0 ? (salida - entPrecio) * entLado / riesgo : 0.0
     string motivo = math.abs(salida - entTP) <= syminfo.mintick * 2 ? "TP" : math.abs(salida - entSL) <= syminfo.mintick * 2 ? "SL" : "Cierre"
-    string txt = motivo + " " + (r >= 0 ? "+" : "") + str.tostring(r, "0.0") + "R"
-    label.new(bar_index, entLado == 1 ? high : low, txt,
+    // La cuenta de operaciones cerradas cambia en la vela SIGUIENTE a la salida (en
+    // el cierre de sesion, la apertura del otro dia): la etiqueta va en la hora
+    // real de salida.
+    int tSalida = strategy.closedtrades.exit_time(i)
+    string txt = motivo + " " + (r >= 0 ? "+" : "") + str.tostring(r, "0.0") + "R · " + str.format_time(tSalida, "HH:mm", "America/New_York")
+    label.new(tSalida, salida, txt, xloc = xloc.bar_time,
          style = entLado == 1 ? label.style_label_down : label.style_label_up,
          color = color.new(r >= 0 ? #26a69a : #ef5350, 60), textcolor = color.white, size = size.tiny)
     alert("GGAL salida " + (entLado == 1 ? "LONG" : "SHORT") + ": " + txt + " @ " + f_fmt(salida), alert.freq_once_per_bar_close)

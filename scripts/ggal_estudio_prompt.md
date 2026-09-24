@@ -90,6 +90,12 @@ dibujos (paso el 2026-09-22, se perdieron los 12).
 - **RSI 14** (Relative Strength Index)
 - **Volume** como overlay
 
+El chart tiene ademas la estrategia **GGAL Señales** (Pine, señales intradia en
+15m, con su Strategy Tester). **No la saques ni la toques.** Sus plots (EMA
+rapida, EMA lenta, VWAP) y su tabla no son parte del estudio: la EMA20 es la
+del indicador "Moving Average Exponential". En diario no marca nada. Al terminar
+no hace falta volver el chart a 15m: lo hace el vigia de señales.
+
 Si el modelo no devuelve valores (estudio mudo, series en 0), aplicá el fix del
 punto 2 y reintentá.
 
