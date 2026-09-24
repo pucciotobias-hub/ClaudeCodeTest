@@ -5,10 +5,14 @@
 .DESCRIPTION
     Crea tres tareas, hora local (ART, UTC-3):
 
-      EstudioGGAL-Apertura   L-V 10:20  -> 10 min antes de que abra NY
-      EstudioGGAL-Cierre     L-V 17:15  -> 15 min despues del cierre
-      AuditoriaGGAL          V   19:00  -> despues del cierre del viernes (que
-                                           puede tardar hasta las 18:00)
+      EstudioGGAL-Apertura   L-V 10:20, 10:50        -> antes de que abra NY
+      EstudioGGAL-Cierre     L-V 17:15, 17:50, 18:30 -> despues del cierre
+      AuditoriaGGAL          V   19:30, 20:30        -> despues del ultimo
+                                                        reintento del cierre
+
+    El primer disparo es el bueno; los otros son reintentos. Si el primero murio
+    en el despertar de la maquina (0xC000013A, paso el 11 y el 23-sep), el
+    siguiente lo cubre. Si el informe ya existe, el wrapper sale sin hacer nada.
 
     Todas corren SOLO con el usuario logueado: Chrome necesita una sesion de
     escritorio activa para renderizar el chart.
@@ -34,9 +38,9 @@ $WorkDir = Split-Path -Parent $PSScriptRoot
 
 $LaV = @('Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday')
 $Tareas = @(
-    @{ Nombre = 'EstudioGGAL-Apertura'; Turno = 'apertura';  Hora = '10:20'; Dias = $LaV;       Desc = 'Estudio tecnico GGAL ADR - pre-apertura de NY' }
-    @{ Nombre = 'EstudioGGAL-Cierre';   Turno = 'cierre';    Hora = '17:15'; Dias = $LaV;       Desc = 'Estudio tecnico GGAL ADR - post-cierre de NY' }
-    @{ Nombre = 'AuditoriaGGAL';        Turno = 'auditoria'; Hora = '19:00'; Dias = @('Friday'); Desc = 'Auditoria semanal de los estudios GGAL contra el precio' }
+    @{ Nombre = 'EstudioGGAL-Apertura'; Turno = 'apertura';  Horas = @('10:20', '10:50');          Dias = $LaV;       Desc = 'Estudio tecnico GGAL ADR - pre-apertura de NY' }
+    @{ Nombre = 'EstudioGGAL-Cierre';   Turno = 'cierre';    Horas = @('17:15', '17:50', '18:30'); Dias = $LaV;       Desc = 'Estudio tecnico GGAL ADR - post-cierre de NY' }
+    @{ Nombre = 'AuditoriaGGAL';        Turno = 'auditoria'; Horas = @('19:30', '20:30');          Dias = @('Friday'); Desc = 'Auditoria semanal de los estudios GGAL contra el precio' }
 )
 
 switch ($Accion) {
@@ -73,9 +77,9 @@ switch ($Accion) {
                 -Argument "-NoProfile -NonInteractive -ExecutionPolicy Bypass -File `"$Runner`" -Turno $($t.Turno)" `
                 -WorkingDirectory $WorkDir
 
-            $trigger = New-ScheduledTaskTrigger -Weekly `
-                -DaysOfWeek $t.Dias `
-                -At $t.Hora
+            $trigger = @($t.Horas | ForEach-Object {
+                New-ScheduledTaskTrigger -Weekly -DaysOfWeek $t.Dias -At $_
+            })
 
             # Interactive: la tarea corre en la sesion del usuario logueado, que es
             # lo que Chrome necesita para renderizar. Sin esto el chart no repinta.
@@ -109,7 +113,7 @@ switch ($Accion) {
                 -Settings $settings `
                 -Description $t.Desc | Out-Null
 
-            Write-Output "Registrada: $($t.Nombre) -> $($t.Dias -join ',') $($t.Hora) ART"
+            Write-Output "Registrada: $($t.Nombre) -> $($t.Dias -join ',') $($t.Horas -join ', ') ART"
         }
 
         Write-Output ""

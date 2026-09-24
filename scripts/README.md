@@ -18,9 +18,14 @@ dos veces por dia habil, y deja el informe versionado en `estudios/ggal/`.
 
 | Tarea | Cuando | Por que |
 |---|---|---|
-| `EstudioGGAL-Apertura` | L-V 10:20 | 10 min antes de que abra NY (10:30 ART). Llegas con el mapa armado. |
-| `EstudioGGAL-Cierre` | L-V 17:15 | 15 min despues del cierre (17:00 ART). Vela diaria ya cerrada. |
-| `AuditoriaGGAL` | V 19:00 | Despues del cierre del viernes, que puede tardar hasta las 18:00. |
+| `EstudioGGAL-Apertura` | L-V 10:20 (reintento 10:50) | 10 min antes de que abra NY (10:30 ART). Llegas con el mapa armado. |
+| `EstudioGGAL-Cierre` | L-V 17:15 (reintentos 17:50 y 18:30) | 15 min despues del cierre (17:00 ART). Vela diaria ya cerrada. |
+| `AuditoriaGGAL` | V 19:30 (reintento 20:30) | Despues del ultimo reintento del cierre del viernes. |
+
+Los reintentos no duplican nada: si el informe del dia ya existe, el wrapper sale
+sin hacer nada. Tampoco corre fuera de su ventana (apertura 10:00-16:30, cierre
+17:00-23:59), para no escribir un cierre con fecha del dia siguiente ni pisarse
+con la apertura.
 
 ## Instalacion
 
@@ -42,6 +47,7 @@ Verificar / borrar:
 .\ggal_estudio.ps1 -Turno apertura
 .\ggal_estudio.ps1 -Turno cierre
 .\ggal_estudio.ps1 -Turno auditoria
+.\ggal_estudio.ps1 -Turno cierre -Forzar   # fuera de ventana o pisando el informe de hoy
 ```
 
 ## Salida
@@ -75,10 +81,19 @@ Verificar / borrar:
      ES_DISPLAY_REQUIRED` mientras dura el estudio y lo suelta al terminar. La
      pantalla queda prendida esas ~12 min, a proposito: Chrome tiene que renderizar.
 
-  La falla 1 **no esta arreglada por decision del usuario**: `WakeToRun` haria
-  que la laptop se despierte sola 10:20 y 17:15 L-V, y no se quiere eso. O sea:
-  **si la maquina duerme a esa hora, el informe no sale**. Para esos dias, correrlo
-  a mano (ver arriba).
+  3. *La maquina se suspende a mitad por otra via* (tapa, boton, "Application
+     API"): `ES_SYSTEM_REQUIRED` solo frena el Idle Timeout. El 17-sep se
+     suspendio a las 19:31 con claude corriendo y desperto el 22-sep: la corrida
+     quedo 4 dias "en ejecucion", el Programador ignoro todos los disparos
+     (`IgnoreNew`) y se perdieron 4 informes. **Arreglado**: el wrapper corta a
+     claude a los 40 min de reloj de pared, asi que al despertar lo mata y libera
+     la tarea para el disparo siguiente.
+
+  La falla 1 **no esta arreglada del todo, por decision del usuario**: `WakeToRun`
+  haria que la laptop se despierte sola, y no se quiere eso. Lo que si hay son
+  reintentos: si el primer disparo muere en el despertar, el siguiente lo cubre.
+  Si la maquina duerme durante toda la ventana, el informe no sale; para esos
+  dias, correrlo a mano con `-Forzar`.
 - **El limite de ejecucion es de 45 min.** Eran 20 y el scheduler mato la corrida
   del cierre del 9-sep al llegar al limite (`0x41306`). Una corrida normal tarda
   entre 7 y 12 min.

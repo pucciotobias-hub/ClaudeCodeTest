@@ -19,14 +19,21 @@
 .PARAMETER Turno
     'apertura' (pre-mercado), 'cierre' (post-mercado) o 'auditoria' (semanal).
 
+.PARAMETER Forzar
+    Corre aunque el informe de hoy ya exista o este fuera de la ventana horaria.
+    Para correrlo a mano.
+
 .EXAMPLE
     .\ggal_estudio.ps1 -Turno apertura
+    .\ggal_estudio.ps1 -Turno cierre -Forzar
 #>
 [CmdletBinding()]
 param(
     [Parameter(Mandatory = $true)]
     [ValidateSet('apertura', 'cierre', 'auditoria')]
-    [string]$Turno
+    [string]$Turno,
+
+    [switch]$Forzar
 )
 
 $ErrorActionPreference = 'Stop'
@@ -43,6 +50,24 @@ $ChromeExe   = 'C:\Program Files\Google\Chrome\Application\chrome.exe'
 $CdpProfile  = Join-Path $env:USERPROFILE 'tv-cdp-profile'
 $ChartUrl    = 'https://www.tradingview.com/chart/pzxwEAwm/'
 $CdpPort     = 9222
+
+# Tope de reloj real para claude -p. Va por reloj de pared, no por tiempo de CPU:
+# si la maquina se suspende a mitad, al despertar ya esta pasado y se corta.
+# Paso el 2026-09-17: la maquina se suspendio a las 19:31 con claude corriendo,
+# desperto el 22-sep, y en esos 4 dias la tarea figuro "en ejecucion", asi que
+# el Programador ignoro todos los disparos (MultipleInstances IgnoreNew): se
+# perdieron los informes del 18, del 21 y la apertura del 22. El limite de 45 min
+# de la tarea no lo corto. Tiene que quedar debajo de esos 45.
+$TopeMinutos = 40
+
+# Ventana en la que cada turno tiene sentido (hora ART). Fuera de ella la corrida
+# se saltea: el cierre del 10-sep corrio a las 00:55 del 11 y salio con fecha 11,
+# y el del 15-sep corrio 16 h tarde en paralelo con la apertura del 16 y se
+# pisaron los dibujos. La auditoria no tiene ventana.
+$Ventanas = @{
+    apertura = @{ Desde = '10:00'; Hasta = '16:30' }
+    cierre   = @{ Desde = '17:00'; Hasta = '23:59' }
+}
 
 if (-not (Test-Path $LogDir)) { New-Item -ItemType Directory -Path $LogDir | Out-Null }
 
@@ -62,6 +87,25 @@ function Test-Cdp {
 
 # --- 1. Preflight ----------------------------------------------------------
 Write-Log "=== INICIO estudio GGAL - turno: $Turno ==="
+
+$fecha  = Get-Date -Format 'yyyy-MM-dd'
+$hora   = Get-Date -Format 'HH:mm'
+$salida = if ($Turno -eq 'auditoria') { "estudios/ggal/auditorias/$fecha.md" } else { "estudios/ggal/$fecha-$Turno.md" }
+
+# Cada turno tiene varios disparos (ver install_ggal_tasks.ps1): si uno muere en
+# el despertar de la maquina, el siguiente lo cubre. Los que llegan despues de
+# una corrida buena no tienen nada que hacer.
+if (-not $Forzar) {
+    if (Test-Path (Join-Path $RepoDir $salida)) {
+        Write-Log "Ya existe $salida. Nada que hacer."
+        exit 0
+    }
+    $v = $Ventanas[$Turno]
+    if ($v -and ($hora -lt $v.Desde -or $hora -gt $v.Hasta)) {
+        Write-Log "Fuera de ventana ($hora, el turno $Turno va de $($v.Desde) a $($v.Hasta)). Se saltea; para correrlo igual, -Forzar." 'WARN'
+        exit 0
+    }
+}
 
 # --- 1.b Bloquear la suspension -------------------------------------------
 # La corrida tarda ~12 min y nadie toca el teclado mientras tanto, asi que el
@@ -110,10 +154,7 @@ if ($LASTEXITCODE -ne 0) {
 }
 
 # --- 3. Armar el prompt ----------------------------------------------------
-$fecha  = Get-Date -Format 'yyyy-MM-dd'
-$hora   = Get-Date -Format 'HH:mm'
 $receta = Get-Content $PromptFile -Raw
-$salida = if ($Turno -eq 'auditoria') { "estudios/ggal/auditorias/$fecha.md" } else { "estudios/ggal/$fecha-$Turno.md" }
 
 $prompt = @"
 FECHA: $fecha
@@ -153,21 +194,49 @@ $allowed = @(
     'Bash(powershell*relanzar_chrome_cdp.ps1*)'
 ) -join ','
 
-Push-Location $RepoDir
+# Claude corre como proceso aparte (no con el pipe de siempre) para poder
+# vigilarlo contra el reloj de pared y matarlo si pasa $TopeMinutos.
+$tmpIn  = Join-Path $LogDir "claude_$Turno.in.txt"
+$tmpOut = Join-Path $LogDir "claude_$Turno.out.txt"
+$tmpErr = Join-Path $LogDir "claude_$Turno.err.txt"
+[IO.File]::WriteAllText($tmpIn, $prompt, (New-Object System.Text.UTF8Encoding $false))
+
+$argumentos = @(
+    '-p'
+    '--model', 'claude-opus-5-5'
+    '--mcp-config', "`"$McpConfig`""
+    '--permission-mode', 'acceptEdits'
+    '--allowedTools', "`"$allowed`""
+) -join ' '
+
+$code = $null
 try {
-    $out = $prompt | & $ClaudeExe -p `
-        --model claude-opus-5-5 `
-        --mcp-config $McpConfig `
-        --permission-mode acceptEdits `
-        --allowedTools $allowed 2>&1 | Out-String
-    $code = $LASTEXITCODE
+    $proc = Start-Process -FilePath $ClaudeExe -ArgumentList $argumentos `
+        -WorkingDirectory $RepoDir -NoNewWindow -PassThru `
+        -RedirectStandardInput $tmpIn -RedirectStandardOutput $tmpOut -RedirectStandardError $tmpErr
+    $null = $proc.Handle  # sin esto ExitCode puede quedar vacio con -PassThru
+    $inicio = [DateTime]::UtcNow
+
+    while (-not $proc.WaitForExit(15000)) {
+        $min = ([DateTime]::UtcNow - $inicio).TotalMinutes
+        if ($min -gt $TopeMinutos) {
+            Write-Log ("Claude lleva {0:N0} min de reloj (tope {1}); se corta. Si el salto es grande, la maquina se suspendio a mitad." -f $min, $TopeMinutos) 'ERROR'
+            # /T: claude levanta los servidores MCP como hijos.
+            & taskkill.exe /PID $proc.Id /T /F | Out-Null
+            $proc.WaitForExit(10000) | Out-Null
+            $code = 124
+            break
+        }
+    }
+    if ($null -eq $code) { $code = $proc.ExitCode }
 } finally {
-    Pop-Location
     [GgalPower]::SetThreadExecutionState($ES_CONTINUOUS) | Out-Null
     Write-Log "Suspension desbloqueada."
+    foreach ($f in @($tmpOut, $tmpErr)) {
+        if (Test-Path $f) { Add-Content -Path $LogFile -Value (Get-Content $f -Raw -Encoding utf8) -Encoding utf8 }
+    }
+    Remove-Item $tmpIn, $tmpOut, $tmpErr -ErrorAction SilentlyContinue
 }
-
-Add-Content -Path $LogFile -Value $out -Encoding utf8
 
 if ($code -ne 0) {
     Write-Log "Claude salio con codigo $code." 'ERROR'
