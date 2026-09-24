@@ -10,7 +10,9 @@ dos veces por dia habil, y deja el informe versionado en `estudios/ggal/`.
 | `ggal_estudio_prompt.md` | **La receta.** Que niveles trazar, como leer el macro, el fix de paneles de TradingView, y el formato del informe. Es lo unico que hay que editar para cambiar el estudio. |
 | `ggal_estudio.ps1` | Wrapper: levanta Chrome con CDP si esta caido y dispara `claude -p` con la receta. |
 | `relanzar_chrome_cdp.ps1` | Levanta Chrome con CDP en el 9222 (idempotente). Lo llama el wrapper en el preflight, y tambien Claude si el CDP se cae a mitad del estudio. |
-| `install_ggal_tasks.ps1` | Registra/borra las dos Tareas Programadas de Windows. |
+| `install_ggal_tasks.ps1` | Registra/borra las tres Tareas Programadas de Windows. |
+| `ggal_auditoria_prompt.md` | Receta de la **auditoria semanal**: contrasta los estudios contra lo que hizo el precio y propone cambios a la receta del estudio. |
+| `ggal_auditoria.py` | La parte objetiva de la auditoria (niveles respetados/perforados/rotos, extremos anticipados contra una grilla, encabezados contra la barra). Se puede correr a mano: `python scripts/ggal_auditoria.py --barras scripts/ggal_bars.json`. |
 
 ## Horarios (ART, UTC-3)
 
@@ -18,6 +20,7 @@ dos veces por dia habil, y deja el informe versionado en `estudios/ggal/`.
 |---|---|---|
 | `EstudioGGAL-Apertura` | L-V 10:20 | 10 min antes de que abra NY (10:30 ART). Llegas con el mapa armado. |
 | `EstudioGGAL-Cierre` | L-V 17:15 | 15 min despues del cierre (17:00 ART). Vela diaria ya cerrada. |
+| `AuditoriaGGAL` | V 19:00 | Despues del cierre del viernes, que puede tardar hasta las 18:00. |
 
 ## Instalacion
 
@@ -38,11 +41,15 @@ Verificar / borrar:
 ```powershell
 .\ggal_estudio.ps1 -Turno apertura
 .\ggal_estudio.ps1 -Turno cierre
+.\ggal_estudio.ps1 -Turno auditoria
 ```
 
 ## Salida
 
 - Informe: `estudios/ggal/YYYY-MM-DD-<turno>.md`, commiteado y pusheado solo.
+- Auditoria: `estudios/ggal/auditorias/YYYY-MM-DD.md`. **Las propuestas de cambio a
+  la receta no se aplican solas**: las lee Tobias y decide. Una receta que se
+  reescribe sola sin que nadie la mire puede derivar sin que se note.
 - Screenshot del chart: `C:\Users\Tobias\Desktop\tradingview-mcp-jackson\screenshots\`
 - Log de las corridas: `logs/ggal_estudio.log` (gitignoreado).
 

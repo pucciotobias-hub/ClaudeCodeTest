@@ -3,12 +3,14 @@
     Registra (o borra) las Tareas Programadas del estudio diario de GGAL.
 
 .DESCRIPTION
-    Crea dos tareas de lunes a viernes, hora local (ART, UTC-3):
+    Crea tres tareas, hora local (ART, UTC-3):
 
-      EstudioGGAL-Apertura   10:20  -> 10 min antes de que abra NY
-      EstudioGGAL-Cierre     17:15  -> 15 min despues del cierre
+      EstudioGGAL-Apertura   L-V 10:20  -> 10 min antes de que abra NY
+      EstudioGGAL-Cierre     L-V 17:15  -> 15 min despues del cierre
+      AuditoriaGGAL          V   19:00  -> despues del cierre del viernes (que
+                                           puede tardar hasta las 18:00)
 
-    Ambas corren SOLO con el usuario logueado: Chrome necesita una sesion de
+    Todas corren SOLO con el usuario logueado: Chrome necesita una sesion de
     escritorio activa para renderizar el chart.
 
 .PARAMETER Accion
@@ -30,9 +32,11 @@ $ErrorActionPreference = 'Stop'
 $Runner = Join-Path $PSScriptRoot 'ggal_estudio.ps1'
 $WorkDir = Split-Path -Parent $PSScriptRoot
 
+$LaV = @('Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday')
 $Tareas = @(
-    @{ Nombre = 'EstudioGGAL-Apertura'; Turno = 'apertura'; Hora = '10:20'; Desc = 'Estudio tecnico GGAL ADR - pre-apertura de NY' }
-    @{ Nombre = 'EstudioGGAL-Cierre';   Turno = 'cierre';   Hora = '17:15'; Desc = 'Estudio tecnico GGAL ADR - post-cierre de NY' }
+    @{ Nombre = 'EstudioGGAL-Apertura'; Turno = 'apertura';  Hora = '10:20'; Dias = $LaV;       Desc = 'Estudio tecnico GGAL ADR - pre-apertura de NY' }
+    @{ Nombre = 'EstudioGGAL-Cierre';   Turno = 'cierre';    Hora = '17:15'; Dias = $LaV;       Desc = 'Estudio tecnico GGAL ADR - post-cierre de NY' }
+    @{ Nombre = 'AuditoriaGGAL';        Turno = 'auditoria'; Hora = '19:00'; Dias = @('Friday'); Desc = 'Auditoria semanal de los estudios GGAL contra el precio' }
 )
 
 switch ($Accion) {
@@ -70,7 +74,7 @@ switch ($Accion) {
                 -WorkingDirectory $WorkDir
 
             $trigger = New-ScheduledTaskTrigger -Weekly `
-                -DaysOfWeek Monday, Tuesday, Wednesday, Thursday, Friday `
+                -DaysOfWeek $t.Dias `
                 -At $t.Hora
 
             # Interactive: la tarea corre en la sesion del usuario logueado, que es
@@ -103,7 +107,7 @@ switch ($Accion) {
                 -Settings $settings `
                 -Description $t.Desc | Out-Null
 
-            Write-Output "Registrada: $($t.Nombre) -> L-V $($t.Hora) ART"
+            Write-Output "Registrada: $($t.Nombre) -> $($t.Dias -join ',') $($t.Hora) ART"
         }
 
         Write-Output ""

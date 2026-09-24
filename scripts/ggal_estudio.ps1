@@ -1,6 +1,7 @@
 ﻿<#
 .SYNOPSIS
-    Corre el estudio diario de GGAL ADR en TradingView via Claude Code headless.
+    Corre el estudio diario de GGAL ADR en TradingView via Claude Code headless,
+    o la auditoria semanal de esos estudios.
 
 .DESCRIPTION
     1. Se asegura de que Chrome este corriendo con CDP en el puerto 9222.
@@ -8,11 +9,15 @@
     3. Claude redibuja los niveles, lee EMA/RSI/macro, escribe el informe en
        estudios/ggal/<fecha>-<turno>.md y lo commitea.
 
+    Con -Turno auditoria usa la receta de scripts/ggal_auditoria_prompt.md: baja
+    las barras de GGAL, contrasta los estudios de la semana contra el precio y
+    escribe estudios/ggal/auditorias/<fecha>.md.
+
     Requiere una sesion de escritorio activa: Chrome tiene que poder renderizar.
     Si la maquina esta bloqueada o con sesion cerrada, el chart no repinta.
 
 .PARAMETER Turno
-    'apertura' (pre-mercado) o 'cierre' (post-mercado).
+    'apertura' (pre-mercado), 'cierre' (post-mercado) o 'auditoria' (semanal).
 
 .EXAMPLE
     .\ggal_estudio.ps1 -Turno apertura
@@ -20,7 +25,7 @@
 [CmdletBinding()]
 param(
     [Parameter(Mandatory = $true)]
-    [ValidateSet('apertura', 'cierre')]
+    [ValidateSet('apertura', 'cierre', 'auditoria')]
     [string]$Turno
 )
 
@@ -28,7 +33,7 @@ $ErrorActionPreference = 'Stop'
 
 # --- Rutas -----------------------------------------------------------------
 $RepoDir     = Split-Path -Parent $PSScriptRoot
-$PromptFile  = Join-Path $PSScriptRoot 'ggal_estudio_prompt.md'
+$PromptFile  = Join-Path $PSScriptRoot $(if ($Turno -eq 'auditoria') { 'ggal_auditoria_prompt.md' } else { 'ggal_estudio_prompt.md' })
 $RelanzarScript = Join-Path $PSScriptRoot 'relanzar_chrome_cdp.ps1'
 $LogDir      = Join-Path $RepoDir 'logs'
 $LogFile     = Join-Path $LogDir 'ggal_estudio.log'
@@ -108,12 +113,13 @@ if ($LASTEXITCODE -ne 0) {
 $fecha  = Get-Date -Format 'yyyy-MM-dd'
 $hora   = Get-Date -Format 'HH:mm'
 $receta = Get-Content $PromptFile -Raw
+$salida = if ($Turno -eq 'auditoria') { "estudios/ggal/auditorias/$fecha.md" } else { "estudios/ggal/$fecha-$Turno.md" }
 
 $prompt = @"
 FECHA: $fecha
 HORA LOCAL (ART): $hora
 TURNO: $Turno
-ARCHIVO DE SALIDA: estudios/ggal/$fecha-$Turno.md
+ARCHIVO DE SALIDA: $salida
 
 Corrida automatica y desatendida. Segui la receta de abajo de punta a punta y
 no pidas confirmacion de nada.
@@ -168,7 +174,7 @@ if ($code -ne 0) {
     exit $code
 }
 
-$informe = Join-Path $RepoDir "estudios\ggal\$fecha-$Turno.md"
+$informe = Join-Path $RepoDir $salida
 if (Test-Path $informe) {
     Write-Log "OK. Informe: $informe"
 } else {
