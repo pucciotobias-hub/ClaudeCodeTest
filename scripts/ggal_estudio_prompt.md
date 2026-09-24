@@ -29,7 +29,12 @@ hace 3 minutos vale; el informe que no existe, no.
   Si despues de dos intentos sigue sin responder, escribí el informe igual marcando
   **"SIN DATOS: TradingView no respondio"** y terminá.
 - El chart guardado es `pzxwEAwm`.
-- `chart_set_symbol` → `NASDAQ:GGAL`, `chart_set_timeframe` → `D`.
+- `chart_set_timeframe` → `D` **y despues** `chart_set_symbol` → `NASDAQ:GGAL`
+  (en ese orden: al reves el feed se queda pegado en el simbolo anterior; paso en
+  7 de las primeras 12 corridas). Verificá en un `ui_evaluate` aparte que
+  `activeChart().symbol()` sea `BATS:GGAL`, que `resolution()` sea `1D` y que la
+  ultima barra sea de la ultima rueda. Si no: `location.reload()`,
+  `tv_health_check` y repetí. Lo mismo en cada ticker del macro.
 
 ## 1.bis Si el CDP se cae a mitad (pasa seguido)
 
@@ -58,7 +63,7 @@ como N/D, dejando la nota de corrida al final del informe.
 Bug conocido: despues de un rato la pagina deja de repintar y los paneles de
 indicadores quedan con altura 0 (el RSI existe pero es invisible), y
 `capture_screenshot` devuelve un frame viejo. `setHeight` / `setAllPanesHeight` /
-`restore()` no sirven. El unico arreglo es forzar un relayout con `ui_evaluate`:
+`restore()` no sirven. El primer arreglo es forzar un relayout con `ui_evaluate`:
 
 ```js
 const w = window.TradingViewApi.activeChart()._chartWidget;
@@ -71,15 +76,22 @@ Notas:
 - Paneles fantasma (stretchFactor 0, sin fuentes): `w.model().model().removePane(pane)`.
 - Volume como overlay del panel de precio: `chart.createStudy('Volume', true, false)`
   (el `true` es forceOverlay). `chart_manage_indicator add` lo mete en panel aparte.
+- **Si el doble resize no alcanza** (no alcanzo en 4 de las primeras 12 corridas):
+  `location.reload()` pelado. Si despues del reload un panel sigue en altura 0,
+  `paneWidget.setSize({width, height})` sobre cada panel.
 
 ## 3. Indicadores
 
-Tienen que quedar **visibles** y reportando valor en `data_get_study_values`:
+Tienen que quedar **visibles** y reportando valor **leido del modelo**
+(`dataSources()` de la serie → `data().last()`), sobre el simbolo verificado.
+**No uses `data_get_study_values`**: hace derivar el simbolo solo y se lleva los
+dibujos (paso el 2026-09-22, se perdieron los 12).
 - **EMA 20** (Moving Average Exponential, length 20, source close)
 - **RSI 14** (Relative Strength Index)
 - **Volume** como overlay
 
-Si `data_get_study_values` no los devuelve, aplicá el fix del punto 2 y reintentá.
+Si el modelo no devuelve valores (estudio mudo, series en 0), aplicá el fix del
+punto 2 y reintentá.
 
 ## 4. Datos
 
@@ -99,8 +111,23 @@ Si `data_get_study_values` no los devuelve, aplicá el fix del punto 2 y reinten
 
 - `draw_list` para ver que hay, despues `draw_clear`, despues redibujar todo.
 - Los niveles salen de los maximos y minimos de swing de las ultimas ~30 ruedas
-  mas el mapa vigente que esta en el informe anterior. Maximo **10 lineas
-  horizontales**: si un nivel ya no marca nada, sacalo y decilo en el informe.
+  mas el mapa vigente del informe anterior. Maximo **10 lineas horizontales**,
+  repartidas asi:
+  - **Por lo menos 3 de cada lado del precio**, dentro de ~5% (un rango de 3
+    ruedas de GGAL).
+  - **A mas de 5% del precio, una sola linea por lado** (el gatillo de fondo). El
+    resto sale del mapa aunque tenga historia; si el precio vuelve, se redibuja.
+    Decí en el informe que salio.
+  - Si del lado hacia donde va la tendencia no hay swings de 30 ruedas, buscá mas
+    atras (meses o el año anterior) antes de dejar ese lado con menos de 3 lineas.
+  - (Auditoria 2026-09-24: el 55% de las lineas no se toco en 3 ruedas, casi todas
+    resistencias viejas, y del lado de la caida quedaban dos soportes.)
+- **R o S se decide por la posicion contra el ultimo precio, no por la historia del
+  nivel.** Un "ex soporte" que quedo debajo del precio es S. La historia va en la
+  columna "Que es".
+- **Los niveles son bandas, no lineas.** Los que aguantaron se perforaron en el
+  intradia una mediana de 0,8% antes de recuperar. En el texto, un nivel "se
+  perdio" cuando se perdio en cierre; una perforacion intradia se describe como tal.
 - **Colores, siempre con opacidad baja.** Las lineas son referencia, no protagonistas:
   a full color tapan las velas y molestan para leer el precio. Pasá el alfa dentro
   del color, en `rgba(...)`, que es lo que acepta `linecolor` en los `overrides`:
@@ -121,8 +148,11 @@ Si `data_get_study_values` no los devuelve, aplicá el fix del punto 2 y reinten
   `trend_line` gris punteada (`rgba(150,150,150,0.40)`, ver la tabla de arriba). OJO: TradingView la plotea en espacio de **barras**,
   no de tiempo lineal — para saber por donde pasa hoy, interpolá por indice de
   barra, no por dias calendario (interpolar por calendario da ~0.35 de mas).
-- Dejá el chart con un rango visible de las ultimas ~40 ruedas y sacá un
-  `capture_screenshot` con nombre `ggal_TURNO_FECHA`.
+- Dejá el chart con un rango visible de las ultimas ~40 ruedas y sacá el
+  screenshot con nombre `ggal_TURNO_FECHA`. Si `document.hidden` es `true`,
+  `capture_screenshot` sale en blanco (paso en 8 de las primeras 12 corridas):
+  usá `TradingViewApi.takeClientScreenshot()` + descarga.
+- Para guardar el layout, `saveChart()`: `saveChartSilently` ya no existe.
 
 ## 6. Escribir el informe
 
@@ -163,6 +193,20 @@ Reglas de escritura:
 - Español rioplatense, directo, sin relleno. Nada de "es importante notar que".
 - Numeros concretos siempre. Si un dato no lo pudiste leer, escribí `N/D`, nunca
   un numero inventado ni un cero enganioso.
+- **Todo gatillo es un cierre.** Escribí "cierre arriba/debajo de X", nunca
+  "superar X" o "perder X" a secas: un toque intradia no activa nada. Si el
+  gatillo es el maximo o el minimo de una vela de rotura, avisá que es el nivel
+  mas probable de trampa.
+- **Contra la tendencia** (precio del otro lado de la EMA20 y serie de
+  maximos/minimos intacta), un gatillo recien cuenta como confirmado con **dos
+  cierres seguidos** del otro lado del nivel. Con un solo cierre escribilo como
+  "rebote en curso, sin confirmar", no como escenario activado. A favor de la
+  tendencia vale con un cierre. (Auditoria 2026-09-24: los gatillos a favor de la
+  tendencia anduvieron 4 de 4; los en contra, 0 de 6.)
+- **En la apertura no inclines el sesgo por la vela en curso.** Los escenarios se
+  arman sobre el ultimo cierre; la vela de hoy se describe, pero no mueve la
+  balanza. (En 3 de las primeras 5 aperturas el signo al cierre fue el opuesto al
+  de la lectura.)
 - **No es asesoramiento financiero**: describí el cuadro tecnico y los escenarios,
   no des ordenes de compra/venta con tamanio de posicion.
 - Si el mercado esta cerrado o la vela del dia esta vacia, decilo arriba de todo.
