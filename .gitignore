@@ -11,7 +11,3 @@ monitor_divergencia.log
 # Scratch de los calculos del estudio GGAL (la corrida desatendida los deja sueltos)
 scripts/ggal_bars.json
 scripts/ggal_calc.py
-
-# Estado del vigia de señales y lock del estudio (locales)
-logs/ggal_senales_estado.json
-logs/estudio.lock
