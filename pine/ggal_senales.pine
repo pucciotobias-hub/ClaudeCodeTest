@@ -6,26 +6,36 @@
 // para ver las señales en vivo, dispararlas como alertas y medirlas en el
 // Strategy Tester.
 //
-// Reglas (salen de la auditoria de los estudios del 2026-09-24: los gatillos a
-// favor de la tendencia anduvieron 4 de 4 y los en contra 0 de 6, y los niveles
-// funcionan como bandas):
+// Reglas:
 //   - Tendencia diaria = cierre de ayer contra la EMA20 diaria de ayer.
 //   - Setup: en 15m, EMA9 del lado de la EMA21, precio del lado del VWAP,
 //     retroceso que toco la EMA21 en las ultimas 3 velas, y vela que CIERRA
 //     rompiendo la vela anterior. Todo al cierre de vela: no repinta.
 //   - Stop: extremo de las ultimas 5 velas, con un colchon de 0,1 ATR.
-//   - Objetivo: el primer nivel estructural (maximo/minimo de ayer, de hoy o
-//     ultimo pivote) que este entre 1,5R y 4R. Si hay un nivel ANTES de 1,5R, no
-//     entra: el camino esta tapado. Sin niveles a la vista, 2R.
-//   - Grande: a favor de la tendencia diaria, volumen relativo >= 1,2 y R:R >= 2.
-//     Chica: cualquier otra. Contra la tendencia, siempre chica.
-//   - Una posicion por vez, maximo 3 por dia, entradas 9:45-15:30 NY y todo
-//     cerrado a las 15:55 NY. Nada queda abierto de un dia para el otro.
+//   - Objetivo: el primer nivel (maximo/minimo de ayer, de hoy o ultimo pivote)
+//     entre 1,5R y 4R; sin niveles a la vista, 2R. Si el maximo/minimo de AYER
+//     esta antes de 1,5R, no entra: el camino esta tapado.
+//   - Grande (1% de riesgo): la señal va CONTRA la tendencia diaria, o sea el
+//     intradia esta girando. Chica (0,5%): va a favor.
+//   - Una posicion por vez, maximo 3 por dia, entradas 9:45-15:30 NY, y todo
+//     cerrado en la ultima vela (15:45 NY). Nada queda abierto de un dia para el otro.
+//
+// Por que grande es contra la tendencia (backtest 15m, dic-2025 a sep-2026, 97
+// operaciones): a favor de la tendencia diaria el setup dio PF 0,71 y en contra
+// PF 1,68, y la diferencia se sostuvo en las dos mitades (dic-abr 0,65 vs 1,42;
+// may-sep 0,85 vs 2,55). Es lo contrario de lo que mostro la auditoria de los
+// estudios diarios: en 15m, la continuacion contra la tendencia del diario marca
+// los dias de giro. Resultado con estas reglas: 44% de aciertos, PF 1,27, +7,8%,
+// drawdown maximo 7%. Muestra chica: medirlo en vivo antes de creerle.
 
 strategy("GGAL Señales", shorttitle = "GGAL Señal", overlay = true,
      initial_capital = 100000, currency = currency.USD,
      commission_type = strategy.commission.cash_per_order, commission_value = 1,
      slippage = 1, pyramiding = 0,
+     // Poder de compra intradia 4x (cuenta de day trading en EE.UU.). Con el
+     // margen por defecto (100%) las posiciones grandes con stop corto piden mas
+     // que el capital y TradingView rechaza la orden sin avisar.
+     margin_long = 25, margin_short = 25,
      max_labels_count = 500, max_lines_count = 500)
 
 // --- Parametros ----------------------------------------------------------------
@@ -34,14 +44,11 @@ emaLenLen    = input.int(21, "EMA lenta")
 atrLen       = input.int(14, "ATR")
 rrMin        = input.float(1.5, "R:R minimo para operar", step = 0.1)
 rrMax        = input.float(4.0, "R:R maximo del objetivo", step = 0.1)
-rrGrande     = input.float(2.0, "R:R minimo para posicion grande", step = 0.1)
-volGrande    = input.float(1.2, "Volumen relativo minimo para grande", step = 0.1)
 riesgoGrande = input.float(1.0, "Riesgo posicion grande (% del capital)", step = 0.1)
 riesgoChica  = input.float(0.5, "Riesgo posicion chica (% del capital)", step = 0.1)
 maxOps       = input.int(3, "Maximo de operaciones por dia")
-contraTend   = input.bool(true, "Operar contra la tendencia diaria (siempre chica)")
 ventana      = input.session("0945-1530", "Ventana de entradas (hora NY)")
-cierreSes    = input.session("1555-1600", "Cierre forzado (hora NY)")
+cierreSes    = input.session("1545-1600", "Cierre forzado: velas que arrancan en esta franja (hora NY)")
 
 // --- Contexto diario (dia anterior: no repinta) --------------------------------
 [dCierre, dEma, pdh, pdl] = request.security(syminfo.tickerid, "D",
@@ -54,7 +61,6 @@ emaR   = ta.ema(close, emaRapLen)
 emaL   = ta.ema(close, emaLenLen)
 vwap   = ta.vwap(hlc3)
 atr    = ta.atr(atrLen)
-volRel = volume / ta.sma(volume, 20)
 
 enVentana = not na(time(timeframe.period, ventana, "America/New_York"))
 enCierre  = not na(time(timeframe.period, cierreSes, "America/New_York"))
@@ -85,16 +91,22 @@ if not na(pl)
     ultPL := pl
 
 // --- Objetivo y camino ------------------------------------------------------------
-// Devuelve el objetivo, o na si hay un nivel tapando el camino antes de rrMin.
-f_objetivo(float entrada, float riesgo, bool esLong, array<float> niveles) =>
-    float obj = na
+// Devuelve el objetivo, o na si un nivel DIARIO tapa el camino antes de rrMin.
+// Los niveles intradia (maximo/minimo de hoy, ultimo pivote) no bloquean: en un
+// retroceso a favor de la tendencia el extremo del dia siempre esta cerca, y
+// romperlo es justamente la continuacion. Solo cuentan como objetivo.
+f_objetivo(float entrada, float riesgo, bool esLong, array<float> bloqueantes, array<float> objetivos) =>
     bool tapado = false
-    for n in niveles
+    for n in bloqueantes
         if not na(n)
             float dist = esLong ? n - entrada : entrada - n
             if dist > 0 and dist < rrMin * riesgo
                 tapado := true
-            else if dist >= rrMin * riesgo and dist <= rrMax * riesgo
+    float obj = na
+    for n in objetivos
+        if not na(n)
+            float dist = esLong ? n - entrada : entrada - n
+            if dist >= rrMin * riesgo and dist <= rrMax * riesgo
                 obj := na(obj) ? n : esLong ? math.min(obj, n) : math.max(obj, n)
     tapado ? na : na(obj) ? (esLong ? entrada + 2 * riesgo : entrada - 2 * riesgo) : obj
 
@@ -111,13 +123,13 @@ riesgoS = slS - close
 riesgoOkL = riesgoL >= 0.4 * atr and riesgoL <= 3 * atr
 riesgoOkS = riesgoS >= 0.4 * atr and riesgoS <= 3 * atr
 
-tpL = riesgoOkL ? f_objetivo(close, riesgoL, true, array.from(pdh, hoyMaxPrev, ultPH)) : na
-tpS = riesgoOkS ? f_objetivo(close, riesgoS, false, array.from(pdl, hoyMinPrev, ultPL)) : na
+tpL = riesgoOkL ? f_objetivo(close, riesgoL, true, array.from(pdh), array.from(pdh, hoyMaxPrev, ultPH)) : na
+tpS = riesgoOkS ? f_objetivo(close, riesgoS, false, array.from(pdl), array.from(pdl, hoyMinPrev, ultPL)) : na
 rrL = riesgoL > 0 ? (tpL - close) / riesgoL : na
 rrS = riesgoS > 0 ? (close - tpS) / riesgoS : na
 
-puedeL = setupL and not na(tpL) and (tendAlcista or contraTend)
-puedeS = setupS and not na(tpS) and (tendBajista or contraTend)
+puedeL = setupL and not na(tpL)
+puedeS = setupS and not na(tpS)
 
 // --- Estado de la posicion (para dibujar y etiquetar la salida) --------------------
 var float entPrecio = na
@@ -130,26 +142,26 @@ var string ultSenal = "Sin posicion"
 
 f_fmt(float x) => str.tostring(x, "#.00")
 
-f_entrar(bool esLong, float sl, float tp, float rr, bool grande) =>
+f_entrar(bool esLong, float sl, float tp, float rr, bool grande, bool alineado) =>
     float riesgo = math.abs(close - sl)
     float pct = grande ? riesgoGrande : riesgoChica
     int qty = math.max(1, int(math.floor(strategy.equity * pct / 100 / riesgo)))
     string lado = esLong ? "LONG" : "SHORT"
     string tam = grande ? "GRANDE" : "CHICA"
-    string txt = lado + " · " + tam + "\nR:R 1:" + str.tostring(rr, "#.0") + "\nSL " + f_fmt(sl) + " · TP " + f_fmt(tp)
-    strategy.entry(lado, esLong ? strategy.long : strategy.short, qty = qty, comment = lado + " " + tam)
+    string txt = lado + " · " + tam + "\nR:R 1:" + str.tostring(rr, "0.0") + "\nSL " + f_fmt(sl) + " · TP " + f_fmt(tp)
+    strategy.entry(lado, esLong ? strategy.long : strategy.short, qty = qty, comment = lado + " " + tam + (alineado ? " AF" : " CT"))
     strategy.exit(lado + " salida", lado, stop = sl, limit = tp)
     color c = esLong ? color.new(#26a69a, 0) : color.new(#ef5350, 0)
     label.new(bar_index, esLong ? low : high, txt,
          style = esLong ? label.style_label_up : label.style_label_down,
          color = c, textcolor = color.white, size = size.small)
-    alert("GGAL " + lado + " " + tam + " @ " + f_fmt(close) + " | SL " + f_fmt(sl) + " | TP " + f_fmt(tp) + " | R:R 1:" + str.tostring(rr, "#.0"), alert.freq_once_per_bar_close)
+    alert("GGAL " + lado + " " + tam + " @ " + f_fmt(close) + " | SL " + f_fmt(sl) + " | TP " + f_fmt(tp) + " | R:R 1:" + str.tostring(rr, "0.0"), alert.freq_once_per_bar_close)
     txt
 
 if strategy.position_size == 0 and enVentana and opsHoy < maxOps and barstate.isconfirmed
     if puedeL
-        bool grande = tendAlcista and volRel >= volGrande and rrL >= rrGrande
-        ultSenal := f_entrar(true, slL, tpL, rrL, grande)
+        bool grande = not tendAlcista
+        ultSenal := f_entrar(true, slL, tpL, rrL, grande, tendAlcista)
         entPrecio := close
         entSL := slL
         entTP := tpL
@@ -158,8 +170,8 @@ if strategy.position_size == 0 and enVentana and opsHoy < maxOps and barstate.is
         lnSL := line.new(bar_index, slL, bar_index + 1, slL, color = color.new(#ef5350, 30), style = line.style_dashed)
         lnTP := line.new(bar_index, tpL, bar_index + 1, tpL, color = color.new(#26a69a, 30), style = line.style_dashed)
     else if puedeS
-        bool grande = tendBajista and volRel >= volGrande and rrS >= rrGrande
-        ultSenal := f_entrar(false, slS, tpS, rrS, grande)
+        bool grande = not tendBajista
+        ultSenal := f_entrar(false, slS, tpS, rrS, grande, tendBajista)
         entPrecio := close
         entSL := slS
         entTP := tpS
@@ -175,7 +187,7 @@ if strategy.position_size != 0 and not na(lnSL)
 
 // Nada queda abierto de un dia para el otro.
 if enCierre and strategy.position_size != 0
-    strategy.close_all(comment = "Cierre de sesion")
+    strategy.close_all(comment = "Cierre de sesion", immediately = true)
 
 // --- Etiqueta de salida -------------------------------------------------------------
 if strategy.closedtrades > strategy.closedtrades[1]
@@ -184,7 +196,7 @@ if strategy.closedtrades > strategy.closedtrades[1]
     float riesgo = math.abs(entPrecio - entSL)
     float r = riesgo > 0 ? (salida - entPrecio) * entLado / riesgo : 0.0
     string motivo = math.abs(salida - entTP) <= syminfo.mintick * 2 ? "TP" : math.abs(salida - entSL) <= syminfo.mintick * 2 ? "SL" : "Cierre"
-    string txt = motivo + " " + (r >= 0 ? "+" : "") + str.tostring(r, "#.0") + "R"
+    string txt = motivo + " " + (r >= 0 ? "+" : "") + str.tostring(r, "0.0") + "R"
     label.new(bar_index, entLado == 1 ? high : low, txt,
          style = entLado == 1 ? label.style_label_down : label.style_label_up,
          color = color.new(r >= 0 ? #26a69a : #ef5350, 60), textcolor = color.white, size = size.tiny)
@@ -199,8 +211,10 @@ plot(emaR, "EMA rapida", color = color.new(#2962ff, 40), linewidth = 1)
 plot(emaL, "EMA lenta", color = color.new(#ff9800, 40), linewidth = 1)
 plot(vwap, "VWAP", color = color.new(#9c27b0, 30), linewidth = 2)
 
+// Se actualiza en cada vela: en una estrategia sin calc_on_every_tick,
+// barstate.islast puede no dar true en vivo.
 var table panel = table.new(position.top_right, 1, 2, bgcolor = color.new(#131722, 10), border_width = 1)
-if barstate.islast
+if barstate.isconfirmed
     string tend = tendAlcista ? "Tendencia diaria: ALCISTA" : tendBajista ? "Tendencia diaria: BAJISTA" : "Tendencia diaria: neutra"
     string pos = strategy.position_size > 0 ? "En posicion: " + ultSenal : strategy.position_size < 0 ? "En posicion: " + ultSenal : ultSenal
     table.cell(panel, 0, 0, tend, text_color = tendAlcista ? #26a69a : tendBajista ? #ef5350 : color.gray, text_size = size.small)
