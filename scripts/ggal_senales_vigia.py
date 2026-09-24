@@ -1,21 +1,22 @@
-"""Vigia de las señales de GGAL: avisa cada entrada y salida de la estrategia.
+"""Vigia de las señales de GGAL: avisa cada cambio de postura de la estrategia.
 
-La estrategia `pine/ggal_senales.pine` corre adentro de TradingView y dibuja las
-señales en el chart. Las alertas de TradingView para estrategias son pagas (el
-plan actual tiene 0 alertas tecnicas), asi que este script hace de alerta: lee
-la estrategia del chart por CDP cada minuto durante la rueda y, cuando aparece
-algo nuevo:
+La estrategia `pine/ggal_senales.pine` corre adentro de TradingView y en cada
+vela de 15 minutos tiene una postura: LONG, SHORT o AFUERA, con tamaño, stop,
+objetivo y R:R. Las alertas de TradingView para estrategias son pagas (el plan
+actual tiene 0 alertas tecnicas), asi que este script hace de alerta: lee la
+postura del chart por CDP cada minuto durante la rueda y, cuando cambia:
 
   - avisa con una notificacion de Windows (y por Telegram si hay
     TELEGRAM_BOT_TOKEN / TELEGRAM_CHAT_ID en el .env);
   - lo anota en senales/ggal/<AAAA-MM>.csv;
   - al terminar la rueda commitea y pushea ese CSV, para poder medir la
-    estrategia en vivo contra el backtest.
+    estrategia en vivo.
 
-Lee lo mismo que se ve en el chart: las etiquetas de entrada (texto con lado,
-tamaño, hora, precio, R:R, stop y objetivo) y las operaciones cerradas del
-reporte del Strategy Tester. No calcula señales por su cuenta, asi que no puede
-divergir de lo que dibuja el chart.
+Lee lo mismo que se ve en el chart: la postura vigente que expone la estrategia
+(plots p_*: lado, hora, precio, stop, objetivo, R:R, tamaño) y las operaciones
+cerradas del reporte del Strategy Tester. Avisa solo cambios de postura de los
+ultimos minutos, asi que recalcular el script no dispara avisos viejos. Al
+arrancar avisa una vez la postura vigente. No calcula señales por su cuenta.
 
 Convive con el estudio diario: mientras `logs/estudio.lock` existe (lo crea
 ggal_estudio.ps1) no toca el chart, y cuando el estudio termina lo vuelve a
@@ -34,7 +35,6 @@ import os
 import subprocess
 import sys
 import time
-from collections import Counter
 from datetime import datetime
 from pathlib import Path
 from zoneinfo import ZoneInfo
@@ -50,15 +50,19 @@ DIARIO_DIR = REPO / "senales" / "ggal"
 CDP = "http://127.0.0.1:9222"
 NY = ZoneInfo("America/New_York")
 
-DESDE = (9, 40)        # hora NY en que empieza a mirar (la primera señal posible es 9:45)
+DESDE = (9, 40)        # hora NY en que empieza a mirar (la primera entrada posible es 9:45)
 HASTA = (16, 5)        # hora NY en que deja de mirar (todo cierra en la vela de 15:45)
 CADA_SEG = 60
 LOCK_VIEJO_MIN = 60    # un lock mas viejo que esto es de una corrida que murio
 DATOS_VIEJOS_MIN = 20  # sin velas nuevas en este lapso con la rueda abierta -> reload
+RECIENTE_MIN = 45      # un cambio de postura mas viejo que esto no se avisa: es historia
 
 log = logging.getLogger("vigia")
 
-# Todo lo que se lee del chart sale de este JS. Devuelve null si no esta la estrategia.
+# Todo lo que se lee del chart sale de este JS: la postura vigente (los plots
+# p_* de la estrategia en la ultima vela) y las ultimas operaciones cerradas.
+# No usa las etiquetas: cambian cada vez que el script se recalcula, y leerlas
+# como eventos manda avisos viejos (paso el 2026-09-24 al recompilar: ~23 avisos).
 JS_LECTURA = r"""
 (() => {
   const c = TradingViewApi.activeChart();
@@ -70,18 +74,22 @@ JS_LECTURA = r"""
   const ultima = bars.size() ? bars.valueAt(bars.lastIndex())[0] * 1000 : null;
   const base = { simbolo: c.symbol(), resolucion: c.resolution(), ultimaVela: ultima };
   if (!s) return JSON.stringify(Object.assign(base, { estrategia: false }));
-  const etiquetas = [];
-  try {
-    s._graphics._primitivesCollection.dwglabels.get('labels').get(false)
-      ._primitivesDataById.forEach(v => { if (v.t) etiquetas.push(v.t); });
-  } catch (e) {}
+  const meta = s.metaInfo();
+  const titulos = (meta.plots || []).map(p => (meta.styles[p.id] && meta.styles[p.id].title) || p.id);
+  const fila = s.data().last();
+  const p = {};
+  if (fila) titulos.forEach((t, i) => { p[t] = fila.value[i + 1]; });
   let r = s._reportData;
   if (r && typeof r.value === 'function') r = r.value();
-  const ops = ((r && r.trades) || []).slice(-30).map(t => ({
+  const cerradas = ((r && r.trades) || []).filter(t => t.x.c).slice(-5).map(t => ({
     lado: t.e.c.split(' ')[0], tam: t.e.c.split(' ')[1] || '', entrada: t.e.p, tEntrada: t.e.tm,
-    salida: t.x.p, tSalida: t.x.tm, motivo: t.x.c, pnl: t.tp.v, pnlPct: t.tp.p
+    salida: t.x.p, tSalida: t.x.tm, motivo: t.x.c, pnl: t.tp.v
   }));
-  return JSON.stringify(Object.assign(base, { estrategia: true, etiquetas: etiquetas, ops: ops }));
+  return JSON.stringify(Object.assign(base, {
+    estrategia: true,
+    postura: p.postura, hora: p.p_hora, precio: p.p_precio, sl: p.p_sl, tp: p.p_tp, rr: p.p_rr, grande: p.p_grande,
+    cerradas: cerradas
+  }));
 })()
 """
 
@@ -178,23 +186,6 @@ def anotar(fila: dict) -> None:
         w.writerow(fila)
 
 
-def parsear_entrada(texto: str) -> dict:
-    """'SHORT · CHICA · 10:30\\n@ 39.90\\nR:R 1:2.0\\nSL 40.52 · TP 38.67' -> campos."""
-    lineas = texto.split("\n")
-    cab = [p.strip() for p in lineas[0].split("·")]
-    d = {"lado": cab[0], "tamano": cab[1] if len(cab) > 1 else "", "hora": cab[2] if len(cab) > 2 else ""}
-    for l in lineas[1:]:
-        if l.startswith("@"):
-            d["precio"] = l[1:].strip()
-        elif l.startswith("R:R"):
-            d["rr"] = l.rsplit(":", 1)[1].strip()  # "R:R 1:2.0" -> "2.0"
-        elif l.startswith("SL"):
-            partes = [p.strip() for p in l.split("·")]
-            d["sl"] = partes[0][2:].strip()
-            d["tp"] = partes[1][2:].strip() if len(partes) > 1 else ""
-    return d
-
-
 # --- Chart ----------------------------------------------------------------------------
 def estudio_corriendo() -> bool:
     if not LOCK_ESTUDIO.exists():
@@ -219,73 +210,100 @@ def poner_chart_en_15m(lectura: dict) -> bool:
     return False
 
 
-# --- Loop -----------------------------------------------------------------------------
-def mantener_despierta(si: bool) -> None:
-    # Sin esto el Idle Timeout duerme la maquina a mitad de la rueda. La pantalla
-    # puede apagarse: el chart sigue recibiendo datos aunque no pinte.
-    ES_CONTINUOUS, ES_SYSTEM_REQUIRED = 0x80000000, 0x00000001
-    ctypes.windll.kernel32.SetThreadExecutionState(ES_CONTINUOUS | (ES_SYSTEM_REQUIRED if si else 0))
+# --- Postura --------------------------------------------------------------------------
+def _num(x) -> str:
+    return f"{x:.2f}" if isinstance(x, (int, float)) else "?"
 
 
-def una_lectura(estado: dict, ahora: datetime, ultimo_reload: list) -> None:
-    lectura = json.loads(evaluar(JS_LECTURA))
-    if not poner_chart_en_15m(lectura):
+def _hora(ms) -> str:
+    return datetime.fromtimestamp(ms / 1000, NY).strftime("%H:%M") if ms else "?"
+
+
+def _minutos_desde(ms, ahora: datetime) -> float:
+    return (ahora - datetime.fromtimestamp(ms / 1000, NY)).total_seconds() / 60
+
+
+def describir(lec: dict) -> tuple[str, str]:
+    """Titulo y texto de la postura vigente."""
+    if not lec.get("postura"):
+        return "GGAL AFUERA", "Sin posicion."
+    lado = "LONG" if lec["postura"] > 0 else "SHORT"
+    tam = "GRANDE" if lec.get("grande") == 1 else "CHICA"
+    rr = f"R:R 1:{lec['rr']:.1f} · " if isinstance(lec.get("rr"), (int, float)) else ""
+    return (f"GGAL {lado} {tam} @ {_num(lec.get('precio'))} ({_hora(lec.get('hora'))} NY)",
+            f"{rr}SL {_num(lec.get('sl'))} · TP {_num(lec.get('tp'))}")
+
+
+def una_lectura(estado: dict, ahora: datetime, ultimo_reload: list, arranque: bool = False) -> None:
+    lec = json.loads(evaluar(JS_LECTURA))
+    if not poner_chart_en_15m(lec):
         return
-    if not lectura.get("estrategia"):
+    if not lec.get("estrategia"):
         if not estado.get("avisado_sin_estrategia"):
             notificar("GGAL Señales: falta la estrategia", "El chart no tiene 'GGAL Señales'. Agregala desde el Pine Editor.")
             estado["avisado_sin_estrategia"] = True
         return
 
     # Datos viejos: con la rueda abierta tiene que haber una vela de los ultimos minutos.
-    if lectura.get("ultimaVela"):
-        atraso = (ahora - datetime.fromtimestamp(lectura["ultimaVela"] / 1000, NY)).total_seconds() / 60
+    if lec.get("ultimaVela") and not arranque:
+        atraso = _minutos_desde(lec["ultimaVela"], ahora)
         if atraso > DATOS_VIEJOS_MIN and time.time() - ultimo_reload[0] > 15 * 60:
             log.warning("La ultima vela es de hace %.0f min: recargo la pagina.", atraso)
             evaluar("location.reload()")
             ultimo_reload[0] = time.time()
             return
 
-    entradas = Counter(t for t in lectura["etiquetas"] if t.startswith(("LONG", "SHORT")))
-    cerradas = {f"{o['tEntrada']}-{o['tSalida']}": o for o in lectura["ops"] if o["motivo"]}
+    postura = int(lec.get("postura") or 0)
+    hora = lec.get("hora")
+    clave = f"{postura}:{hora}" if postura else "0"
+    previa = estado.get("clave")
+    estado["clave"] = clave
 
-    if "entradas" not in estado:
-        # Primera lectura del dia: lo que ya esta dibujado no se avisa.
-        estado["entradas"] = dict(entradas)
-        estado["cerradas"] = sorted(cerradas)
-        log.info("Arranque: %d etiquetas de entrada y %d operaciones cerradas ya vistas.",
-                 sum(entradas.values()), len(cerradas))
+    if arranque or previa is None:
+        # Al arrancar se avisa la postura vigente una vez, sin anotarla como evento.
+        titulo, texto = describir(lec)
+        notificar(f"Postura actual · {titulo}", texto)
+        return
+    if clave == previa:
         return
 
-    previas = Counter(estado["entradas"])
-    for texto, n in entradas.items():
-        for _ in range(n - previas.get(texto, 0)):
-            d = parsear_entrada(texto)
-            notificar(f"GGAL {d['lado']} {d['tamano']} @ {d.get('precio', '?')}",
-                      f"R:R 1:{d.get('rr', '?')} · SL {d.get('sl', '?')} · TP {d.get('tp', '?')}")
-            anotar({"fecha": ahora.strftime("%Y-%m-%d"), "hora_ny": d.get("hora", ""), "evento": "entrada",
-                    "lado": d["lado"], "tamano": d["tamano"], "precio": d.get("precio", ""),
-                    "sl": d.get("sl", ""), "tp": d.get("tp", ""), "rr": d.get("rr", ""),
-                    "motivo_salida": "", "pnl_pct": ""})
-    estado["entradas"] = dict(entradas)
+    # Cambio de postura. Si se cerro una posicion, primero la salida.
+    if previa != "0":
+        cerradas = lec.get("cerradas") or []
+        o = cerradas[-1] if cerradas else None
+        if o and _minutos_desde(o["tSalida"], ahora) <= RECIENTE_MIN:
+            # Resultado sobre el capital inicial (100k), que es contra lo que se mide
+            # el riesgo de 0,5% / 1% por operacion.
+            pct = o["pnl"] / 100000 * 100
+            if o["motivo"].endswith("salida"):  # orden de stop/objetivo de strategy.exit
+                motivo = "objetivo" if o["pnl"] > 0 else "stop"
+            else:
+                motivo = o["motivo"].lower()
+            notificar(f"GGAL AFUERA · cierra el {o['lado']} @ {o['salida']:.2f}",
+                      f"{motivo} · {o['pnl']:+.0f} USD ({pct:+.2f}% del capital)")
+            anotar({"fecha": ahora.strftime("%Y-%m-%d"), "hora_ny": _hora(o["tSalida"]), "evento": "salida",
+                    "lado": o["lado"], "tamano": o["tam"], "precio": f"{o['salida']:.2f}",
+                    "sl": "", "tp": "", "rr": "", "motivo_salida": motivo, "pnl_pct": f"{pct:.2f}"})
 
-    for clave, o in cerradas.items():
-        if clave in estado["cerradas"]:
-            continue
-        # Resultado sobre el capital inicial de la estrategia (100k), que es lo que
-        # mide el riesgo de 0,5% / 1% por operacion.
-        pct = o["pnl"] / 100000 * 100
-        hora = datetime.fromtimestamp(o["tSalida"] / 1000, NY).strftime("%H:%M")
-        if o["motivo"].endswith("salida"):  # la orden de stop/objetivo de strategy.exit
-            motivo = "objetivo" if o["pnl"] > 0 else "stop"
-        else:
-            motivo = o["motivo"].lower()
-        notificar(f"GGAL salida {o['lado']} @ {o['salida']:.2f} ({motivo})",
-                  f"{o['pnl']:+.0f} USD · {pct:+.2f}% del capital")
-        anotar({"fecha": ahora.strftime("%Y-%m-%d"), "hora_ny": hora, "evento": "salida",
-                "lado": o["lado"], "tamano": o["tam"], "precio": f"{o['salida']:.2f}",
-                "sl": "", "tp": "", "rr": "", "motivo_salida": motivo, "pnl_pct": f"{pct:.2f}"})
-        estado["cerradas"].append(clave)
+    # Despues, si hay posicion nueva, la entrada (solo si es reciente).
+    if postura and hora and _minutos_desde(hora, ahora) <= RECIENTE_MIN:
+        titulo, texto = describir(lec)
+        notificar(titulo, texto)
+        anotar({"fecha": ahora.strftime("%Y-%m-%d"), "hora_ny": _hora(hora), "evento": "entrada",
+                "lado": "LONG" if postura > 0 else "SHORT", "tamano": "GRANDE" if lec.get("grande") == 1 else "CHICA",
+                "precio": _num(lec.get("precio")), "sl": _num(lec.get("sl")), "tp": _num(lec.get("tp")),
+                "rr": f"{lec['rr']:.1f}" if isinstance(lec.get("rr"), (int, float)) else "",
+                "motivo_salida": "", "pnl_pct": ""})
+    elif postura:
+        log.info("Cambio de postura viejo (%s): no se avisa.", clave)
+
+
+# --- Loop -----------------------------------------------------------------------------
+def mantener_despierta(si: bool) -> None:
+    # Sin esto el Idle Timeout duerme la maquina a mitad de la rueda. La pantalla
+    # puede apagarse: el chart sigue recibiendo datos aunque no pinte.
+    ES_CONTINUOUS, ES_SYSTEM_REQUIRED = 0x80000000, 0x00000001
+    ctypes.windll.kernel32.SetThreadExecutionState(ES_CONTINUOUS | (ES_SYSTEM_REQUIRED if si else 0))
 
 
 def commitear_diario(hoy: str) -> None:
@@ -318,25 +336,26 @@ def main() -> int:
 
     ahora = datetime.now(NY)
     hoy = ahora.strftime("%Y-%m-%d")
-    if ahora.weekday() >= 5 and not args.una_vez:
-        log.info("Fin de semana: nada que mirar.")
-        return 0
-    inicio = ahora.replace(hour=DESDE[0], minute=DESDE[1], second=0, microsecond=0)
-    fin = ahora.replace(hour=HASTA[0], minute=HASTA[1], second=0, microsecond=0)
-    if ahora >= fin and not args.una_vez:
-        log.info("La rueda de hoy ya termino.")
-        return 0
-
     estado = leer_estado(hoy) or {"fecha": hoy}
     ultimo_reload = [0.0]
 
     if args.una_vez:
-        una_lectura(estado, ahora, ultimo_reload)
+        una_lectura(estado, ahora, ultimo_reload, arranque=True)
         guardar_estado(estado)
+        return 0
+
+    if ahora.weekday() >= 5:
+        log.info("Fin de semana: nada que mirar.")
+        return 0
+    inicio = ahora.replace(hour=DESDE[0], minute=DESDE[1], second=0, microsecond=0)
+    fin = ahora.replace(hour=HASTA[0], minute=HASTA[1], second=0, microsecond=0)
+    if ahora >= fin:
+        log.info("La rueda de hoy ya termino.")
         return 0
 
     log.info("=== Vigia GGAL %s: mira de %02d:%02d a %02d:%02d NY ===", hoy, *DESDE, *HASTA)
     mantener_despierta(True)
+    avisado_arranque = False
     try:
         while datetime.now(NY) < inicio:
             time.sleep(30)
@@ -345,7 +364,8 @@ def main() -> int:
                 log.info("El estudio diario esta usando el chart; espero.")
             else:
                 try:
-                    una_lectura(estado, ahora, ultimo_reload)
+                    una_lectura(estado, ahora, ultimo_reload, arranque=not avisado_arranque)
+                    avisado_arranque = True
                     guardar_estado(estado)
                 except Exception as exc:
                     # CDP caido, pagina recargando, etc.: se reintenta en la vuelta siguiente.
