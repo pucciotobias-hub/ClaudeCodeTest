@@ -109,7 +109,11 @@ la metrica que tenia que mejorar.
 
 **No edites `ggal_estudio_prompt.md` vos.** Las propuestas las aprueba Tobias:
 una receta que se reescribe sola sin que nadie la mire puede derivar sin que se
-note. Maximo 3 propuestas, ordenadas por impacto. Si no hay nada que proponer
+note. Maximo 3 propuestas, ordenadas por impacto.
+**No propongas cuotas de cantidad de niveles** ("minimo N por lado"): el
+2026-09-24 una propuesta asi lleno el chart de lineas sin fundamento y Tobias la
+hizo sacar. Si falta cobertura de un lado, la propuesta es buscar niveles con
+fundamento mas atras, no agregar lineas. Si no hay nada que proponer
 con fundamento, decilo — no rellenes.
 
 ## 6. Escribir el informe

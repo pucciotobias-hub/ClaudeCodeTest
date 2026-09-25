@@ -110,18 +110,31 @@ punto 2 y reintentá.
 ## 5. Redibujar los niveles
 
 - `draw_list` para ver que hay, despues `draw_clear`, despues redibujar todo.
-- Los niveles salen de los maximos y minimos de swing de las ultimas ~30 ruedas
-  mas el mapa vigente del informe anterior. Maximo **10 lineas horizontales**,
-  repartidas asi:
-  - **Por lo menos 3 de cada lado del precio**, dentro de ~5% (un rango de 3
-    ruedas de GGAL).
-  - **A mas de 5% del precio, una sola linea por lado** (el gatillo de fondo). El
-    resto sale del mapa aunque tenga historia; si el precio vuelve, se redibuja.
-    Decí en el informe que salio.
-  - Si del lado hacia donde va la tendencia no hay swings de 30 ruedas, buscá mas
-    atras (meses o el año anterior) antes de dejar ese lado con menos de 3 lineas.
-  - (Auditoria 2026-09-24: el 55% de las lineas no se toco en 3 ruedas, casi todas
-    resistencias viejas, y del lado de la caida quedaban dos soportes.)
+- **Pocos niveles y todos con fundamento.** Maximo **7 lineas horizontales**: el
+  pivote y hasta 3 de cada lado. Es un techo, no una cuota: si hay 2 niveles
+  buenos de un lado, van 2. (El 24-sep quedaron 9 lineas entre 38.87 y 42.01, una
+  cada ~1%, y el chart no se podia leer. La regla vieja de "por lo menos 3 de
+  cada lado" obligaba a rellenar; se saco el 2026-09-25 a pedido de Tobias.)
+- **Que cuenta como nivel.** Solo entra si cumple al menos una de estas, y el
+  fundamento va con fecha en la columna "Que es":
+  1. Maximo o minimo de swing **confirmado** en diario: la vela tiene por lo menos
+     3 velas con maximos mas bajos (o minimos mas altos) de cada lado.
+  2. Zona con **2 o mas toques/rechazos** en ruedas distintas.
+  3. Borde de un gap, o maximo/minimo de un periodo relevante (mes, año, piso
+     de un rango de varias semanas).
+  No cuentan: un cierre suelto, un maximo intradia de una sola vela sin reaccion
+  despues, un numero redondo, ni "el punto medio" entre dos niveles.
+- **Separacion minima de 1,5% entre lineas** (~0,60 USD con GGAL en 40). Si dos
+  candidatos quedan mas cerca, quedate con el que tiene mas toques o es de mayor
+  temporalidad, o marcalos como **una zona** con un rectangulo en vez de dos lineas.
+- Candidatos: swings de las ultimas ~60 ruedas, el mapa del informe anterior, y
+  si hacia donde va la tendencia no hay nada, swings de meses o del año anterior.
+  Si aun asi un lado queda con 1 nivel, se deja con 1 y se dice: **mejor un lado
+  corto que una linea sin fundamento.**
+- A mas de 5% del precio, una sola linea por lado (el gatillo de fondo).
+- **Antes de dibujar**, armá la lista final (nivel, criterio 1/2/3, fecha) y
+  chequeá cantidad y separacion. Si una linea no pasa, no se dibuja. En el
+  informe decí que entro y que salio.
 - **R o S se decide por la posicion contra el ultimo precio, no por la historia del
   nivel.** Un "ex soporte" que quedo debajo del precio es S. La historia va en la
   columna "Que es".
@@ -177,7 +190,7 @@ Estructura:
 
 ## Mapa de niveles
 | | Nivel | Que es |
-(tabla con R4..R1, PIVOTE, S1..S5)
+(tabla con R3..R1, PIVOTE, S1..S3, y en "Que es" el fundamento con fecha)
 
 ## Indicadores
 (EMA20 vs precio, RSI y si hay divergencia, volumen relativo)
