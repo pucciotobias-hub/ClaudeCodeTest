@@ -1,0 +1,223 @@
+<title>GGAL Semanal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Public+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+:root{
+  --bg:#f3f5f7; --panel:#ffffff; --ink:#15202b; --muted:#5b6875; --line:#d9dfe5;
+  --accent:#0b5c8f; --up:#0f8a5f; --down:#c23b32; --flat:#7a8691; --amber:#b77800;
+  --up-bg:rgba(15,138,95,.10); --down-bg:rgba(194,59,50,.10); --flat-bg:rgba(122,134,145,.12);
+  --display:"Barlow Condensed","Arial Narrow",Arial,sans-serif;
+  --body:"Public Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme:dark;
+    --bg:#0e141a; --panel:#151d25; --ink:#e4e9ee; --muted:#95a2af; --line:#26313c;
+    --accent:#5fb0e6; --up:#3ccf95; --down:#f0736a; --flat:#8d99a5; --amber:#f2b33d;
+    --up-bg:rgba(60,207,149,.12); --down-bg:rgba(240,115,106,.12); --flat-bg:rgba(141,153,165,.14);
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#0e141a; --panel:#151d25; --ink:#e4e9ee; --muted:#95a2af; --line:#26313c;
+  --accent:#5fb0e6; --up:#3ccf95; --down:#f0736a; --flat:#8d99a5; --amber:#f2b33d;
+  --up-bg:rgba(60,207,149,.12); --down-bg:rgba(240,115,106,.12); --flat-bg:rgba(141,153,165,.14);
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font:15px/1.6 var(--body);padding-inline:16px;padding-block:28px 56px}
+.wrap{max-width:860px;margin:0 auto;display:grid;gap:28px}
+h1,h2,h3{font-family:var(--display);text-wrap:balance;margin:0;line-height:1.1}
+h2{font-size:1.55rem;font-weight:600;letter-spacing:.01em;display:flex;align-items:baseline;gap:10px}
+h2 small{font:500 .72rem/1 var(--body);color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
+p{margin:0;max-width:68ch}
+.num{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.up{color:var(--up)} .down{color:var(--down)} .flat{color:var(--flat)}
+.eyebrow{font:600 .74rem/1 var(--body);text-transform:uppercase;letter-spacing:.12em;color:var(--accent)}
+
+/* Cabecera: el cierre semanal de GGAL es la tesis de la pagina */
+header{display:grid;gap:14px;border-bottom:2px solid var(--ink);padding-bottom:22px}
+header h1{font-size:clamp(2rem,6vw,3.1rem);font-weight:700}
+.tape{display:flex;flex-wrap:wrap;gap:6px 22px;align-items:baseline}
+.tape .px{font:600 clamp(2.4rem,8vw,3.6rem)/1 var(--mono);font-variant-numeric:tabular-nums}
+.tape .chg{font:600 1.25rem/1 var(--mono)}
+.tape .meta{color:var(--muted);font-size:.9rem}
+.stats{display:flex;flex-wrap:wrap;gap:8px 20px;color:var(--muted);font-size:.88rem}
+.stats b{color:var(--ink);font-family:var(--mono);font-weight:600}
+
+.resumen{margin:0;padding-left:1.1em;display:grid;gap:6px}
+.resumen li{max-width:70ch}
+
+/* Mercados: barras de variacion semanal a escala */
+.mk{display:grid;gap:2px}
+.mk-row{display:grid;grid-template-columns:minmax(64px,90px) 1fr minmax(70px,auto) 72px;gap:12px;align-items:center;padding:7px 0;border-bottom:1px solid var(--line)}
+.mk-row .tk{font:600 1.05rem/1.1 var(--display);letter-spacing:.02em}
+.mk-row .tk span{display:block;font:400 .72rem/1.2 var(--body);color:var(--muted);letter-spacing:0}
+.bar{position:relative;height:14px}
+.bar::before{content:"";position:absolute;left:50%;top:-4px;bottom:-4px;width:1px;background:var(--line)}
+.bar i{position:absolute;top:0;bottom:0;border-radius:2px}
+.mk-row .v{text-align:right;font-weight:600}
+.mk-row .c{text-align:right;color:var(--muted);font-size:.85rem}
+.mk-note{color:var(--muted);font-size:.85rem;margin-top:8px}
+
+/* Noticias agrupadas por bloque */
+.bloques{display:grid;gap:22px}
+.bloque h3{font-size:1.15rem;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px}
+.nota{display:grid;grid-template-columns:auto 1fr;gap:4px 12px;padding:10px 0;border-top:1px solid var(--line)}
+.chip{font:600 .68rem/1 var(--body);text-transform:uppercase;letter-spacing:.08em;padding:5px 7px;border-radius:3px;align-self:start;margin-top:3px;white-space:nowrap}
+.chip.positivo{background:var(--up-bg);color:var(--up)}
+.chip.negativo{background:var(--down-bg);color:var(--down)}
+.chip.neutro{background:var(--flat-bg);color:var(--flat)}
+.nota .t{font-weight:600}
+.nota .d{grid-column:2;color:var(--muted);font-size:.92rem}
+.nota .src{grid-column:2;font-size:.78rem;color:var(--muted)}
+.nota a{color:var(--accent)}
+
+/* Tecnico */
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:18px}
+.niveles{width:100%;border-collapse:collapse;font-size:.92rem;margin-top:12px}
+.niveles td{padding:6px 8px;border-top:1px solid var(--line);vertical-align:top}
+.niveles td:first-child{font:600 .8rem/1.6 var(--mono);width:3.5em}
+.niveles td:nth-child(2){font-family:var(--mono);font-variant-numeric:tabular-nums;font-weight:600;width:5.5em}
+.niveles tr.R td:first-child{color:var(--down)}
+.niveles tr.S td:first-child{color:var(--up)}
+.niveles tr.P td{background:rgba(183,120,0,.08)} .niveles tr.P td:first-child{color:var(--amber)}
+.niveles tr.precio td{color:var(--accent);font-weight:600;border-top:2px solid var(--accent)}
+.table-x{overflow-x:auto}
+
+/* Semana que viene */
+.agenda{display:grid;gap:0}
+.ag{display:grid;grid-template-columns:5.2em 1fr;gap:12px;padding:9px 0;border-top:1px solid var(--line)}
+.ag .dia{font:600 .95rem/1.4 var(--display);letter-spacing:.03em;color:var(--accent)}
+.ag .por{display:block;color:var(--muted);font-size:.9rem}
+.esc{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin-top:6px}
+.esc > div{border-top:3px solid var(--flat);padding-top:10px;display:grid;gap:4px;align-content:start}
+.esc > div.alcista{border-color:var(--up)} .esc > div.bajista{border-color:var(--down)}
+.esc b{font-family:var(--display);font-size:1.15rem;font-weight:600}
+.esc .g{font:500 .82rem/1.4 var(--mono);color:var(--muted)}
+.panorama{font-size:1.02rem}
+
+footer{color:var(--muted);font-size:.8rem;border-top:1px solid var(--line);padding-top:14px;display:grid;gap:4px}
+@media (max-width:520px){
+  .mk-row{grid-template-columns:64px 1fr 62px;}
+  .mk-row .c{display:none}
+}
+</style>
+
+<!--
+  DATOS DE LA SEMANA. Es lo unico que cambia de una semana a otra: el agente
+  reemplaza este JSON y no toca el resto del archivo. Formato en
+  scripts/ggal_semanal_prompt.md.
+-->
+<script type="application/json" id="datos">
+{
+  "semana": "",
+  "generado": "",
+  "titular": "",
+  "ggal": { "cierre": null, "var_semana": null, "cierre_previo": null, "maximo": null, "minimo": null, "ema20": null, "rsi": null, "volumen_rel": "" },
+  "resumen": [],
+  "mercados": [],
+  "mercados_nota": "",
+  "noticias": [],
+  "tecnico": { "texto": "", "niveles": [] },
+  "agenda": [],
+  "escenarios": [],
+  "panorama": "",
+  "notas": ""
+}
+</script>
+
+<div class="wrap" id="app"></div>
+
+<script>
+(function(){
+  var D = JSON.parse(document.getElementById('datos').textContent);
+  var app = document.getElementById('app');
+  function esc(s){ return String(s == null ? '' : s).replace(/[&<>"]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
+  function cls(v){ return v == null ? 'flat' : v > 0.05 ? 'up' : v < -0.05 ? 'down' : 'flat'; }
+  function pct(v){ return v == null ? 'N/D' : (v > 0 ? '+' : v < 0 ? '−' : '') + Math.abs(v).toFixed(2).replace('.', ',') + '%'; }
+  function px(v, d){ return v == null ? 'N/D' : Number(v).toFixed(d == null ? 2 : d); }
+  var h = [];
+  var g = D.ggal || {};
+
+  h.push('<header><div class="eyebrow">GGAL ADR · semana del ' + esc(D.semana) + '</div>');
+  h.push('<h1>' + esc(D.titular || 'Reporte semanal') + '</h1>');
+  h.push('<div class="tape"><span class="px">' + px(g.cierre) + '</span><span class="chg ' + cls(g.var_semana) + '">' + pct(g.var_semana) + ' en la semana</span>');
+  h.push('<span class="meta">cierre previo ' + px(g.cierre_previo) + '</span></div>');
+  h.push('<div class="stats"><span>Rango <b>' + px(g.minimo) + ' – ' + px(g.maximo) + '</b></span><span>EMA20 <b>' + px(g.ema20) + '</b></span><span>RSI14 <b>' + px(g.rsi, 1) + '</b></span>' + (g.volumen_rel ? '<span>Volumen <b>' + esc(g.volumen_rel) + '</b></span>' : '') + '</div></header>');
+
+  if (D.resumen && D.resumen.length) {
+    h.push('<section><h2>Lo importante</h2><ul class="resumen">' + D.resumen.map(function(r){ return '<li>' + esc(r) + '</li>'; }).join('') + '</ul></section>');
+  }
+
+  if (D.mercados && D.mercados.length) {
+    var max = Math.max.apply(null, D.mercados.map(function(m){ return Math.abs(m.var || 0); }).concat([1]));
+    h.push('<section><h2>La semana en números <small>variación semanal · feed de TradingView</small></h2><div class="mk">');
+    D.mercados.forEach(function(m){
+      var w = Math.abs(m.var || 0) / max * 50;
+      var left = (m.var || 0) >= 0 ? 50 : 50 - w;
+      var col = (m.var || 0) >= 0 ? 'var(--up)' : 'var(--down)';
+      h.push('<div class="mk-row"><div class="tk">' + esc(m.ticker) + '<span>' + esc(m.nombre) + '</span></div>' +
+        '<div class="bar" aria-hidden="true"><i style="left:' + left + '%;width:' + w + '%;background:' + col + '"></i></div>' +
+        '<div class="v num ' + cls(m.var) + '">' + pct(m.var) + '</div><div class="c num">' + esc(m.cierre == null ? 'N/D' : m.cierre) + '</div></div>');
+    });
+    h.push('</div>' + (D.mercados_nota ? '<p class="mk-note">' + esc(D.mercados_nota) + '</p>' : '') + '</section>');
+  }
+
+  if (D.noticias && D.noticias.length) {
+    var orden = [], grupos = {};
+    D.noticias.forEach(function(n){ var b = n.bloque || 'Otros'; if (!grupos[b]) { grupos[b] = []; orden.push(b); } grupos[b].push(n); });
+    h.push('<section><h2>Noticias macro <small>qué movió y por qué importa para GGAL</small></h2><div class="bloques">');
+    orden.forEach(function(b){
+      h.push('<div class="bloque"><h3>' + esc(b) + '</h3>');
+      grupos[b].forEach(function(n){
+        var imp = ['positivo','negativo','neutro'].indexOf(n.impacto) >= 0 ? n.impacto : 'neutro';
+        h.push('<div class="nota"><span class="chip ' + imp + '">' + imp + '</span><div class="t">' + esc(n.titulo) + '</div>' +
+          '<div class="d">' + esc(n.detalle) + '</div>' +
+          (n.fuente ? '<div class="src">' + (n.url ? '<a href="' + esc(n.url) + '" target="_blank" rel="noopener">' + esc(n.fuente) + '</a>' : esc(n.fuente)) + (n.fecha ? ' · ' + esc(n.fecha) : '') + '</div>' : '') + '</div>');
+      });
+      h.push('</div>');
+    });
+    h.push('</div></section>');
+  }
+
+  var t = D.tecnico || {};
+  if (t.texto || (t.niveles && t.niveles.length)) {
+    h.push('<section><h2>Técnico <small>mapa del último estudio de cierre</small></h2><div class="panel"><p>' + esc(t.texto) + '</p>');
+    if (t.niveles && t.niveles.length) {
+      var niv = t.niveles.slice().sort(function(a, b){ return b.nivel - a.nivel; });
+      var puesto = false, rows = [];
+      niv.forEach(function(n){
+        if (!puesto && g.cierre != null && n.nivel < g.cierre) { rows.push('<tr class="precio"><td>Precio</td><td>' + px(g.cierre) + '</td><td>cierre de la semana</td></tr>'); puesto = true; }
+        var tipo = /^P/i.test(n.tipo) ? 'P' : /^R/i.test(n.tipo) ? 'R' : 'S';
+        rows.push('<tr class="' + tipo + '"><td>' + esc(n.tipo) + '</td><td>' + px(n.nivel) + '</td><td>' + esc(n.que) + '</td></tr>');
+      });
+      if (!puesto && g.cierre != null) rows.push('<tr class="precio"><td>Precio</td><td>' + px(g.cierre) + '</td><td>cierre de la semana</td></tr>');
+      h.push('<div class="table-x"><table class="niveles"><tbody>' + rows.join('') + '</tbody></table></div>');
+    }
+    h.push('</div></section>');
+  }
+
+  if ((D.agenda && D.agenda.length) || (D.escenarios && D.escenarios.length) || D.panorama) {
+    h.push('<section><h2>Panorama <small>la semana que viene</small></h2>');
+    if (D.panorama) h.push('<p class="panorama">' + esc(D.panorama) + '</p>');
+    if (D.agenda && D.agenda.length) {
+      h.push('<div class="agenda" style="margin-top:14px">' + D.agenda.map(function(a){ return '<div class="ag"><div class="dia">' + esc(a.dia) + '</div><div>' + esc(a.evento) + '<span class="por">' + esc(a.por_que) + '</span></div></div>'; }).join('') + '</div>');
+    }
+    if (D.escenarios && D.escenarios.length) {
+      h.push('<div class="esc" style="margin-top:18px">' + D.escenarios.map(function(e){
+        var k = /alc|rebot|sub/i.test(e.sesgo || '') ? 'alcista' : /baj|ca[ií]/i.test(e.sesgo || '') ? 'bajista' : '';
+        return '<div class="' + k + '"><b>' + esc(e.nombre) + '</b><span class="g">' + esc(e.gatillo) + '</span><span>' + esc(e.lectura) + '</span></div>';
+      }).join('') + '</div>');
+    }
+    h.push('</section>');
+  }
+
+  h.push('<footer><span>Generado ' + esc(D.generado) + ' · precios del feed de TradingView, noticias de la web con fuente citada.</span>' +
+    (D.notas ? '<span>' + esc(D.notas) + '</span>' : '') +
+    '<span>Descripción del cuadro técnico y macro. No es asesoramiento financiero.</span></footer>');
+
+  app.innerHTML = h.join('');
+})();
+</script>

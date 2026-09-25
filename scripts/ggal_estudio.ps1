@@ -13,11 +13,16 @@
     las barras de GGAL, contrasta los estudios de la semana contra el precio y
     escribe estudios/ggal/auditorias/<fecha>.md.
 
+    Con -Turno semanal usa scripts/ggal_semanal_prompt.md: arma el reporte de la
+    semana (numeros del feed, noticias macro, panorama) en
+    estudios/ggal/semanal/<fecha>.html y lo publica como pagina en claude.ai.
+
     Requiere una sesion de escritorio activa: Chrome tiene que poder renderizar.
     Si la maquina esta bloqueada o con sesion cerrada, el chart no repinta.
 
 .PARAMETER Turno
-    'apertura' (pre-mercado), 'cierre' (post-mercado) o 'auditoria' (semanal).
+    'apertura' (pre-mercado), 'cierre' (post-mercado), 'auditoria' (semanal) o
+    'semanal' (reporte de la semana con noticias y panorama).
 
 .PARAMETER Forzar
     Corre aunque el informe de hoy ya exista o este fuera de la ventana horaria.
@@ -30,7 +35,7 @@
 [CmdletBinding()]
 param(
     [Parameter(Mandatory = $true)]
-    [ValidateSet('apertura', 'cierre', 'auditoria')]
+    [ValidateSet('apertura', 'cierre', 'auditoria', 'semanal')]
     [string]$Turno,
 
     [switch]$Forzar
@@ -40,7 +45,8 @@ $ErrorActionPreference = 'Stop'
 
 # --- Rutas -----------------------------------------------------------------
 $RepoDir     = Split-Path -Parent $PSScriptRoot
-$PromptFile  = Join-Path $PSScriptRoot $(if ($Turno -eq 'auditoria') { 'ggal_auditoria_prompt.md' } else { 'ggal_estudio_prompt.md' })
+$Recetas     = @{ apertura = 'ggal_estudio_prompt.md'; cierre = 'ggal_estudio_prompt.md'; auditoria = 'ggal_auditoria_prompt.md'; semanal = 'ggal_semanal_prompt.md' }
+$PromptFile  = Join-Path $PSScriptRoot $Recetas[$Turno]
 $RelanzarScript = Join-Path $PSScriptRoot 'relanzar_chrome_cdp.ps1'
 $LogDir      = Join-Path $RepoDir 'logs'
 $LogFile     = Join-Path $LogDir 'ggal_estudio.log'
@@ -63,10 +69,12 @@ $TopeMinutos = 40
 # Ventana en la que cada turno tiene sentido (hora ART). Fuera de ella la corrida
 # se saltea: el cierre del 10-sep corrio a las 00:55 del 11 y salio con fecha 11,
 # y el del 15-sep corrio 16 h tarde en paralelo con la apertura del 16 y se
-# pisaron los dibujos. La auditoria no tiene ventana.
+# pisaron los dibujos. La auditoria no tiene ventana. El semanal no puede pisarse
+# con la apertura (usan el mismo chart), por eso sus disparos son 09:30 y 12:00.
 $Ventanas = @{
     apertura = @{ Desde = '10:00'; Hasta = '16:30' }
     cierre   = @{ Desde = '17:00'; Hasta = '23:59' }
+    semanal  = @{ Desde = '09:00'; Hasta = '16:30' }
 }
 
 if (-not (Test-Path $LogDir)) { New-Item -ItemType Directory -Path $LogDir | Out-Null }
@@ -90,7 +98,11 @@ Write-Log "=== INICIO estudio GGAL - turno: $Turno ==="
 
 $fecha  = Get-Date -Format 'yyyy-MM-dd'
 $hora   = Get-Date -Format 'HH:mm'
-$salida = if ($Turno -eq 'auditoria') { "estudios/ggal/auditorias/$fecha.md" } else { "estudios/ggal/$fecha-$Turno.md" }
+$salida = switch ($Turno) {
+    'auditoria' { "estudios/ggal/auditorias/$fecha.md" }
+    'semanal'   { "estudios/ggal/semanal/$fecha.html" }
+    default     { "estudios/ggal/$fecha-$Turno.md" }
+}
 
 # Cada turno tiene varios disparos (ver install_ggal_tasks.ps1): si uno muere en
 # el despertar de la maquina, el siguiente lo cubre. Los que llegan despues de
@@ -192,6 +204,8 @@ $allowed = @(
     # el informe sale parcial (paso el 2026-09-09: se perdio el macro y el
     # retrazado). El patron apunta solo al script de relanzamiento.
     'Bash(powershell*relanzar_chrome_cdp.ps1*)'
+    # Solo el reporte semanal: noticias de la web y publicar la pagina.
+    if ($Turno -eq 'semanal') { 'WebSearch'; 'WebFetch'; 'Artifact'; 'Bash(cp *)' }
 ) -join ','
 
 # Claude corre como proceso aparte (no con el pipe de siempre) para poder

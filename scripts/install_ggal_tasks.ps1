@@ -40,6 +40,7 @@ $LaV = @('Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday')
 $Tareas = @(
     @{ Nombre = 'EstudioGGAL-Apertura'; Turno = 'apertura';  Horas = @('10:20', '10:50');          Dias = $LaV;       Desc = 'Estudio tecnico GGAL ADR - pre-apertura de NY' }
     @{ Nombre = 'EstudioGGAL-Cierre';   Turno = 'cierre';    Horas = @('17:15', '17:50', '18:30'); Dias = $LaV;       Desc = 'Estudio tecnico GGAL ADR - post-cierre de NY' }
+    @{ Nombre = 'ReporteSemanalGGAL';   Turno = 'semanal';   Horas = @('09:30', '12:00');          Dias = @('Monday'); Desc = 'Reporte semanal GGAL: noticias macro y panorama, publicado en claude.ai' }
     @{ Nombre = 'AuditoriaGGAL';        Turno = 'auditoria'; Horas = @('19:30', '20:30');          Dias = @('Friday'); Desc = 'Auditoria semanal de los estudios GGAL contra el precio' }
 )
 

@@ -12,6 +12,9 @@ dos veces por dia habil, y deja el informe versionado en `estudios/ggal/`.
 | `relanzar_chrome_cdp.ps1` | Levanta Chrome con CDP en el 9222 (idempotente). Lo llama el wrapper en el preflight, y tambien Claude si el CDP se cae a mitad del estudio. |
 | `install_ggal_tasks.ps1` | Registra/borra las tres Tareas Programadas de Windows. |
 | `ggal_auditoria_prompt.md` | Receta de la **auditoria semanal**: contrasta los estudios contra lo que hizo el precio y propone cambios a la receta del estudio. |
+| `ggal_semanal_prompt.md` | Receta del **reporte semanal**: numeros de la semana del feed, noticias macro de la web (con fuente) y panorama de la semana que viene. |
+| `ggal_semanal_template.html` | Plantilla fija de la pagina semanal. El agente solo reemplaza el bloque JSON de datos; el diseño no cambia. |
+| `ggal_semanal_url.txt` | Link fijo de la pagina publicada en claude.ai (lo crea la primera corrida). |
 | `ggal_auditoria.py` | La parte objetiva de la auditoria (niveles respetados/perforados/rotos, extremos anticipados contra una grilla, encabezados contra la barra). Se puede correr a mano: `python scripts/ggal_auditoria.py --barras scripts/ggal_bars.json`. |
 
 ## Horarios (ART, UTC-3)
@@ -20,6 +23,7 @@ dos veces por dia habil, y deja el informe versionado en `estudios/ggal/`.
 |---|---|---|
 | `EstudioGGAL-Apertura` | L-V 10:20 (reintento 10:50) | 10 min antes de que abra NY (10:30 ART). Llegas con el mapa armado. |
 | `EstudioGGAL-Cierre` | L-V 17:15 (reintentos 17:50 y 18:30) | 15 min despues del cierre (17:00 ART). Vela diaria ya cerrada. |
+| `ReporteSemanalGGAL` | L 09:30 (reintento 12:00) | Semana cerrada, antes de la apertura. El de 12:00 va despues de la apertura para no pisarse en el chart. |
 | `AuditoriaGGAL` | V 19:30 (reintento 20:30) | Despues del ultimo reintento del cierre del viernes. |
 
 Los reintentos no duplican nada: si el informe del dia ya existe, el wrapper sale
@@ -53,6 +57,8 @@ Verificar / borrar:
 ## Salida
 
 - Informe: `estudios/ggal/YYYY-MM-DD-<turno>.md`, commiteado y pusheado solo.
+- Reporte semanal: `estudios/ggal/semanal/YYYY-MM-DD.html`, publicado siempre en el mismo
+  link de claude.ai (el de `scripts/ggal_semanal_url.txt`).
 - Auditoria: `estudios/ggal/auditorias/YYYY-MM-DD.md`. **Las propuestas de cambio a
   la receta no se aplican solas**: las lee Tobias y decide. Una receta que se
   reescribe sola sin que nadie la mire puede derivar sin que se note.
