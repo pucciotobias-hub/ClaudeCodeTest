@@ -13,8 +13,7 @@ dos veces por dia habil, y deja el informe versionado en `estudios/ggal/`.
 | `install_ggal_tasks.ps1` | Registra/borra las tres Tareas Programadas de Windows. |
 | `ggal_auditoria_prompt.md` | Receta de la **auditoria semanal**: contrasta los estudios contra lo que hizo el precio y propone cambios a la receta del estudio. |
 | `ggal_semanal_prompt.md` | Receta del **reporte semanal**: numeros de la semana del feed, noticias macro de la web (con fuente) y panorama de la semana que viene. |
-| `ggal_semanal_template.html` | Plantilla fija de la pagina semanal. El agente solo reemplaza el bloque JSON de datos; el diseño no cambia. |
-| `ggal_semanal_url.txt` | Link fijo de la pagina publicada en claude.ai (lo crea la primera corrida). |
+| `ggal_semanal_doc.txt` | Ids y link fijo del documento de Claude Docs donde se publica el semanal (la semana nueva arriba, las anteriores debajo). |
 | `ggal_auditoria.py` | La parte objetiva de la auditoria (niveles respetados/perforados/rotos, extremos anticipados contra una grilla, encabezados contra la barra). Se puede correr a mano: `python scripts/ggal_auditoria.py --barras scripts/ggal_bars.json`. |
 
 ## Horarios (ART, UTC-3)
@@ -57,8 +56,9 @@ Verificar / borrar:
 ## Salida
 
 - Informe: `estudios/ggal/YYYY-MM-DD-<turno>.md`, commiteado y pusheado solo.
-- Reporte semanal: `estudios/ggal/semanal/YYYY-MM-DD.html`, publicado siempre en el mismo
-  link de claude.ai (el de `scripts/ggal_semanal_url.txt`).
+- Reporte semanal: `estudios/ggal/semanal/YYYY-MM-DD.md`, publicado en el documento de
+  Claude Docs de `scripts/ggal_semanal_doc.txt`. (Una pagina HTML no sirve: la herramienta
+  Artifact no existe en `claude -p`.)
 - Auditoria: `estudios/ggal/auditorias/YYYY-MM-DD.md`. **Las propuestas de cambio a
   la receta no se aplican solas**: las lee Tobias y decide. Una receta que se
   reescribe sola sin que nadie la mire puede derivar sin que se note.
