@@ -1,0 +1,436 @@
+<title>GGAL Semanal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Public+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+:root{
+  --bg:#f3f5f7; --panel:#ffffff; --ink:#15202b; --muted:#5b6875; --line:#d9dfe5;
+  --accent:#0b5c8f; --up:#0f8a5f; --down:#c23b32; --flat:#7a8691; --amber:#b77800;
+  --up-bg:rgba(15,138,95,.10); --down-bg:rgba(194,59,50,.10); --flat-bg:rgba(122,134,145,.12);
+  --display:"Barlow Condensed","Arial Narrow",Arial,sans-serif;
+  --body:"Public Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme:dark;
+    --bg:#0e141a; --panel:#151d25; --ink:#e4e9ee; --muted:#95a2af; --line:#26313c;
+    --accent:#5fb0e6; --up:#3ccf95; --down:#f0736a; --flat:#8d99a5; --amber:#f2b33d;
+    --up-bg:rgba(60,207,149,.12); --down-bg:rgba(240,115,106,.12); --flat-bg:rgba(141,153,165,.14);
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#0e141a; --panel:#151d25; --ink:#e4e9ee; --muted:#95a2af; --line:#26313c;
+  --accent:#5fb0e6; --up:#3ccf95; --down:#f0736a; --flat:#8d99a5; --amber:#f2b33d;
+  --up-bg:rgba(60,207,149,.12); --down-bg:rgba(240,115,106,.12); --flat-bg:rgba(141,153,165,.14);
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font:15px/1.6 var(--body);padding-inline:16px;padding-block:28px 56px}
+.wrap{max-width:860px;margin:0 auto;display:grid;gap:28px}
+h1,h2,h3{font-family:var(--display);text-wrap:balance;margin:0;line-height:1.1}
+h2{font-size:1.55rem;font-weight:600;letter-spacing:.01em;display:flex;align-items:baseline;gap:10px}
+h2 small{font:500 .72rem/1 var(--body);color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
+p{margin:0;max-width:68ch}
+.num{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.up{color:var(--up)} .down{color:var(--down)} .flat{color:var(--flat)}
+.eyebrow{font:600 .74rem/1 var(--body);text-transform:uppercase;letter-spacing:.12em;color:var(--accent)}
+
+/* Cabecera: el cierre semanal de GGAL es la tesis de la pagina */
+header{display:grid;gap:14px;border-bottom:2px solid var(--ink);padding-bottom:22px}
+header h1{font-size:clamp(2rem,6vw,3.1rem);font-weight:700}
+.tape{display:flex;flex-wrap:wrap;gap:6px 22px;align-items:baseline}
+.tape .px{font:600 clamp(2.4rem,8vw,3.6rem)/1 var(--mono);font-variant-numeric:tabular-nums}
+.tape .chg{font:600 1.25rem/1 var(--mono)}
+.tape .meta{color:var(--muted);font-size:.9rem}
+.stats{display:flex;flex-wrap:wrap;gap:8px 20px;color:var(--muted);font-size:.88rem}
+.stats b{color:var(--ink);font-family:var(--mono);font-weight:600}
+
+.resumen{margin:0;padding-left:1.1em;display:grid;gap:6px}
+.resumen li{max-width:70ch}
+
+/* Mercados: barras de variacion semanal a escala */
+.mk{display:grid;gap:2px}
+.mk-row{display:grid;grid-template-columns:minmax(64px,90px) 1fr minmax(70px,auto) 72px;gap:12px;align-items:center;padding:7px 0;border-bottom:1px solid var(--line)}
+.mk-row .tk{font:600 1.05rem/1.1 var(--display);letter-spacing:.02em}
+.mk-row .tk span{display:block;font:400 .72rem/1.2 var(--body);color:var(--muted);letter-spacing:0}
+.bar{position:relative;height:14px}
+.bar::before{content:"";position:absolute;left:50%;top:-4px;bottom:-4px;width:1px;background:var(--line)}
+.bar i{position:absolute;top:0;bottom:0;border-radius:2px}
+.mk-row .v{text-align:right;font-weight:600}
+.mk-row .c{text-align:right;color:var(--muted);font-size:.85rem}
+.mk-note{color:var(--muted);font-size:.85rem;margin-top:8px}
+
+/* Noticias agrupadas por bloque */
+.bloques{display:grid;gap:22px}
+.bloque h3{font-size:1.15rem;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px}
+.nota{display:grid;grid-template-columns:auto 1fr;gap:4px 12px;padding:10px 0;border-top:1px solid var(--line)}
+.chip{font:600 .68rem/1 var(--body);text-transform:uppercase;letter-spacing:.08em;padding:5px 7px;border-radius:3px;align-self:start;margin-top:3px;white-space:nowrap}
+.chip.positivo{background:var(--up-bg);color:var(--up)}
+.chip.negativo{background:var(--down-bg);color:var(--down)}
+.chip.neutro{background:var(--flat-bg);color:var(--flat)}
+.nota .t{font-weight:600}
+.nota .d{grid-column:2;color:var(--muted);font-size:.92rem}
+.nota .src{grid-column:2;font-size:.78rem;color:var(--muted)}
+.nota a{color:var(--accent)}
+
+/* Tecnico */
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:18px}
+.niveles{width:100%;border-collapse:collapse;font-size:.92rem;margin-top:12px}
+.niveles td{padding:6px 8px;border-top:1px solid var(--line);vertical-align:top}
+.niveles td:first-child{font:600 .8rem/1.6 var(--mono);width:3.5em}
+.niveles td:nth-child(2){font-family:var(--mono);font-variant-numeric:tabular-nums;font-weight:600;width:5.5em}
+.niveles tr.R td:first-child{color:var(--down)}
+.niveles tr.S td:first-child{color:var(--up)}
+.niveles tr.P td{background:rgba(183,120,0,.08)} .niveles tr.P td:first-child{color:var(--amber)}
+.niveles tr.precio td{color:var(--accent);font-weight:600;border-top:2px solid var(--accent)}
+.table-x{overflow-x:auto}
+
+/* Semana que viene */
+.agenda{display:grid;gap:0}
+.ag{display:grid;grid-template-columns:5.2em 1fr;gap:12px;padding:9px 0;border-top:1px solid var(--line)}
+.ag .dia{font:600 .95rem/1.4 var(--display);letter-spacing:.03em;color:var(--accent)}
+.ag .por{display:block;color:var(--muted);font-size:.9rem}
+.esc{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin-top:6px}
+.esc > div{border-top:3px solid var(--flat);padding-top:10px;display:grid;gap:4px;align-content:start}
+.esc > div.alcista{border-color:var(--up)} .esc > div.bajista{border-color:var(--down)}
+.esc b{font-family:var(--display);font-size:1.15rem;font-weight:600}
+.esc .g{font:500 .82rem/1.4 var(--mono);color:var(--muted)}
+.panorama{font-size:1.02rem}
+
+footer{color:var(--muted);font-size:.8rem;border-top:1px solid var(--line);padding-top:14px;display:grid;gap:4px}
+@media (max-width:520px){
+  .mk-row{grid-template-columns:64px 1fr 62px;}
+  .mk-row .c{display:none}
+}
+</style>
+
+<!--
+  DATOS DE LA SEMANA. Es lo unico que cambia de una semana a otra: el agente
+  reemplaza este JSON y no toca el resto del archivo. Formato en
+  scripts/ggal_semanal_prompt.md.
+-->
+<script type="application/json" id="datos">
+{
+  "semana": "21 al 25 de septiembre de 2026",
+  "generado": "2026-09-28 10:40 ART",
+  "titular": "GGAL −7,2%: perdió el piso de mayo y cerró en el mínimo del año",
+  "ggal": {
+    "cierre": 38.74,
+    "var_semana": -7.23,
+    "cierre_previo": 41.76,
+    "maximo": 42.2,
+    "minimo": 38.74,
+    "ema20": 42.22,
+    "rsi": 27.0,
+    "volumen_rel": "114% del promedio de las 4 semanas previas"
+  },
+  "resumen": [
+    "GGAL cerró la semana en 38.74 (−7,23%), con cinco ruedas sin un cierre al alza y el viernes en el mínimo exacto: el cierre más bajo desde octubre de 2025.",
+    "Perdió en cierre el piso de mayo (39.76–39.875, el 24-sep) y el mínimo del 1-may (39.40, el 25-sep). La continuación bajista del mapa se activó dos veces.",
+    "Cayó con el bloque argentino pero bastante más: ARGT −4,14%, EWZ −1,87%, con SPY +1,27%. Contra ARGT, −3,09 pp.",
+    "Detrás: riesgo país arriba de 600 pb (609, máximo en seis meses), reservas −USD 1.544 M con el pago al FMI y un BCRA que casi no compró; afuera, la tasa a 10 años de EE.UU. arriba de 5,1% y el Brent cerca de 107.",
+    "RSI 27 en sobreventa, sin divergencia; EMA20 en 42.22 (−8,2%). El soporte siguiente es el estante 38.155–38.55 de sep-2025."
+  ],
+  "mercados": [
+    {
+      "ticker": "GGAL",
+      "nombre": "Galicia ADR",
+      "cierre": 38.74,
+      "var": -7.23
+    },
+    {
+      "ticker": "ARGT",
+      "nombre": "ETF Argentina",
+      "cierre": 88.6,
+      "var": -4.14
+    },
+    {
+      "ticker": "EWZ",
+      "nombre": "ETF Brasil",
+      "cierre": 36.82,
+      "var": -1.87
+    },
+    {
+      "ticker": "SPY",
+      "nombre": "S&P 500",
+      "cierre": 771.35,
+      "var": 1.27
+    },
+    {
+      "ticker": "DXY",
+      "nombre": "Índice dólar",
+      "cierre": 101.034,
+      "var": 0.82
+    },
+    {
+      "ticker": "US10Y",
+      "nombre": "Tasa 10 años EE.UU.",
+      "cierre": 5.167,
+      "var": 3.34
+    }
+  ],
+  "mercados_nota": "GGAL cayó con el bloque argentino pero −3,09 pp peor que ARGT, con SPY en alza: la debilidad es argentina y, dentro de Argentina, más en los bancos.",
+  "noticias": [
+    {
+      "bloque": "Argentina",
+      "titulo": "El riesgo país superó los 600 puntos, máximo en seis meses",
+      "detalle": "Cerró la semana en 609 pb (+84, +16%), con un pico de 628 el viernes y diez ruedas seguidas de caída de Globales y Bonares. Encarece el financiamiento de un país con el muro de vencimientos de 2027 y pesa directo sobre los bancos, cargados de deuda soberana.",
+      "impacto": "negativo",
+      "fuente": "Infobae",
+      "url": "https://www.infobae.com/economia/2026/09/25/jornada-financiera-el-riesgo-pais-supero-los-600-puntos-basicos-y-toco-el-nivel-mas-alto-en-seis-meses/",
+      "fecha": "25-sep"
+    },
+    {
+      "bloque": "Argentina",
+      "titulo": "Pago de casi USD 800 M al FMI: las reservas cayeron USD 1.544 M en la semana",
+      "detalle": "Las reservas brutas bajaron a USD 48.245 M, mínimo desde julio, y el BCRA compró sólo USD 29 M en la semana (nada el viernes). El mercado mira si el Tesoro llega con dólares a los pagos de fin de año.",
+      "impacto": "negativo",
+      "fuente": "Ámbito",
+      "url": "https://www.ambito.com/finanzas/el-gobierno-pago-casi-us800-millones-al-fmi-las-reservas-cayeron-us1553-millones-la-semana-y-el-bcra-no-compro-dolares-n6326858",
+      "fecha": "25-sep"
+    },
+    {
+      "bloque": "Argentina",
+      "titulo": "Semana financiera: los ADRs bancarios entre los peores, Merval −6,5% en dólares",
+      "detalle": "Macro −10,1%, Supervielle y BBVA −9,6%, Galicia −7,9%; el Merval quedó debajo de 1.800 puntos en dólares por primera vez desde marzo. El mayorista cerró en $1.525,50 (máximo nominal, lejos del techo de la banda) y el EMAE de julio cayó 2,9% mensual, con alerta de recesión técnica.",
+      "impacto": "negativo",
+      "fuente": "Infobae",
+      "url": "https://www.infobae.com/economia/2026/09/26/semana-financiera-un-dificil-contexto-externo-y-las-dudas-locales-golpearon-a-las-acciones-y-bonos-argentinos/",
+      "fecha": "26-sep"
+    },
+    {
+      "bloque": "Argentina",
+      "titulo": "Detrás de la caída de los bonos: dos factores externos y tres locales",
+      "detalle": "Afuera, tasas de EE.UU. y petróleo; adentro, compras del BCRA en baja (USD 13 M diarios en septiembre contra 38 M en agosto), Bonares con rendimientos de dos dígitos y ruido electoral de cara a 2027 con la actividad floja. Es el mismo combo que castiga a los bancos.",
+      "impacto": "negativo",
+      "fuente": "Infobae",
+      "url": "https://www.infobae.com/economia/2026/09/27/riesgo-pais-arriba-de-600-puntos-dos-factores-externos-y-tres-locales-detras-de-la-caida-de-los-bonos-argentinos/",
+      "fecha": "27-sep"
+    },
+    {
+      "bloque": "Argentina",
+      "titulo": "Galicia corta hoy el dividendo mensual de USD 0,0479 por ADR",
+      "detalle": "Ex-dividendo el 28-sep, pago el 5-oct. Es el 0,12% del precio: explica el premarket en 38.69 y no cambia el cuadro.",
+      "impacto": "neutro",
+      "fuente": "Futu News",
+      "url": "https://news.futunn.com/en/post/1000196992/grupo-financiero-galicia-to-go-ex-dividend-on-september-28th",
+      "fecha": "18-sep"
+    },
+    {
+      "bloque": "EE.UU. y global",
+      "titulo": "La tasa a 10 años tocó su máximo desde 2007",
+      "detalle": "El jueves pasó 5,2% después de un PMI en máximos de cinco años y una subasta floja de bonos a 5 años; cerró el viernes en 5,17%. Tasas más altas en EE.UU. encarecen la deuda emergente y le restan flujo a los activos argentinos.",
+      "impacto": "negativo",
+      "fuente": "Advisor Perspectives",
+      "url": "https://www.advisorperspectives.com/dshort/updates/2026/09/25/treasury-yields-snapshot-september-25-2026",
+      "fecha": "25-sep"
+    },
+    {
+      "bloque": "EE.UU. y global",
+      "titulo": "Crece la apuesta a otra suba de la Fed en octubre",
+      "detalle": "Después de la suba de septiembre, el mercado le da más de 65% a otro aumento en la reunión de octubre. Dólar más firme (DXY +0,8% en la semana) y menos apetito por emergentes.",
+      "impacto": "negativo",
+      "fuente": "Infobae",
+      "url": "https://www.infobae.com/economia/2026/09/26/semana-financiera-un-dificil-contexto-externo-y-las-dudas-locales-golpearon-a-las-acciones-y-bonos-argentinos/",
+      "fecha": "26-sep"
+    },
+    {
+      "bloque": "EE.UU. y global",
+      "titulo": "Brent a 108 por ataques hutíes a Arabia Saudita, después aflojó",
+      "detalle": "Seis misiles hutíes llevaron el Brent a 108,23 el jueves; cerró en 106,6 y bajó el viernes con versiones de negociación EE.UU.-Irán por Ormuz. El petróleo caro alimenta la inflación y la presión sobre la Fed, que es lo que pesa sobre un banco.",
+      "impacto": "negativo",
+      "fuente": "Eastern Herald",
+      "url": "https://easternherald.com/2026/09/24/brent-crude-oil-price-september-24-2026-houthi-strike-hormuz",
+      "fecha": "24-sep"
+    },
+    {
+      "bloque": "Brasil",
+      "titulo": "Ibovespa −1% en la semana, segunda semana negativa",
+      "detalle": "Pesaron una encuesta Datafolha y el IPCA-15 de septiembre (+0,70%, 4,47% anual). EWZ cayó 1,87%, bastante menos que ARGT: la región acompañó pero no explica la caída de GGAL.",
+      "impacto": "neutro",
+      "fuente": "Exame",
+      "url": "https://exame.com/invest/mercados/ibovespa-ibov-fechamento-25-09-2026/",
+      "fecha": "25-sep"
+    }
+  ],
+  "tecnico": {
+    "texto": "Tendencia bajista intacta y acelerándose. Máximos más bajos en la semana (42.01 el 23-sep → 40.44 → 40.00) y un mínimo nuevo cada rueda (41.33 → 40.275 → 39.93 → 39.28 → 38.74). Se perdieron en cierre el piso de mayo (24-sep) y el mínimo del 1-may, 39.40 (25-sep): la zona 39.28–39.80 pasó de piso a techo y el precio volvió debajo de la directriz bajista desde junio (hoy 39.28, miércoles 38.74). Los dos gatillos a favor de la tendencia se cumplieron; los de rebote no se activaron. El 25-sep el mapa se depuró a 5 líneas con fundamento.",
+    "niveles": [
+      {
+        "tipo": "R2",
+        "nivel": 42.5,
+        "que": "Mínimo doble 25/31-ago, techo del 16-sep. Única línea a más de 5% arriba"
+      },
+      {
+        "tipo": "R1",
+        "nivel": 40.6,
+        "que": "Piso del 20-ago y techo del rebote del 24-sep"
+      },
+      {
+        "tipo": "PIVOTE",
+        "nivel": 39.4,
+        "que": "Mínimo 1-may, perdido en cierre el 25-sep. Zona 39.28–39.80; directriz 39.28 hoy"
+      },
+      {
+        "tipo": "S1",
+        "nivel": 38.4,
+        "que": "Estante 3/4/5-sep-2025 (38.155–38.55)"
+      },
+      {
+        "tipo": "S2",
+        "nivel": 36.56,
+        "que": "Mínimo 2-sep-2025, gatillo de fondo; debajo, el gap de 2025 sin soportes"
+      }
+    ]
+  },
+  "agenda": [
+    {
+      "dia": "Lun 28",
+      "evento": "Licitación del Tesoro: vencen $8,6 billones (Boncap, Boncer, TAMAR y dólar linked); liquida el miércoles 30",
+      "por_que": "Con los bonos en caída, un rollover bajo o tasas altas pesan sobre los bancos, principales tenedores de deuda en pesos"
+    },
+    {
+      "dia": "Lun 28",
+      "evento": "GGAL cotiza ex-dividendo (USD 0,0479)",
+      "por_que": "El precio arranca ajustado 0,12%; no es caída"
+    },
+    {
+      "dia": "Mar 29",
+      "evento": "JOLTS de agosto y confianza del consumidor (EE.UU.)",
+      "por_que": "Primeros datos para medir si la Fed vuelve a subir en octubre"
+    },
+    {
+      "dia": "Mié 30",
+      "evento": "PCE de agosto, ADP y PBI 3ª estimación (EE.UU.)",
+      "por_que": "El PCE es la inflación que mira la Fed: un dato alto empuja la tasa a 10 años, el principal viento en contra externo"
+    },
+    {
+      "dia": "Jue 1",
+      "evento": "ISM manufacturero (EE.UU.)",
+      "por_que": "Otra pista de actividad para la Fed, después del PMI en máximos de cinco años"
+    },
+    {
+      "dia": "Vie 2",
+      "evento": "Informe de empleo de septiembre (EE.UU.)",
+      "por_que": "El dato de la semana: se esperan +100 mil empleos y desempleo de 4,2%; define la apuesta por la suba de octubre"
+    }
+  ],
+  "escenarios": [
+    {
+      "nombre": "Continuación bajista",
+      "sesgo": "bajista",
+      "gatillo": "1 cierre < 38.40 (versión limpia < 38.155)",
+      "lectura": "A favor de la tendencia, vale con un cierre. Pierde el estante de sep-2025 y apunta al gatillo de fondo 36.56; debajo está el gap de 2025 sin soportes. Con RSI en 27, una barrida del estante con recompra es tan posible como la rotura."
+    },
+    {
+      "nombre": "Rango de digestión",
+      "sesgo": "rango",
+      "gatillo": "cierres entre 38.40 y 39.28",
+      "lectura": "Digerir la rotura entre el estante de 2025 y la zona perdida. La directriz baja por el medio (39.01 el martes, 38.74 el miércoles): cruzarla de lado no cuenta como rebote. Es donde puede armarse una divergencia del RSI."
+    },
+    {
+      "nombre": "Rebote",
+      "sesgo": "alcista",
+      "gatillo": "2 cierres seguidos > 39.80",
+      "lectura": "Contra la tendencia, pide dos cierres. Un cierre arriba de 39.28 es rebote en curso sin confirmar; dos arriba de 39.80 recuperan la zona crítica, y el rebote serio son dos cierres arriba de 40.60."
+    }
+  ],
+  "panorama": "GGAL terminó la semana en 38.74, en el mínimo del año y con la tendencia bajista acelerándose: perdió el piso de mayo y el pivote 39.40, y quedó a menos de 1% del estante de septiembre de 2025. La empuja el bloque argentino —riesgo país arriba de 600, reservas en baja y un BCRA que no compra— sobre un fondo externo pesado (10 años en máximos desde 2007, petróleo arriba de 100), pero cayó 3 puntos más que ARGT: hay debilidad propia de los bancos. El RSI en 27 marca sobreventa sin divergencia. Esta semana, a mirar: la licitación del Tesoro del lunes, el PCE del miércoles y el empleo del viernes por la tasa a 10 años, y si el estante 38.155–38.55 aguanta en cierre.",
+  "notas": "Faltan los informes de cierre del 21, 23 y 25-sep y los de apertura del 21, 22 y 23-sep; el cuadro técnico sale del cierre del 24-sep y de la apertura del 28-sep (armada sobre el cierre del viernes, con el mapa depurado el 25-sep). EMA20 y RSI al viernes tomados de esa apertura. Precios de la semana del feed de TradingView, leídos después de que terminara el estudio de apertura de hoy para no pisarle el chart. El −7,9% de Galicia que cita Infobae no coincide con el −7,23% del ADR en el feed. El promedio de volumen de las 4 semanas previas incluye una semana de 4 ruedas (feriado del 7-sep)."
+}
+</script>
+
+<div class="wrap" id="app"></div>
+
+<script>
+(function(){
+  var D = JSON.parse(document.getElementById('datos').textContent);
+  var app = document.getElementById('app');
+  function esc(s){ return String(s == null ? '' : s).replace(/[&<>"]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
+  function cls(v){ return v == null ? 'flat' : v > 0.05 ? 'up' : v < -0.05 ? 'down' : 'flat'; }
+  function pct(v){ return v == null ? 'N/D' : (v > 0 ? '+' : v < 0 ? '−' : '') + Math.abs(v).toFixed(2).replace('.', ',') + '%'; }
+  function px(v, d){ return v == null ? 'N/D' : Number(v).toFixed(d == null ? 2 : d); }
+  var h = [];
+  var g = D.ggal || {};
+
+  h.push('<header><div class="eyebrow">GGAL ADR · semana del ' + esc(D.semana) + '</div>');
+  h.push('<h1>' + esc(D.titular || 'Reporte semanal') + '</h1>');
+  h.push('<div class="tape"><span class="px">' + px(g.cierre) + '</span><span class="chg ' + cls(g.var_semana) + '">' + pct(g.var_semana) + ' en la semana</span>');
+  h.push('<span class="meta">cierre previo ' + px(g.cierre_previo) + '</span></div>');
+  h.push('<div class="stats"><span>Rango <b>' + px(g.minimo) + ' – ' + px(g.maximo) + '</b></span><span>EMA20 <b>' + px(g.ema20) + '</b></span><span>RSI14 <b>' + px(g.rsi, 1) + '</b></span>' + (g.volumen_rel ? '<span>Volumen <b>' + esc(g.volumen_rel) + '</b></span>' : '') + '</div></header>');
+
+  if (D.resumen && D.resumen.length) {
+    h.push('<section><h2>Lo importante</h2><ul class="resumen">' + D.resumen.map(function(r){ return '<li>' + esc(r) + '</li>'; }).join('') + '</ul></section>');
+  }
+
+  if (D.mercados && D.mercados.length) {
+    var max = Math.max.apply(null, D.mercados.map(function(m){ return Math.abs(m.var || 0); }).concat([1]));
+    h.push('<section><h2>La semana en números <small>variación semanal · feed de TradingView</small></h2><div class="mk">');
+    D.mercados.forEach(function(m){
+      var w = Math.abs(m.var || 0) / max * 50;
+      var left = (m.var || 0) >= 0 ? 50 : 50 - w;
+      var col = (m.var || 0) >= 0 ? 'var(--up)' : 'var(--down)';
+      h.push('<div class="mk-row"><div class="tk">' + esc(m.ticker) + '<span>' + esc(m.nombre) + '</span></div>' +
+        '<div class="bar" aria-hidden="true"><i style="left:' + left + '%;width:' + w + '%;background:' + col + '"></i></div>' +
+        '<div class="v num ' + cls(m.var) + '">' + pct(m.var) + '</div><div class="c num">' + esc(m.cierre == null ? 'N/D' : m.cierre) + '</div></div>');
+    });
+    h.push('</div>' + (D.mercados_nota ? '<p class="mk-note">' + esc(D.mercados_nota) + '</p>' : '') + '</section>');
+  }
+
+  if (D.noticias && D.noticias.length) {
+    var orden = [], grupos = {};
+    D.noticias.forEach(function(n){ var b = n.bloque || 'Otros'; if (!grupos[b]) { grupos[b] = []; orden.push(b); } grupos[b].push(n); });
+    h.push('<section><h2>Noticias macro <small>qué movió y por qué importa para GGAL</small></h2><div class="bloques">');
+    orden.forEach(function(b){
+      h.push('<div class="bloque"><h3>' + esc(b) + '</h3>');
+      grupos[b].forEach(function(n){
+        var imp = ['positivo','negativo','neutro'].indexOf(n.impacto) >= 0 ? n.impacto : 'neutro';
+        h.push('<div class="nota"><span class="chip ' + imp + '">' + imp + '</span><div class="t">' + esc(n.titulo) + '</div>' +
+          '<div class="d">' + esc(n.detalle) + '</div>' +
+          (n.fuente ? '<div class="src">' + (n.url ? '<a href="' + esc(n.url) + '" target="_blank" rel="noopener">' + esc(n.fuente) + '</a>' : esc(n.fuente)) + (n.fecha ? ' · ' + esc(n.fecha) : '') + '</div>' : '') + '</div>');
+      });
+      h.push('</div>');
+    });
+    h.push('</div></section>');
+  }
+
+  var t = D.tecnico || {};
+  if (t.texto || (t.niveles && t.niveles.length)) {
+    h.push('<section><h2>Técnico <small>mapa del último estudio de cierre</small></h2><div class="panel"><p>' + esc(t.texto) + '</p>');
+    if (t.niveles && t.niveles.length) {
+      var niv = t.niveles.slice().sort(function(a, b){ return b.nivel - a.nivel; });
+      var puesto = false, rows = [];
+      niv.forEach(function(n){
+        if (!puesto && g.cierre != null && n.nivel < g.cierre) { rows.push('<tr class="precio"><td>Precio</td><td>' + px(g.cierre) + '</td><td>cierre de la semana</td></tr>'); puesto = true; }
+        var tipo = /^P/i.test(n.tipo) ? 'P' : /^R/i.test(n.tipo) ? 'R' : 'S';
+        rows.push('<tr class="' + tipo + '"><td>' + esc(n.tipo) + '</td><td>' + px(n.nivel) + '</td><td>' + esc(n.que) + '</td></tr>');
+      });
+      if (!puesto && g.cierre != null) rows.push('<tr class="precio"><td>Precio</td><td>' + px(g.cierre) + '</td><td>cierre de la semana</td></tr>');
+      h.push('<div class="table-x"><table class="niveles"><tbody>' + rows.join('') + '</tbody></table></div>');
+    }
+    h.push('</div></section>');
+  }
+
+  if ((D.agenda && D.agenda.length) || (D.escenarios && D.escenarios.length) || D.panorama) {
+    h.push('<section><h2>Panorama <small>la semana que viene</small></h2>');
+    if (D.panorama) h.push('<p class="panorama">' + esc(D.panorama) + '</p>');
+    if (D.agenda && D.agenda.length) {
+      h.push('<div class="agenda" style="margin-top:14px">' + D.agenda.map(function(a){ return '<div class="ag"><div class="dia">' + esc(a.dia) + '</div><div>' + esc(a.evento) + '<span class="por">' + esc(a.por_que) + '</span></div></div>'; }).join('') + '</div>');
+    }
+    if (D.escenarios && D.escenarios.length) {
+      h.push('<div class="esc" style="margin-top:18px">' + D.escenarios.map(function(e){
+        var k = /alc|rebot|sub/i.test(e.sesgo || '') ? 'alcista' : /baj|ca[ií]/i.test(e.sesgo || '') ? 'bajista' : '';
+        return '<div class="' + k + '"><b>' + esc(e.nombre) + '</b><span class="g">' + esc(e.gatillo) + '</span><span>' + esc(e.lectura) + '</span></div>';
+      }).join('') + '</div>');
+    }
+    h.push('</section>');
+  }
+
+  h.push('<footer><span>Generado ' + esc(D.generado) + ' · precios del feed de TradingView, noticias de la web con fuente citada.</span>' +
+    (D.notas ? '<span>' + esc(D.notas) + '</span>' : '') +
+    '<span>Descripción del cuadro técnico y macro. No es asesoramiento financiero.</span></footer>');
+
+  app.innerHTML = h.join('');
+})();
+</script>
