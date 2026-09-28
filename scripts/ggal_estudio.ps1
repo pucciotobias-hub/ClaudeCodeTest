@@ -107,9 +107,13 @@ $salida = switch ($Turno) {
 # Cada turno tiene varios disparos (ver install_ggal_tasks.ps1): si uno muere en
 # el despertar de la maquina, el siguiente lo cubre. Los que llegan despues de
 # una corrida buena no tienen nada que hacer.
+# "Hecho" es "commiteado", no "el archivo existe": el semanal copia la plantilla
+# al archivo de salida al principio, y una corrida que muere a mitad lo dejaba ahi
+# y los reintentos se salteaban (paso el 2026-09-28).
 if (-not $Forzar) {
-    if (Test-Path (Join-Path $RepoDir $salida)) {
-        Write-Log "Ya existe $salida. Nada que hacer."
+    & git -C $RepoDir ls-files --error-unmatch $salida 2>$null | Out-Null
+    if ($LASTEXITCODE -eq 0) {
+        Write-Log "Ya esta commiteado $salida. Nada que hacer."
         exit 0
     }
     $v = $Ventanas[$Turno]
@@ -117,6 +121,18 @@ if (-not $Forzar) {
         Write-Log "Fuera de ventana ($hora, el turno $Turno va de $($v.Desde) a $($v.Hasta)). Se saltea; para correrlo igual, -Forzar." 'WARN'
         exit 0
     }
+}
+
+# Un solo estudio a la vez: todos manejan el mismo chart. El 2026-09-28 la maquina
+# durmio hasta las 10:20 y el semanal de las 09:30 se disparo al despertar, en
+# paralelo con la apertura. Si el chart esta ocupado se sale sin hacer nada y el
+# reintento siguiente lo cubre (esperar no sirve: el tope de la tarea es 45 min).
+$candado = New-Object System.Threading.Mutex($false, 'Local\GgalEstudioChart')
+# AbandonedMutexException = el duenio anterior murio sin soltarlo: el candado es nuestro.
+$libre = try { $candado.WaitOne(0) } catch [System.Threading.AbandonedMutexException] { $true }
+if (-not $libre) {
+    Write-Log "Hay otro estudio GGAL corriendo sobre el chart. Se saltea; lo cubre el reintento siguiente." 'WARN'
+    exit 0
 }
 
 # --- 1.b Bloquear la suspension -------------------------------------------
@@ -246,6 +262,7 @@ try {
 } finally {
     [GgalPower]::SetThreadExecutionState($ES_CONTINUOUS) | Out-Null
     Write-Log "Suspension desbloqueada."
+    $candado.ReleaseMutex()
     foreach ($f in @($tmpOut, $tmpErr)) {
         if (Test-Path $f) { Add-Content -Path $LogFile -Value (Get-Content $f -Raw -Encoding utf8) -Encoding utf8 }
     }
