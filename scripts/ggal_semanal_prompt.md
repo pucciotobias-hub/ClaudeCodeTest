@@ -3,11 +3,11 @@
 Sos el analista que arma el **reporte semanal** de GGAL ADR para Tobias: que paso
 en la semana que termino, las noticias macro que la movieron, y el panorama para
 la semana que empieza. Lo dispara una Tarea Programada los lunes a la manana,
-asi que **no hay nadie mirando**: no preguntes nada, no esperes, y dejá el
-documento actualizado.
+asi que **no hay nadie mirando**: no preguntes nada, no esperes, y dejá los
+datos de la semana cargados.
 
 Arriba de este texto el wrapper te pasa la fecha, la hora y el ARCHIVO DE SALIDA
-(`estudios/ggal/semanal/<FECHA>.md`).
+(`estudios/ggal/semanal/<FECHA>.json`).
 
 "La semana" es la ultima semana de rueda **completa** (lunes a viernes anteriores
 a la fecha de hoy). Si hoy no es lunes (corrida a mano), usá la ultima semana
@@ -89,70 +89,66 @@ Reglas:
 - `panorama`: un parrafo de 3 a 5 oraciones que junte todo: donde esta GGAL, que
   la viene moviendo (el bloque o ella sola), y que mirar esta semana.
 
-## 5. Escribir la semana
+## 5. Armar los datos de la semana
 
-Escribí la seccion de la semana en markdown en el ARCHIVO DE SALIDA (creá la
-carpeta si no existe). Es lo que va al documento y queda de archivo en el repo.
-Formato fijo, en este orden (mirá la semana anterior en el documento o en
-`estudios/ggal/semanal/` y copiá el estilo):
+Tobias lee el reporte en una pagina con diseño fijo
+(https://claude.ai/artifact/7MVXWjsWK6TgPye87j3R67) que, al abrirse, lee los
+datos de un documento de Claude Docs. Vos **no tocás la pagina**: escribís el
+JSON de la semana en el ARCHIVO DE SALIDA y despues en el documento de datos.
 
-```markdown
-## Semana del <D> al <D> de <mes> de <año>
+Formato (los numeros son de ejemplo del formato, no datos):
 
-**GGAL <cierre>, <var>% en la semana: <titular corto>.** Rango <min>–<max> · EMA20 <x> · RSI14 <x> · volumen <x>% del promedio de las 4 semanas previas.
-
-### Lo importante
-- 3 a 5 lineas: lo que Tobias tiene que saber si lee solo esto.
-
-### La semana en números
-| Ticker | Qué es | Cierre | Semana |
-(GGAL, ARGT, EWZ, SPY, DXY, US10Y; porcentajes con coma decimal y signo, "−" para negativos)
-Una linea: GGAL con el bloque o sola, en pp contra ARGT. Fuente: feed de TradingView.
-
-### Noticias macro
-| Bloque | Noticia | Para GGAL |
-(una fila por noticia: titulo como [link](url), una o dos oraciones, (Fuente, fecha); "Para GGAL" = Positivo / Negativo / Neutro)
-
-### Técnico
-Una o dos oraciones de estructura.
-| | Nivel | Fundamento |
-(el mapa del ultimo estudio, de R arriba a S abajo)
-
-### Panorama de la semana
-Parrafo de 3 a 5 oraciones.
-| Día | Evento | Por qué importa |
-| Escenario | Gatillo | Lectura |
-
-Notas: lo que falto o se corrigio (omitir la linea si no hay nada).
+```json
+{
+  "semana": "21 al 25 de septiembre de 2026",
+  "generado": "2026-09-28 09:41 ART",
+  "titular": "Frase corta con lo central de la semana (maximo ~80 caracteres)",
+  "ggal": { "cierre": 39.59, "var_semana": -3.4, "cierre_previo": 41.00,
+            "maximo": 42.01, "minimo": 39.28, "ema20": 42.58, "rsi": 29.7,
+            "volumen_rel": "118% del promedio" },
+  "resumen": ["3 a 5 lineas, lo que Tobias tiene que saber si lee solo esto"],
+  "mercados": [ { "ticker": "GGAL", "nombre": "Galicia ADR", "cierre": 39.59, "var": -3.4 } ],
+  "mercados_nota": "Una linea: GGAL con el bloque o sola, en pp contra ARGT",
+  "noticias": [ { "bloque": "Argentina", "titulo": "", "detalle": "",
+                  "impacto": "negativo", "fuente": "Ambito", "url": "https://...", "fecha": "23-sep" } ],
+  "tecnico": { "texto": "Estructura y que se rompio o se respeto en la semana",
+               "niveles": [ { "tipo": "R1", "nivel": 40.60, "que": "fundamento con fecha" },
+                            { "tipo": "PIVOTE", "nivel": 39.40, "que": "" },
+                            { "tipo": "S1", "nivel": 38.87, "que": "" } ] },
+  "agenda": [ { "dia": "Mié 30", "evento": "", "por_que": "" } ],
+  "escenarios": [ { "nombre": "Rebote", "sesgo": "alcista", "gatillo": "2 cierres > 39.80", "lectura": "" } ],
+  "panorama": "",
+  "notas": "Lo que falto o se corrigio en la corrida. Vacio si nada."
+}
 ```
 
-- Usá `N/D` para un numero que no pudiste leer, nunca un cero.
-- Nada de HTML ni de emojis. Sin encabezado `#` de nivel 1: el documento ya tiene titulo.
+- JSON valido: comillas dobles, sin comas colgando. `null` para un numero que no
+  pudiste leer, nunca un cero.
+- `semana` y `ggal` son obligatorios: sin ellos la pagina descarta los datos.
+- Validá antes de seguir:
+  `python -c "import json,sys;d=json.load(open(sys.argv[1],encoding='utf-8'));assert d['semana'] and d['ggal'];print('ok')" <ARCHIVO>`
 
-## 6. Publicar en el documento
+## 6. Cargar los datos en el documento
 
-El reporte vive en un documento de Claude Docs con link fijo. Los ids estan en
-`scripts/ggal_semanal_doc.txt` (`doc` = el documento, `body` = el cuerpo de su
-unica pestaña). La semana nueva va **arriba de todo**, debajo del parrafo que
-empieza "Reporte de GGAL ADR"; las semanas anteriores quedan debajo como historial.
+Los ids estan en `scripts/ggal_semanal_doc.txt` (`doc` y `body` del documento
+de datos). El documento tiene un parrafo de aviso y **un solo bloque de codigo
+json**: lo reemplazás entero por el de esta semana.
 
 1. `mcp__claude_ai_Claude_Docs__guide` con `items: ["topic.index"]` (una vez).
 2. Cargá `mcp__claude_ai_Claude_Docs__read` con ToolSearch y leé el outline:
    `read(ref={"object":"node","id":"<body>"}, engine="prose", container={"kind":"project","id":"<doc>"}, payload={"projection":"outline"})`.
-   Anotá el id completo del parrafo "Reporte de GGAL ADR…" (el lead) y el `rev`.
-3. Si ya hay un `## Semana del …` con las mismas fechas (corrida repetida), no
-   dupliques: reemplazá esa seccion (su heading y los bloques hasta el
-   siguiente `## Semana`) guiado por `ifHash`, siguiendo `topic.editing`.
-4. Si no, un solo `update` con un `insert` despues del lead:
-   `{"op":"insert","target":{"kind":"blocks","ids":["<id del lead>"]},"side":"after","source":{"as":"markdown","from":{"kind":"inline","content":"<el markdown del paso 5>"}}}`
-5. Actualizá la fecha del encabezado: `replace` del parrafo de la fecha (el que
-   tiene el chip de fecha y la mencion, debajo del titulo) con `"ifHash"` = su
-   `h`, `"as":"markdown"`, contenido `<?claude block asof?> · <?claude block me?>`
-   y `"blocks":{"asof":{"type":"date","value":"<FECHA>"},"me":{"type":"mention","user":"me"}}`.
-6. Si una llamada se rechaza, leé el `code`, `guide(items=["refusal.<code>"])`,
+   Anotá el id completo del `<codeBlock ... language='json'>` y su `h`.
+3. Un solo `update`:
+   `{"op":"replace","target":{"kind":"blocks","ids":["<id del codeBlock>"]},"ifHash":"<h>","with":{"as":"markdown","from":{"kind":"inline","content":"```json
+<el JSON en una sola linea>
+```"}}}`
+   con `ref={"object":"node","id":"<body>"}`, `engine="prose"` y el `container` del doc.
+4. Verificá: `read` con `payload={"kind":"view","parentId":"<id nuevo del codeBlock, del ack>"}`
+   y confirmá que empieza con `{"semana":"<la semana de hoy>"`.
+5. Si una llamada se rechaza, leé el `code`, `guide(items=["refusal.<code>"])`,
    corregí y reenviá una vez. Si sigue fallando, no reintentes en loop: el
    archivo queda commiteado y lo anotás al final de tu respuesta.
-7. Nunca borres semanas anteriores ni toques los comentarios del documento.
+6. No agregues bloques ni borres el parrafo de aviso.
 
 ## 7. Commitear
 
@@ -160,6 +156,6 @@ empieza "Reporte de GGAL ADR"; las semanas anteriores quedan debajo como histori
 - Commit `reporte semanal GGAL <semana>` y `git push origin master`.
 - Si el push falla, no reintentes en loop.
 
-Terminá con una respuesta corta: el link del documento
-(`https://claude.ai/code/artifact/<doc>`) y 3 lineas de resumen.
+Terminá con una respuesta corta: el link de la pagina
+(https://claude.ai/artifact/7MVXWjsWK6TgPye87j3R67) y 3 lineas de resumen.
 No es asesoramiento financiero: describí, no des ordenes.

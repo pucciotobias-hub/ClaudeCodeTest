@@ -15,8 +15,8 @@
 
     Con -Turno semanal usa scripts/ggal_semanal_prompt.md: arma el reporte de la
     semana (numeros del feed, noticias macro, panorama) en
-    estudios/ggal/semanal/<fecha>.md y lo publica en un documento de Claude Docs
-    con link fijo (scripts/ggal_semanal_doc.txt).
+    estudios/ggal/semanal/<fecha>.json y lo carga en un documento de Claude Docs
+    que lee la pagina fija del semanal (scripts/ggal_semanal_doc.txt).
 
     Requiere una sesion de escritorio activa: Chrome tiene que poder renderizar.
     Si la maquina esta bloqueada o con sesion cerrada, el chart no repinta.
@@ -101,7 +101,7 @@ $fecha  = Get-Date -Format 'yyyy-MM-dd'
 $hora   = Get-Date -Format 'HH:mm'
 $salida = switch ($Turno) {
     'auditoria' { "estudios/ggal/auditorias/$fecha.md" }
-    'semanal'   { "estudios/ggal/semanal/$fecha.md" }
+    'semanal'   { "estudios/ggal/semanal/$fecha.json" }
     default     { "estudios/ggal/$fecha-$Turno.md" }
 }
 

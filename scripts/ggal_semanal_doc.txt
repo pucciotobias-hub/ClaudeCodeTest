@@ -1,3 +1,3 @@
-doc=284f6cfd-5281-4e8d-82b2-627486f4ac83
-body=8beaf6c7-a5a0
-link=https://claude.ai/code/artifact/284f6cfd-5281-4e8d-82b2-627486f4ac83
+doc=076f496b-17a3-44c4-9b7d-008270709458
+body=4d342d79-cf49
+pagina=https://claude.ai/artifact/7MVXWjsWK6TgPye87j3R67
