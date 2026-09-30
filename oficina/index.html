@@ -1,0 +1,891 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Oficina de agentes</title>
+<style>
+  :root {
+    --panel: rgba(20, 24, 32, .82);
+    --texto: #e8ecf2;
+    --tenue: #9aa4b2;
+    --ok: #3ecf8e;
+    --trabajo: #ffb547;
+    --error: #ff6b6b;
+  }
+  html, body { margin: 0; height: 100%; overflow: hidden; background: #0b1530; font-family: system-ui, "Segoe UI", sans-serif; color: var(--texto); }
+  canvas { display: block; }
+  #hud {
+    position: fixed; top: 16px; left: 16px; width: min(330px, calc(100vw - 32px));
+    background: var(--panel); border-radius: 14px; padding: 14px 16px; backdrop-filter: blur(6px);
+    box-shadow: 0 6px 24px rgba(0,0,0,.35); font-size: 13px; line-height: 1.4;
+  }
+  #hud h1 { font-size: 15px; margin: 0 0 2px; display: flex; justify-content: space-between; align-items: baseline; }
+  #reloj { font-variant-numeric: tabular-nums; color: var(--tenue); font-weight: 500; }
+  #conexion { color: var(--tenue); font-size: 11px; margin-bottom: 10px; }
+  .agente { display: flex; gap: 10px; align-items: flex-start; padding: 8px 0; border-top: 1px solid rgba(255,255,255,.08); }
+  .punto { width: 10px; height: 10px; border-radius: 50%; margin-top: 4px; flex: none; background: var(--ok); }
+  .punto.trabajando { background: var(--trabajo); box-shadow: 0 0 8px var(--trabajo); animation: latido 1.2s infinite; }
+  @keyframes latido { 50% { opacity: .45; } }
+  .nombre { font-weight: 600; }
+  .que { color: var(--tenue); }
+  #corridas { margin-top: 6px; border-top: 1px solid rgba(255,255,255,.08); padding-top: 8px; color: var(--tenue); font-size: 12px; }
+  #corridas div { display: flex; justify-content: space-between; }
+  .r-ok { color: var(--ok); } .r-error, .r-murio { color: var(--error); } .r-salteado, .r-sin { color: var(--tenue); }
+  #botones { margin-top: 10px; display: flex; gap: 6px; flex-wrap: wrap; }
+  button { background: rgba(255,255,255,.1); color: var(--texto); border: 0; border-radius: 8px; padding: 5px 9px; font-size: 12px; cursor: pointer; }
+  button:hover { background: rgba(255,255,255,.18); }
+  button.activo { background: var(--trabajo); color: #1a1200; }
+  .globo {
+    position: fixed; transform: translate(-50%, -100%); pointer-events: none;
+    background: #fff; color: #1b1f27; padding: 5px 10px; border-radius: 12px; font-size: 13px; white-space: nowrap;
+    box-shadow: 0 3px 10px rgba(0,0,0,.25); transition: opacity .3s; opacity: 0;
+  }
+  .globo::after { content: ""; position: absolute; left: 50%; bottom: -6px; margin-left: -6px; border: 6px solid transparent; border-bottom: 0; border-top-color: #fff; }
+  .globo.visible { opacity: 1; }
+  .etiqueta {
+    position: fixed; transform: translate(-50%, 0); pointer-events: none; font-size: 11px; font-weight: 600;
+    color: #fff; background: rgba(0,0,0,.45); padding: 1px 7px; border-radius: 8px; white-space: nowrap;
+  }
+  #ayuda { position: fixed; right: 16px; bottom: 12px; font-size: 11px; color: rgba(255,255,255,.55); }
+</style>
+<script type="importmap">
+{ "imports": {
+  "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
+  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"
+} }
+</script>
+</head>
+<body>
+<div id="hud">
+  <h1>La oficina <span id="reloj">--:--</span></h1>
+  <div id="conexion">conectando…</div>
+  <div class="agente"><div class="punto" id="p-analista"></div><div><div class="nombre">Analista GGAL</div><div class="que" id="q-analista">—</div></div></div>
+  <div class="agente"><div class="punto" id="p-redactor"></div><div><div class="nombre">Redactor semanal</div><div class="que" id="q-redactor">—</div></div></div>
+  <div id="corridas"></div>
+  <div id="botones">
+    <button id="sim-analista">Simular analista</button>
+    <button id="sim-redactor">Simular redactor</button>
+  </div>
+</div>
+<div id="ayuda">arrastrá para girar · rueda para zoom</div>
+
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+// ---------------------------------------------------------------- escena base
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.setSize(innerWidth, innerHeight);
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+document.body.appendChild(renderer.domElement);
+
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(40, innerWidth / innerHeight, 0.1, 200);
+camera.position.set(11, 10.5, 14);
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.target.set(0, 0.8, -0.3);
+controls.enableDamping = true;
+controls.maxPolarAngle = Math.PI * 0.46;
+controls.minDistance = 7;
+controls.maxDistance = 32;
+controls.update();
+
+addEventListener('resize', () => {
+  camera.aspect = innerWidth / innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(innerWidth, innerHeight);
+});
+
+const hemi = new THREE.HemisphereLight(0xdfefff, 0x5a4a3a, 1.1);
+scene.add(hemi);
+const sol = new THREE.DirectionalLight(0xfff2dd, 2.2);
+sol.position.set(8, 14, 9);
+sol.castShadow = true;
+sol.shadow.mapSize.set(2048, 2048);
+Object.assign(sol.shadow.camera, { left: -12, right: 12, top: 12, bottom: -12 });
+scene.add(sol);
+const luzTecho = new THREE.PointLight(0xffd9a0, 0, 16, 1.6);
+luzTecho.position.set(0, 3.2, 0);
+scene.add(luzTecho);
+
+const mat = (color, extra = {}) => new THREE.MeshStandardMaterial({ color, flatShading: true, roughness: 0.85, ...extra });
+function caja(w, h, d, color, x, y, z, padre = scene) {
+  const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), typeof color === 'object' ? color : mat(color));
+  m.position.set(x, y, z);
+  m.castShadow = m.receiveShadow = true;
+  padre.add(m);
+  return m;
+}
+function cilindro(rt, rb, h, color, x, y, z, seg = 8, padre = scene) {
+  const m = new THREE.Mesh(new THREE.CylinderGeometry(rt, rb, h, seg), typeof color === 'object' ? color : mat(color));
+  m.position.set(x, y, z);
+  m.castShadow = m.receiveShadow = true;
+  padre.add(m);
+  return m;
+}
+
+// ---------------------------------------------------------------- exterior
+const pasto = new THREE.Mesh(new THREE.CircleGeometry(40, 32), mat(0x7cc26a));
+pasto.rotation.x = -Math.PI / 2;
+pasto.position.y = -0.02;
+pasto.receiveShadow = true;
+scene.add(pasto);
+caja(2, 0.02, 9, 0xd9c7a3, 1.5, 0.0, 9);  // caminito hasta la puerta
+function arbol(x, z, s = 1) {
+  cilindro(0.15 * s, 0.2 * s, 1 * s, 0x8a5a3b, x, 0.5 * s, z, 6);
+  const copa = new THREE.Mesh(new THREE.ConeGeometry(0.9 * s, 1.8 * s, 7), mat(0x4f9d4a));
+  copa.position.set(x, 1.8 * s, z);
+  copa.castShadow = true;
+  scene.add(copa);
+}
+[[-9, -7, 1.3], [-11, 2, 1], [9, -8, 1.5], [12, 1, 1.1], [-7, 9, 0.9], [8, 10, 1.2], [-14, -3, 1.4]].forEach(a => arbol(...a));
+
+// ---------------------------------------------------------------- la casa
+// Corte tipo casa de munecas: paredes del fondo e izquierda altas, derecha baja,
+// sin techo ni frente para ver adentro.
+const ANCHO = 12, FONDO = 9;
+caja(ANCHO + 0.4, 0.2, FONDO + 0.4, 0xc9a27a, 0, -0.1, 0);             // piso de madera
+for (let i = -5; i <= 5; i++) caja(0.02, 0.005, FONDO, 0xb88f68, i + 0.5, 0.005, 0); // tablas
+const pared = mat(0xf1e6d6);
+caja(ANCHO + 0.4, 3, 0.2, pared, 0, 1.5, -FONDO / 2 - 0.1);            // fondo
+caja(0.2, 3, FONDO + 0.4, pared, -ANCHO / 2 - 0.1, 1.5, 0);            // izquierda
+caja(0.2, 1.0, FONDO + 0.4, pared, ANCHO / 2 + 0.1, 0.5, 0);           // derecha (baja)
+caja(ANCHO + 0.4, 0.12, 0.26, 0xa8825f, 0, 3.02, -FONDO / 2 - 0.1);    // moldura
+caja(0.26, 0.12, FONDO + 0.4, 0xa8825f, -ANCHO / 2 - 0.1, 3.02, 0);
+caja(3.2, 0.02, 2.4, 0x5b7fb5, 0.3, 0.02, 1.4);                        // alfombra
+caja(2.8, 0.021, 2.0, 0x7d9dcc, 0.3, 0.02, 1.4);
+
+// Ventanas: el vidrio cambia de color con el cielo.
+const vidrio = new THREE.MeshStandardMaterial({ color: 0x9fd3f5, emissive: 0x9fd3f5, emissiveIntensity: 0.4, flatShading: true });
+function ventana(x, y, z, rotY) {
+  const g = new THREE.Group();
+  g.position.set(x, y, z);
+  g.rotation.y = rotY;
+  scene.add(g);
+  caja(1.7, 1.2, 0.05, vidrio, 0, 0, 0, g);
+  caja(1.85, 0.1, 0.1, 0xffffff, 0, 0.62, 0.03, g);
+  caja(1.85, 0.1, 0.1, 0xffffff, 0, -0.62, 0.03, g);
+  caja(0.1, 1.3, 0.1, 0xffffff, -0.88, 0, 0.03, g);
+  caja(0.1, 1.3, 0.1, 0xffffff, 0.88, 0, 0.03, g);
+  caja(0.06, 1.2, 0.08, 0xffffff, 0, 0, 0.03, g);
+  caja(1.9, 0.08, 0.25, 0xffffff, 0, -0.66, 0.12, g);
+}
+ventana(-1.1, 1.85, -FONDO / 2 + 0.02, 0);
+ventana(-ANCHO / 2 + 0.02, 1.85, -0.2, Math.PI / 2);
+
+// ---------------------------------------------------------------- pantallas
+function pantalla(ancho = 256, alto = 160) {
+  const cv = document.createElement('canvas');
+  cv.width = ancho; cv.height = alto;
+  const tex = new THREE.CanvasTexture(cv);
+  tex.colorSpace = THREE.SRGBColorSpace;
+  return { cv, ctx: cv.getContext('2d'), tex };
+}
+
+function escritorio(x, colorSilla) {
+  const z = -3.75;
+  caja(1.9, 0.08, 1.0, 0xa3714b, x, 0.78, z);
+  for (const dx of [-0.85, 0.85]) for (const dz of [-0.4, 0.4]) caja(0.08, 0.78, 0.08, 0x7a5236, x + dx, 0.39, z + dz);
+  // monitor
+  const p = pantalla();
+  caja(0.1, 0.35, 0.1, 0x333a44, x, 1.0, z - 0.15);
+  caja(1.1, 0.7, 0.06, 0x2a2f38, x, 1.45, z - 0.18);
+  const scr = new THREE.Mesh(new THREE.PlaneGeometry(1.0, 0.6), new THREE.MeshBasicMaterial({ map: p.tex }));
+  scr.position.set(x, 1.45, z - 0.145);
+  scene.add(scr);
+  caja(0.6, 0.03, 0.2, 0x444b55, x, 0.835, z + 0.38);           // teclado
+  const taza = cilindro(0.06, 0.05, 0.12, 0xffffff, x + 0.65, 0.88, z + 0.1, 8);
+  // lampara de escritorio
+  cilindro(0.1, 0.12, 0.03, 0x2d2d2d, x - 0.75, 0.835, z - 0.2);
+  cilindro(0.015, 0.015, 0.45, 0x2d2d2d, x - 0.75, 1.05, z - 0.2);
+  const pantallita = new THREE.Mesh(new THREE.ConeGeometry(0.14, 0.18, 8, 1, true), mat(0x2d2d2d, { side: THREE.DoubleSide }));
+  pantallita.position.set(x - 0.68, 1.28, z - 0.2);
+  pantallita.rotation.z = 0.6;
+  scene.add(pantallita);
+  const foco = new THREE.Mesh(new THREE.SphereGeometry(0.05, 8, 6), new THREE.MeshStandardMaterial({ color: 0xfff2c0, emissive: 0xffd36b, emissiveIntensity: 0 }));
+  foco.position.set(x - 0.66, 1.23, z - 0.2);
+  scene.add(foco);
+  const luz = new THREE.PointLight(0xffd36b, 0, 3.5, 1.8);
+  luz.position.set(x - 0.5, 1.2, z + 0.1);
+  scene.add(luz);
+  // silla
+  const zs = -2.85;
+  caja(0.6, 0.08, 0.6, colorSilla, x, 0.52, zs);
+  caja(0.6, 0.65, 0.08, colorSilla, x, 0.85, zs + 0.28);
+  cilindro(0.04, 0.04, 0.45, 0x333333, x, 0.26, zs);
+  caja(0.55, 0.04, 0.08, 0x333333, x, 0.03, zs);
+  caja(0.08, 0.04, 0.55, 0x333333, x, 0.03, zs);
+  return { p, foco, luz, taza, silla: { x, z: zs } };
+}
+const escA = escritorio(-3.4, 0x3d6fb6);
+const escR = escritorio(1.3, 0xc0504d);
+
+// Poster sobre el escritorio del analista y corcho del redactor.
+function cartel(x, y, dibujar, ancho = 1.1, alto = 0.75) {
+  const p = pantalla(256, 176);
+  dibujar(p.ctx, 256, 176);
+  p.tex.needsUpdate = true;
+  caja(ancho + 0.08, alto + 0.08, 0.04, 0x6b4a32, x, y, -FONDO / 2 + 0.02);
+  const m = new THREE.Mesh(new THREE.PlaneGeometry(ancho, alto), new THREE.MeshBasicMaterial({ map: p.tex }));
+  m.position.set(x, y, -FONDO / 2 + 0.05);
+  scene.add(m);
+}
+cartel(-3.4, 2.4, (c, w, h) => {
+  c.fillStyle = '#131722'; c.fillRect(0, 0, w, h);
+  c.fillStyle = '#e8ecf2'; c.font = 'bold 26px system-ui'; c.fillText('GGAL', 14, 34);
+  c.fillStyle = '#9aa4b2'; c.font = '14px system-ui'; c.fillText('BUY THE DIP (?)', 14, 56);
+  let y = 70;
+  for (let i = 0; i < 11; i++) {
+    const baja = i % 4 !== 2, x = 20 + i * 21, largo = 10 + (i * 7) % 14;
+    c.fillStyle = baja ? '#f23645' : '#089981';
+    c.fillRect(x, y, 12, largo);
+    c.fillRect(x + 5, y - 5, 2, largo + 10);
+    y += baja ? 8 : -5;
+  }
+});
+cartel(1.3, 2.4, (c, w, h) => {
+  c.fillStyle = '#c89b63'; c.fillRect(0, 0, w, h);
+  const notas = [['#fff59d', 'PCE mié'], ['#ffccbc', 'NFP vie'], ['#c8e6c9', 'riesgo país'], ['#b3e5fc', 'licitación']];
+  notas.forEach(([col, txt], i) => {
+    const x = 16 + (i % 2) * 120, y = 16 + Math.floor(i / 2) * 78;
+    c.fillStyle = col; c.fillRect(x, y, 104, 64);
+    c.fillStyle = '#e53935'; c.beginPath(); c.arc(x + 52, y + 6, 5, 0, 7); c.fill();
+    c.fillStyle = '#333'; c.font = '16px system-ui'; c.fillText(txt, x + 10, y + 40);
+  });
+});
+
+// Pizarra
+const pizarra = pantalla(320, 200);
+(() => {
+  const c = pizarra.ctx;
+  c.fillStyle = '#f8f8f5'; c.fillRect(0, 0, 320, 200);
+  c.strokeStyle = '#2b62c4'; c.lineWidth = 3; c.beginPath();
+  [[20, 40], [70, 60], [110, 50], [150, 95], [190, 85], [240, 140], [290, 150]].forEach(([x, y], i) => i ? c.lineTo(x, y) : c.moveTo(x, y));
+  c.stroke();
+  c.strokeStyle = '#d33'; c.setLineDash([8, 6]); c.beginPath(); c.moveTo(10, 160); c.lineTo(310, 160); c.stroke();
+  c.setLineDash([]); c.fillStyle = '#d33'; c.font = 'bold 18px system-ui'; c.fillText('S2 36.56', 200, 185);
+  c.fillStyle = '#333'; c.font = '18px system-ui'; c.fillText('¿rebote o gap?', 20, 185);
+})();
+pizarra.tex.needsUpdate = true;
+caja(2.2, 1.4, 0.06, 0xdddddd, 4.1, 1.85, -FONDO / 2 + 0.03);
+{
+  const m = new THREE.Mesh(new THREE.PlaneGeometry(2.05, 1.28), new THREE.MeshBasicMaterial({ map: pizarra.tex }));
+  m.position.set(4.1, 1.85, -FONDO / 2 + 0.07);
+  scene.add(m);
+}
+
+// Sofa + mesita
+const sofaColor = 0x6c8f5e;
+caja(0.9, 0.45, 2.6, sofaColor, -5.45, 0.25, 2.0);
+caja(0.25, 0.9, 2.6, sofaColor, -5.85, 0.6, 2.0);
+caja(0.9, 0.65, 0.25, sofaColor, -5.45, 0.35, 0.6);
+caja(0.9, 0.65, 0.25, sofaColor, -5.45, 0.35, 3.4);
+caja(0.7, 0.12, 1.1, 0x7fa56e, -5.4, 0.52, 1.45);
+caja(0.7, 0.12, 1.1, 0x7fa56e, -5.4, 0.52, 2.6);
+caja(0.8, 0.06, 1.2, 0x9c6b45, -3.7, 0.45, 2.0);
+for (const dx of [-0.32, 0.32]) for (const dz of [-0.5, 0.5]) caja(0.06, 0.42, 0.06, 0x7a5236, -3.7 + dx, 0.21, 2.0 + dz);
+caja(0.35, 0.05, 0.25, 0xf5f0e0, -3.65, 0.5, 1.85);  // diario
+
+// Cafetera
+caja(0.8, 0.95, 2.2, 0xe4dccf, 5.55, 0.475, -1.0);
+caja(0.85, 0.06, 2.25, 0x8d6e63, 5.55, 0.98, -1.0);
+caja(0.45, 0.55, 0.4, 0x2e2e2e, 5.6, 1.29, -1.0);
+caja(0.3, 0.1, 0.3, 0x555555, 5.45, 1.05, -1.0);
+const lucesitaCafe = new THREE.Mesh(new THREE.SphereGeometry(0.03, 6, 4), new THREE.MeshStandardMaterial({ color: 0x33ff66, emissive: 0x33ff66, emissiveIntensity: 1 }));
+lucesitaCafe.position.set(5.36, 1.45, -0.9);
+scene.add(lucesitaCafe);
+for (let i = 0; i < 3; i++) cilindro(0.06, 0.05, 0.12, [0xffffff, 0xf7c948, 0x4fa3e0][i], 5.5, 1.07, -0.3 + i * 0.16, 8);
+
+// Biblioteca
+caja(0.45, 2.1, 1.6, 0x8a5a3b, -5.75, 1.05, -2.6);
+const coloresLibros = [0xc0504d, 0x3d6fb6, 0xf7c948, 0x6c8f5e, 0x8e6bbf, 0xe07b39];
+for (let e = 0; e < 4; e++) {
+  caja(0.42, 0.04, 1.5, 0x6b4a32, -5.7, 0.2 + e * 0.5, -2.6);
+  for (let i = 0; i < 7; i++) {
+    const h = 0.3 + ((i * 13 + e * 7) % 10) / 70;
+    caja(0.3, h, 0.14, coloresLibros[(i + e) % 6], -5.66, 0.22 + e * 0.5 + h / 2, -3.2 + i * 0.19);
+  }
+}
+
+// Plantas
+function planta(x, z, s = 1) {
+  cilindro(0.22 * s, 0.17 * s, 0.4 * s, 0xc46a3d, x, 0.2 * s, z, 8);
+  for (let i = 0; i < 5; i++) {
+    const hoja = new THREE.Mesh(new THREE.IcosahedronGeometry(0.28 * s, 0), mat(0x3f8f45));
+    hoja.position.set(x + Math.cos(i * 1.3) * 0.12 * s, (0.6 + (i % 3) * 0.18) * s, z + Math.sin(i * 1.3) * 0.12 * s);
+    hoja.castShadow = true;
+    scene.add(hoja);
+  }
+}
+planta(-5.3, -4.0, 1.1);
+planta(5.3, 3.6, 1.2);
+planta(2.8, -4.0, 0.8);
+
+// Reloj de pared (hora real)
+const reloj3d = new THREE.Group();
+reloj3d.position.set(-ANCHO / 2 + 0.03, 2.3, 2.0);
+reloj3d.rotation.y = Math.PI / 2;
+scene.add(reloj3d);
+{
+  const cara = new THREE.Mesh(new THREE.CylinderGeometry(0.32, 0.32, 0.05, 20), mat(0xffffff));
+  cara.rotation.x = Math.PI / 2;
+  reloj3d.add(cara);
+  const aro = new THREE.Mesh(new THREE.TorusGeometry(0.33, 0.035, 6, 20), mat(0x333333));
+  reloj3d.add(aro);
+}
+function aguja(largo, ancho, color) {
+  const g = new THREE.Group();
+  const m = new THREE.Mesh(new THREE.BoxGeometry(ancho, largo, 0.02), mat(color));
+  m.position.y = largo / 2;
+  g.add(m);
+  g.position.z = 0.04;
+  reloj3d.add(g);
+  return g;
+}
+const agHora = aguja(0.17, 0.035, 0x222222), agMin = aguja(0.26, 0.025, 0x222222);
+
+// ---------------------------------------------------------------- personajes
+function persona({ camisa, pantalon, piel = 0xf1c7a1, pelo, extra }) {
+  const raiz = new THREE.Group();
+  const cuerpo = new THREE.Group();  // se mueve con el "respirar" y el sentarse
+  raiz.add(cuerpo);
+  const mCamisa = mat(camisa), mPant = mat(pantalon), mPiel = mat(piel), mPelo = mat(pelo);
+
+  const pierna = lado => {
+    const g = new THREE.Group();
+    g.position.set(0.12 * lado, 0.62, 0);
+    const m = new THREE.Mesh(new THREE.BoxGeometry(0.17, 0.6, 0.2), mPant);
+    m.position.y = -0.3; m.castShadow = true;
+    const zap = new THREE.Mesh(new THREE.BoxGeometry(0.19, 0.1, 0.28), mat(0x2b2b2b));
+    zap.position.set(0, -0.58, 0.04);
+    g.add(m, zap);
+    cuerpo.add(g);
+    return g;
+  };
+  const brazo = lado => {
+    const g = new THREE.Group();
+    g.position.set(0.3 * lado, 1.14, 0);
+    const m = new THREE.Mesh(new THREE.BoxGeometry(0.13, 0.5, 0.15), mCamisa);
+    m.position.y = -0.25; m.castShadow = true;
+    const mano = new THREE.Mesh(new THREE.SphereGeometry(0.075, 8, 6), mPiel);
+    mano.position.y = -0.52;
+    g.add(m, mano);
+    cuerpo.add(g);
+    return g;
+  };
+  const piernaI = pierna(-1), piernaD = pierna(1);
+  const torso = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.58, 0.3), mCamisa);
+  torso.position.y = 0.9; torso.castShadow = true;
+  cuerpo.add(torso);
+  const brazoI = brazo(-1), brazoD = brazo(1);
+
+  const cabeza = new THREE.Group();
+  cabeza.position.y = 1.42;
+  cuerpo.add(cabeza);
+  const craneo = new THREE.Mesh(new THREE.SphereGeometry(0.27, 12, 10), mPiel);
+  craneo.castShadow = true;
+  cabeza.add(craneo);
+  for (const lado of [-1, 1]) {
+    const ojo = new THREE.Mesh(new THREE.SphereGeometry(0.035, 6, 5), mat(0x1b1b1b));
+    ojo.position.set(0.09 * lado, 0.03, 0.245);
+    cabeza.add(ojo);
+    const cachete = new THREE.Mesh(new THREE.SphereGeometry(0.04, 6, 5), mat(0xf29b9b));
+    cachete.position.set(0.16 * lado, -0.06, 0.2);
+    cabeza.add(cachete);
+  }
+  const pelado = new THREE.Mesh(new THREE.SphereGeometry(0.285, 12, 8, 0, Math.PI * 2, 0, Math.PI * 0.45), mPelo);
+  pelado.rotation.x = -0.25;
+  cabeza.add(pelado);
+
+  // Taza en la mano derecha (para el cafe)
+  const taza = new THREE.Mesh(new THREE.CylinderGeometry(0.065, 0.055, 0.13, 8), mat(0xffffff));
+  taza.position.set(0, -0.58, 0.07);
+  taza.visible = false;
+  brazoD.add(taza);
+
+  // Diario (para leer en el sofa)
+  const diario = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.36, 0.02), mat(0xf5f0e0));
+  diario.position.set(0, 1.0, 0.42);
+  diario.visible = false;
+  cuerpo.add(diario);
+
+  extra && extra({ cabeza, torso, mat });
+  return { raiz, cuerpo, piernaI, piernaD, brazoI, brazoD, cabeza, taza, diario };
+}
+
+const modeloAnalista = persona({
+  camisa: 0x3d6fb6, pantalon: 0x2f3542, pelo: 0x3b2a20,
+  extra: ({ cabeza, torso, mat }) => {
+    // anteojos
+    for (const lado of [-1, 1]) {
+      const lente = new THREE.Mesh(new THREE.TorusGeometry(0.06, 0.012, 5, 12), mat(0x111111));
+      lente.position.set(0.09 * lado, 0.03, 0.262);
+      cabeza.add(lente);
+    }
+    const puente = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.012, 0.012), mat(0x111111));
+    puente.position.set(0, 0.035, 0.265);
+    cabeza.add(puente);
+    // corbata
+    const corbata = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.36, 0.02), mat(0xc0392b));
+    corbata.position.set(0, 0.98, 0.16);
+    torso.parent.add(corbata);
+  },
+});
+const modeloRedactor = persona({
+  camisa: 0xe07b39, pantalon: 0x5a4636, pelo: 0x7a4b2a,
+  extra: ({ cabeza, torso, mat }) => {
+    // gorro de lana con pompon
+    const gorro = new THREE.Mesh(new THREE.SphereGeometry(0.3, 12, 8, 0, Math.PI * 2, 0, Math.PI * 0.42), mat(0x8e6bbf));
+    gorro.position.y = 0.03;
+    cabeza.add(gorro);
+    const pompon = new THREE.Mesh(new THREE.SphereGeometry(0.08, 8, 6), mat(0xffffff));
+    pompon.position.y = 0.31;
+    cabeza.add(pompon);
+    // bufanda
+    const bufanda = new THREE.Mesh(new THREE.TorusGeometry(0.2, 0.06, 6, 14), mat(0xf7c948));
+    bufanda.rotation.x = Math.PI / 2;
+    bufanda.position.y = 1.2;
+    torso.parent.add(bufanda);
+    // lapiz en la oreja
+    const lapiz = new THREE.Mesh(new THREE.CylinderGeometry(0.015, 0.015, 0.22, 6), mat(0xf7c948));
+    lapiz.rotation.z = 1.2;
+    lapiz.position.set(0.27, 0.02, 0.02);
+    cabeza.add(lapiz);
+  },
+});
+
+// ---------------------------------------------------------------- lugares
+const LUGAR = {
+  sillaA: { x: escA.silla.x, z: escA.silla.z, ang: Math.PI, y: 0.56 },
+  sillaR: { x: escR.silla.x, z: escR.silla.z, ang: Math.PI, y: 0.56 },
+  sofa1: { x: -5.25, z: 1.45, ang: Math.PI / 2, y: 0.58, acceso: [-4.4, 1.45] },
+  sofa2: { x: -5.25, z: 2.6, ang: Math.PI / 2, y: 0.58, acceso: [-4.4, 2.6] },
+  cafe: { x: 4.75, z: -1.0, ang: Math.PI / 2 },
+  ventana: { x: -1.1, z: -3.7, ang: Math.PI },
+  ventanaIzq: { x: -4.9, z: -0.2, ang: -Math.PI / 2 },
+  pizarra: { x: 4.1, z: -3.5, ang: Math.PI },
+  planta: { x: 4.6, z: 3.5, ang: Math.PI / 2 },
+  biblioteca: { x: -4.9, z: -2.6, ang: -Math.PI / 2 },
+};
+const PASILLO_Z = 0.4;
+
+// ---------------------------------------------------------------- mensajes
+const MENSAJES = {
+  apertura: ['Leyendo el premarket…', 'Redibujando niveles', '¿Dónde quedó el pivote?', 'EMA20 y RSI…', 'Mirando SPY, EWZ y ARGT', '¿El 10Y sube o baja?', 'Armando el mapa del día', 'Commiteando el informe'],
+  cierre: ['Vela diaria cerrada', '¿Respetó el soporte?', 'Chequeando divergencias', 'Macro del día…', 'GGAL vs ARGT…', 'Escribiendo el cierre', 'git push 🚀'],
+  auditoria: ['Estudios vs precio…', '¿Cuántos gatillos acertamos?', 'Extremos vs grilla', 'Proponiendo cambios', 'Auditoría lista para commit'],
+  semanal: ['Buscando noticias macro', 'Resumiendo la semana', '¿Qué dijo la Fed?', 'Riesgo país y reservas…', 'Panorama de la semana que viene', 'Cargando el documento'],
+  chrome: ['Levantando Chrome… 🙄', 'El CDP otra vez…', 'Esperando el chart'],
+  preparando: ['A trabajar 💪', 'Prendiendo la compu'],
+};
+const CHARLA = [
+  ['¿Viste el RSI?', 'Sobrevendido hace días…'],
+  ['¿Rompe 36.56?', 'Si rompe, buscamos el gap 👀'],
+  ['El 10Y en 5,24%…', 'Tasas altas, bancos sufren'],
+  ['¿Mate o café?', 'Café, que hay datos'],
+  ['¿Y el Brent?', 'Arriba de 100, bien para YPF'],
+  ['¿Llegó el semanal?', 'Commiteado y pusheado ✅'],
+];
+const azar = a => a[Math.floor(Math.random() * a.length)];
+const entre = (a, b) => a + Math.random() * (b - a);
+
+// ---------------------------------------------------------------- agentes
+class Agente {
+  constructor(id, modelo, silla, pantallaEsc, inicio) {
+    Object.assign(this, { id, m: modelo, silla, esc: pantallaEsc });
+    this.pos = new THREE.Vector2(...inicio);
+    this.ang = 0;
+    this.angObj = 0;
+    this.cola = [];
+    this.accion = null;
+    this.pose = 'parado';
+    this.modo = null;
+    this.t = 0;
+    this.trabajando = false;
+    this.turno = null;
+    this.paso = null;
+    this.actividad = 'llegando';
+    this.otro = null;
+    this.ocupadoCharla = false;
+    scene.add(modelo.raiz);
+    this.globo = Object.assign(document.createElement('div'), { className: 'globo' });
+    this.etiqueta = Object.assign(document.createElement('div'), { className: 'etiqueta', textContent: id === 'analista' ? 'Analista' : 'Redactor' });
+    document.body.append(this.globo, this.etiqueta);
+    this.globoHasta = 0;
+    this.proxMensaje = 0;
+  }
+
+  decir(txt, seg = 4) {
+    this.globo.textContent = txt;
+    this.globo.classList.add('visible');
+    this.globoHasta = reloj.elapsedTime + seg;
+  }
+
+  ruta(x, z) {
+    // Por el pasillo del medio para no atravesar muebles.
+    const pasos = [];
+    let cx = this.pos.x, cz = this.pos.y;
+    // Si esta sentado en el sofa, primero sale por delante (si no, atraviesa el apoyabrazos).
+    if (this.lugarActual && this.lugarActual.acceso) {
+      [cx, cz] = this.lugarActual.acceso;
+      pasos.push({ tipo: 'ir', x: cx, z: cz });
+    }
+    this.lugarActual = null;
+    if (Math.abs(cz - PASILLO_Z) > 0.3 && Math.abs(cx - x) > 0.3) pasos.push({ tipo: 'ir', x: cx, z: PASILLO_Z });
+    if (Math.abs(z - PASILLO_Z) > 0.3 && Math.abs(this.pos.x - x) > 0.3) pasos.push({ tipo: 'ir', x, z: PASILLO_Z });
+    pasos.push({ tipo: 'ir', x, z });
+    return pasos;
+  }
+  rutaA(l) {
+    return l.acceso ? [...this.ruta(...l.acceso), { tipo: 'ir', x: l.x, z: l.z }] : this.ruta(l.x, l.z);
+  }
+
+  // El estado real manda: si cambia, se tira el plan y se arma uno nuevo.
+  setTrabajo(trabajando, turno, paso, resultado) {
+    if (trabajando !== this.trabajando) {
+      const antes = this.trabajando;
+      this.trabajando = trabajando;
+      this.cola = [];
+      this.accion = null;
+      this.ocupadoCharla = false;
+      if (!trabajando && antes) {
+        this.cola.push({ tipo: 'decir', txt: resultado === 'ok' ? '¡Listo! Informe commiteado ✅' : resultado ? 'Uff, algo falló 😩' : 'Terminé 🙌', seg: 5 });
+        this.cola.push({ tipo: 'quieto', dur: 1.5, modo: resultado === 'ok' ? 'festejo' : null, sentado: true });
+      }
+    }
+    this.turno = turno;
+    this.paso = paso;
+  }
+
+  planificar() {
+    if (this.trabajando) {
+      this.actividad = 'trabajando';
+      this.cola.push(...this.rutaA(this.silla), { tipo: 'sentar', lugar: this.silla, modo: 'tipear', dur: Infinity });
+      return;
+    }
+    const opciones = [
+      ['cafe', 3], ['sofa', 2], ['ventana', 2], ['pasear', 2], ['charla', 2], ['planta', 1], ['pizarra', 1], ['biblioteca', 1], ['diario', 1],
+    ];
+    let total = opciones.reduce((a, o) => a + o[1], 0), r = Math.random() * total, elegida = 'pasear';
+    for (const [n, w] of opciones) { if ((r -= w) < 0) { elegida = n; break; } }
+    const otro = this.otro;
+    if (elegida === 'charla' && !(otro && !otro.trabajando && !otro.ocupadoCharla && otro.actividad !== 'durmiendo la siesta')) elegida = 'cafe';
+    this.actividad = {
+      cafe: 'tomando un café', sofa: 'descansando en el sofá', ventana: 'mirando por la ventana', pasear: 'dando vueltas',
+      charla: 'charlando', planta: 'regando la planta', pizarra: 'mirando la pizarra', biblioteca: 'buscando un libro', diario: 'leyendo el diario',
+    }[elegida];
+    const L = LUGAR;
+    const sofa = this.id === 'analista' ? L.sofa1 : L.sofa2;
+    switch (elegida) {
+      case 'cafe':
+        this.cola.push(...this.rutaA(L.cafe), { tipo: 'girar', ang: L.cafe.ang }, { tipo: 'decir', txt: azar(['☕ Un cafecito', 'Uno doble, por favor', 'La máquina hace ruido…']) },
+          { tipo: 'quieto', dur: 3 }, { tipo: 'taza', on: true });
+        if (Math.random() < 0.5) this.cola.push(...this.rutaA(sofa), { tipo: 'sentar', lugar: sofa, modo: 'tomar', dur: entre(8, 14) }, { tipo: 'taza', on: false });
+        else this.cola.push({ tipo: 'quieto', dur: entre(6, 10), modo: 'tomar' }, { tipo: 'taza', on: false });
+        break;
+      case 'sofa': {
+        const siesta = Math.random() < 0.5;
+        this.cola.push(...this.rutaA(sofa), { tipo: 'sentar', lugar: sofa, modo: siesta ? 'dormir' : null, dur: entre(10, 20) });
+        if (siesta) this.actividad = 'durmiendo la siesta';
+        break;
+      }
+      case 'diario':
+        this.cola.push(...this.rutaA(sofa), { tipo: 'sentar', lugar: sofa, modo: 'leer', dur: entre(10, 16) });
+        break;
+      case 'ventana': {
+        const v = Math.random() < 0.5 ? L.ventana : L.ventanaIzq;
+        this.cola.push(...this.rutaA(v), { tipo: 'girar', ang: v.ang }, { tipo: 'decir', txt: azar(esDeNoche() ? ['Qué noche…', 'Se ven las luces'] : ['Lindo día', '¿Va a llover?', 'Hay sol 😎']) }, { tipo: 'quieto', dur: entre(6, 10) });
+        break;
+      }
+      case 'pizarra':
+        this.cola.push(...this.rutaA(L.pizarra), { tipo: 'girar', ang: L.pizarra.ang }, { tipo: 'decir', txt: azar(['Hmm, el S2…', '¿Rebote o gap?', 'Esa línea roja…']) }, { tipo: 'quieto', dur: entre(5, 8), modo: 'pensar' });
+        break;
+      case 'biblioteca':
+        this.cola.push(...this.rutaA(L.biblioteca), { tipo: 'girar', ang: L.biblioteca.ang }, { tipo: 'decir', txt: azar(['¿Dónde está el Murphy?', 'Análisis técnico, tomo 2']) }, { tipo: 'quieto', dur: entre(5, 8), modo: 'pensar' });
+        break;
+      case 'planta':
+        this.cola.push(...this.rutaA(L.planta), { tipo: 'girar', ang: L.planta.ang }, { tipo: 'decir', txt: '🌱 Agüita' }, { tipo: 'quieto', dur: 5, modo: 'regar' });
+        break;
+      case 'charla': {
+        const [a, b] = azar(CHARLA);
+        const punto = new THREE.Vector2(entre(-1.5, 2.5), entre(1.2, 2.6));
+        this.ocupadoCharla = otro.ocupadoCharla = true;
+        otro.cola = [];
+        otro.accion = null;
+        otro.actividad = this.actividad = 'charlando';
+        this.cola.push(...this.ruta(punto.x - 0.6, punto.y), { tipo: 'mirarA', a: otro }, { tipo: 'decir', txt: a, seg: 4 }, { tipo: 'quieto', dur: 4.5, modo: 'gesto' }, { tipo: 'quieto', dur: 4.5 },
+          { tipo: 'decir', txt: azar(['Jaja', 'Tal cual', 'Veremos…']), seg: 3 }, { tipo: 'quieto', dur: 3, modo: 'gesto' }, { tipo: 'fin-charla' });
+        otro.cola.push(...otro.ruta(punto.x + 0.6, punto.y), { tipo: 'mirarA', a: this }, { tipo: 'quieto', dur: 4.5 }, { tipo: 'decir', txt: b, seg: 4 }, { tipo: 'quieto', dur: 4.5, modo: 'gesto' },
+          { tipo: 'quieto', dur: 3 }, { tipo: 'fin-charla' });
+        break;
+      }
+      default:
+        for (let i = 0; i < 3; i++) this.cola.push(...this.ruta(entre(-3, 4), entre(0.6, 3.6)));
+        this.cola.push({ tipo: 'quieto', dur: entre(2, 4), modo: 'estirar' });
+    }
+    this.cola.push({ tipo: 'quieto', dur: entre(1, 3) });
+  }
+
+  update(dt, t) {
+    if (!this.accion) {
+      if (!this.cola.length) this.planificar();
+      this.accion = this.cola.shift();
+      this.t = 0;
+    }
+    const a = this.accion;
+    this.t += dt;
+    let terminada = false;
+    switch (a.tipo) {
+      case 'ir': {
+        const obj = new THREE.Vector2(a.x, a.z), d = obj.clone().sub(this.pos), dist = d.length();
+        if (dist < 0.05) { terminada = true; break; }
+        this.pose = 'caminar';
+        this.angObj = Math.atan2(d.x, d.y);
+        this.pos.add(d.normalize().multiplyScalar(Math.min(dist, 1.7 * dt)));
+        break;
+      }
+      case 'girar': this.angObj = a.ang; terminada = true; break;
+      case 'mirarA': { const d = a.a.pos.clone().sub(this.pos); this.angObj = Math.atan2(d.x, d.y); terminada = true; break; }
+      case 'decir': this.decir(a.txt, a.seg); terminada = true; break;
+      case 'taza': this.m.taza.visible = a.on; terminada = true; break;
+      case 'fin-charla': this.ocupadoCharla = false; terminada = true; break;
+      case 'sentar':
+        this.pose = 'sentado';
+        this.modo = a.modo;
+        this.lugarActual = a.lugar;
+        this.pos.set(a.lugar.x, a.lugar.z);
+        this.angObj = a.lugar.ang;
+        this.alturaAsiento = a.lugar.y;
+        terminada = this.t > a.dur;
+        break;
+      case 'quieto':
+        if (!a.sentado) this.pose = 'parado';
+        this.modo = a.modo || null;
+        terminada = this.t > a.dur;
+        break;
+    }
+    if (terminada) { this.accion = null; if (a.tipo === 'sentar' || a.tipo === 'quieto') this.modo = null; }
+    this.animar(dt, t);
+    this.mensajesTrabajo(t);
+  }
+
+  mensajesTrabajo(t) {
+    if (!this.trabajando || this.pose !== 'sentado' || t < this.proxMensaje) return;
+    const lista = MENSAJES[this.paso === 'chrome' || this.paso === 'preparando' ? this.paso : this.turno] || MENSAJES.apertura;
+    this.decir(azar(lista), 4.5);
+    this.proxMensaje = t + entre(6, 9);
+  }
+
+  animar(dt, t) {
+    const m = this.m;
+    // giro suave
+    let da = this.angObj - this.ang;
+    da = Math.atan2(Math.sin(da), Math.cos(da));
+    this.ang += da * Math.min(1, dt * 8);
+    m.raiz.position.set(this.pos.x, 0, this.pos.y);
+    m.raiz.rotation.y = this.ang;
+
+    const s = Math.sin(t * 9);
+    const reset = { pI: 0, pD: 0, bI: 0, bD: 0, bIz: 0, bDz: 0, y: 0, cabX: 0, cabZ: 0 };
+    const o = { ...reset };
+    if (this.pose === 'caminar') {
+      o.pI = s * 0.6; o.pD = -s * 0.6; o.bI = -s * 0.5; o.bD = s * 0.5; o.y = Math.abs(Math.cos(t * 9)) * 0.05;
+    } else if (this.pose === 'sentado') {
+      o.pI = o.pD = -Math.PI / 2;
+      o.y = (this.alturaAsiento || 0.56) - 0.62;
+    } else {
+      o.y = Math.sin(t * 2) * 0.01;
+    }
+    switch (this.modo) {
+      case 'tipear': o.bI = -1.25 + Math.sin(t * 22) * 0.08; o.bD = -1.25 + Math.sin(t * 22 + 1.5) * 0.08; o.cabX = 0.12 + Math.sin(t * 1.3) * 0.05; break;
+      case 'tomar': { const sorbo = (Math.sin(t * 0.9) + 1) / 2; o.bD = -0.6 - sorbo * 1.9; o.bDz = sorbo * 0.25; break; }
+      case 'dormir': o.cabZ = 0.35; o.cabX = 0.25; o.bI = o.bD = -0.2; if (t % 3 < dt * 1.5) this.decir('Zzz…', 2); break;
+      case 'leer': o.bI = o.bD = -1.3; o.bIz = -0.25; o.bDz = 0.25; o.cabX = 0.2; break;
+      case 'pensar': o.bD = -2.3; o.bDz = 0.5; o.cabZ = Math.sin(t * 0.8) * 0.1; break;
+      case 'gesto': o.bD = -0.8 + Math.sin(t * 5) * 0.4; o.bI = -0.4 + Math.sin(t * 4 + 1) * 0.3; o.cabX = Math.sin(t * 6) * 0.06; break;
+      case 'regar': o.bD = o.bI = -1.1; o.cabX = 0.3; break;
+      case 'estirar': o.bI = o.bD = -Math.PI * 0.95; o.bIz = -0.2; o.bDz = 0.2; break;
+      case 'festejo': o.bI = o.bD = -Math.PI * 0.9 + Math.sin(t * 12) * 0.2; o.y += Math.abs(Math.sin(t * 8)) * 0.08; break;
+    }
+    const k = Math.min(1, dt * 10), lerp = (a, b) => a + (b - a) * k;
+    m.piernaI.rotation.x = lerp(m.piernaI.rotation.x, o.pI);
+    m.piernaD.rotation.x = lerp(m.piernaD.rotation.x, o.pD);
+    m.brazoI.rotation.x = lerp(m.brazoI.rotation.x, o.bI);
+    m.brazoD.rotation.x = lerp(m.brazoD.rotation.x, o.bD);
+    m.brazoI.rotation.z = lerp(m.brazoI.rotation.z, o.bIz);
+    m.brazoD.rotation.z = lerp(m.brazoD.rotation.z, o.bDz);
+    m.cabeza.rotation.x = lerp(m.cabeza.rotation.x, o.cabX);
+    m.cabeza.rotation.z = lerp(m.cabeza.rotation.z, o.cabZ);
+    m.cuerpo.position.y = lerp(m.cuerpo.position.y, o.y);
+    m.diario.visible = this.modo === 'leer';
+
+    // lampara y foco del escritorio
+    const prendida = this.trabajando && this.pose === 'sentado' ? 1 : 0;
+    this.esc.luz.intensity = lerp(this.esc.luz.intensity, prendida * 2.5);
+    this.esc.foco.material.emissiveIntensity = lerp(this.esc.foco.material.emissiveIntensity, prendida * 2);
+    this.esc.taza.visible = !m.taza.visible;
+  }
+
+  ubicarHtml() {
+    const cabeza = new THREE.Vector3();
+    this.m.cabeza.getWorldPosition(cabeza);
+    const arriba = cabeza.clone().add(new THREE.Vector3(0, 0.45, 0)).project(camera);
+    const abajo = new THREE.Vector3(this.pos.x, -0.05, this.pos.y).project(camera);
+    const px = v => [(v.x + 1) / 2 * innerWidth, (1 - v.y) / 2 * innerHeight];
+    const [gx, gy] = px(arriba), [ex, ey] = px(abajo);
+    this.globo.style.left = gx + 'px'; this.globo.style.top = gy + 'px';
+    this.etiqueta.style.left = ex + 'px'; this.etiqueta.style.top = ey + 'px';
+    if (reloj.elapsedTime > this.globoHasta) this.globo.classList.remove('visible');
+  }
+}
+
+const analista = new Agente('analista', modeloAnalista, LUGAR.sillaA, escA, [-1, 2]);
+const redactor = new Agente('redactor', modeloRedactor, LUGAR.sillaR, escR, [2, 2.5]);
+analista.otro = redactor;
+redactor.otro = analista;
+const agentes = [analista, redactor];
+
+// ---------------------------------------------------------------- monitores
+const velas = Array.from({ length: 26 }, (_, i) => 80 + Math.sin(i / 3) * 12);
+function dibujarPantallas(t) {
+  // analista: velas en vivo o protector de pantalla
+  {
+    const { ctx: c, cv, tex } = escA.p;
+    c.fillStyle = '#0e1117'; c.fillRect(0, 0, cv.width, cv.height);
+    if (analista.trabajando && analista.pose === 'sentado') {
+      if (Math.random() < 0.35) { velas.shift(); velas.push(velas[velas.length - 1] + (Math.random() - 0.52) * 12); }
+      const min = Math.min(...velas) - 8, max = Math.max(...velas) + 8, Y = v => cv.height - 18 - (v - min) / (max - min) * (cv.height - 36);
+      c.fillStyle = '#9aa4b2'; c.font = '12px system-ui'; c.fillText('GGAL · 5m · ' + (analista.turno || ''), 8, 14);
+      for (let i = 1; i < velas.length; i++) {
+        const a = velas[i - 1], b = velas[i], x = 8 + i * 9, sube = b >= a;
+        c.fillStyle = sube ? '#089981' : '#f23645';
+        c.fillRect(x - 1, Y(Math.max(a, b)) - 4, 2, Math.abs(Y(a) - Y(b)) + 8);
+        c.fillRect(x - 3.5, Y(Math.max(a, b)), 7, Math.max(2, Math.abs(Y(a) - Y(b))));
+      }
+      c.strokeStyle = '#2962ff'; c.lineWidth = 1.5; c.beginPath();
+      let e = velas[0];
+      velas.forEach((v, i) => { e = v * 0.2 + e * 0.8; const x = 8 + i * 9; i ? c.lineTo(x, Y(e)) : c.moveTo(x, Y(e)); });
+      c.stroke();
+    } else {
+      c.fillStyle = '#2962ff'; c.font = 'bold 22px system-ui';
+      c.fillText('GGAL', 90 + Math.sin(t * 0.7) * 70, 85 + Math.sin(t * 1.1) * 45);
+    }
+    tex.needsUpdate = true;
+  }
+  // redactor: texto que se va escribiendo
+  {
+    const { ctx: c, cv, tex } = escR.p;
+    c.fillStyle = '#fbfaf6'; c.fillRect(0, 0, cv.width, cv.height);
+    if (redactor.trabajando && redactor.pose === 'sentado') {
+      c.fillStyle = '#1b1f27'; c.font = 'bold 14px system-ui'; c.fillText('Reporte semanal GGAL', 10, 20);
+      const lineas = Math.floor(t * 1.5) % 14;
+      for (let i = 0; i < lineas; i++) {
+        c.fillStyle = i % 5 === 0 ? '#6b7280' : '#c7cbd3';
+        c.fillRect(10, 32 + i * 9, 60 + ((i * 53) % 170), 4);
+      }
+      if (Math.floor(t * 3) % 2) { c.fillStyle = '#1b1f27'; c.fillRect(12 + ((lineas * 53) % 170), 30 + lineas * 9, 2, 8); }
+    } else {
+      c.fillStyle = '#e07b39'; c.font = 'bold 20px system-ui';
+      c.fillText('✎ semanal', 70 + Math.sin(t * 0.6) * 60, 85 + Math.cos(t * 0.9) * 40);
+    }
+    tex.needsUpdate = true;
+  }
+}
+
+// ---------------------------------------------------------------- dia y noche
+function horaArt() {
+  const partes = new Intl.DateTimeFormat('es-AR', { timeZone: 'America/Argentina/Buenos_Aires', hour: '2-digit', minute: '2-digit', hour12: false }).formatToParts(new Date());
+  const h = +partes.find(p => p.type === 'hour').value, m = +partes.find(p => p.type === 'minute').value;
+  return { h, m, f: h + m / 60 };
+}
+const esDeNoche = () => { const { f } = horaArt(); return f < 7 || f > 19.5; };
+const CIELO = [[0, 0x0b1530], [6, 0x1d2a55], [7.5, 0xf6b88a], [9, 0x9fd3f5], [17.5, 0x9fd3f5], [19, 0xf08a5d], [20, 0x2a2350], [24, 0x0b1530]];
+function actualizarCielo() {
+  const { h, m, f } = horaArt();
+  let i = 0;
+  while (f > CIELO[i + 1][0]) i++;
+  const [f0, c0] = CIELO[i], [f1, c1] = CIELO[i + 1];
+  const col = new THREE.Color(c0).lerp(new THREE.Color(c1), (f - f0) / (f1 - f0));
+  scene.background = col;
+  scene.fog = new THREE.Fog(col, 30, 70);
+  vidrio.color.copy(col); vidrio.emissive.copy(col);
+  const dia = Math.max(0, Math.min(1, Math.min(f - 6.5, 20 - f) / 1.5));
+  sol.intensity = 0.25 + dia * 2.0;
+  hemi.intensity = 0.35 + dia * 0.8;
+  luzTecho.intensity = (1 - dia) * 18;
+  agHora.rotation.z = -((h % 12) + m / 60) / 12 * Math.PI * 2;
+  agMin.rotation.z = -m / 60 * Math.PI * 2;
+  document.getElementById('reloj').textContent = String(h).padStart(2, '0') + ':' + String(m).padStart(2, '0');
+}
+actualizarCielo();
+setInterval(actualizarCielo, 20000);
+
+// ---------------------------------------------------------------- estado real
+const sim = { analista: false, redactor: false };
+let ultimoEstado = null, conectado = false;
+async function consultar() {
+  try {
+    const r = await fetch('/estado', { cache: 'no-store' });
+    ultimoEstado = await r.json();
+    conectado = true;
+  } catch {
+    conectado = false;
+  }
+  aplicarEstado();
+}
+function aplicarEstado() {
+  const e = (ultimoEstado && ultimoEstado.estado) || {};
+  for (const ag of agentes) {
+    const real = conectado && e.activo && e.agente === ag.id;
+    if (sim[ag.id]) ag.setTrabajo(true, ag.id === 'analista' ? 'apertura' : 'semanal', 'claude');
+    else ag.setTrabajo(!!real, real ? e.turno : null, real ? e.paso : null, !real && e.agente === ag.id ? e.resultado : null);
+  }
+  const con = document.getElementById('conexion');
+  con.textContent = conectado ? 'en vivo con los estudios' : 'sin conexión al servidor: modo demo (abrila con abrir_oficina.ps1)';
+
+  const corr = (ultimoEstado && ultimoEstado.corridas) || {};
+  const marca = { ok: '✓', error: '✗', murio: '✗', salteado: '–', 'sin cerrar': '…' };
+  document.getElementById('corridas').innerHTML = Object.keys(corr).length
+    ? Object.entries(corr).map(([t, c]) => `<div><span>${t}</span><span class="r-${c.resultado.split(' ')[0]}">${marca[c.resultado] || ''} ${c.resultado} · ${(c.fin || c.inicio).slice(5, 16)}</span></div>`).join('')
+    : '';
+}
+function actualizarHud() {
+  for (const ag of agentes) {
+    document.getElementById('p-' + ag.id).classList.toggle('trabajando', ag.trabajando);
+    let txt = ag.trabajando ? `trabajando · ${ag.turno || ''}` : ag.actividad;
+    const e = ultimoEstado && ultimoEstado.estado;
+    if (ag.trabajando && e && e.agente === ag.id && e.desde && !sim[ag.id]) txt += ` (desde ${e.desde.slice(11, 16)})`;
+    if (sim[ag.id]) txt += ' (simulado)';
+    document.getElementById('q-' + ag.id).textContent = txt;
+  }
+}
+for (const id of ['analista', 'redactor']) {
+  const b = document.getElementById('sim-' + id);
+  b.onclick = () => { sim[id] = !sim[id]; b.classList.toggle('activo', sim[id]); aplicarEstado(); };
+}
+// ?avanzar=N adelanta N segundos de simulacion al abrir (para probar sin esperar).
+const avanzar = +new URLSearchParams(location.search).get('avanzar') || 0;
+consultar().then(() => {
+  for (let i = 0, t = 0; i < avanzar * 30; i++, t += 1 / 30) for (const ag of agentes) ag.update(1 / 30, t);
+});
+setInterval(consultar, 3000);
+
+// ---------------------------------------------------------------- loop
+const reloj = new THREE.Clock();
+let acumPantalla = 0;
+renderer.setAnimationLoop(() => {
+  const dt = Math.min(reloj.getDelta(), 0.1), t = reloj.elapsedTime;
+  for (const ag of agentes) ag.update(dt, t);
+  if ((acumPantalla += dt) > 0.12) { acumPantalla = 0; dibujarPantallas(t); }
+  lucesitaCafe.material.emissiveIntensity = 0.6 + Math.sin(t * 3) * 0.4;
+  controls.update();
+  renderer.render(scene, camera);
+  for (const ag of agentes) ag.ubicarHtml();
+  actualizarHud();
+});
+</script>
+</body>
+</html>

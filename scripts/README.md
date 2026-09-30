@@ -122,3 +122,18 @@ Verificar / borrar:
   feriados cableado.
 - **No es asesoramiento financiero.** El informe describe el cuadro tecnico y
   escenarios; no emite ordenes.
+
+## Oficina 3D (por diversion)
+
+`oficina/index.html` es una casita low-poly (Three.js) con los dos agentes: el
+**analista** (apertura, cierre y auditoria) y el **redactor** (semanal). Cuando
+corre un estudio, el wrapper escribe `oficina/estado.json` (quien trabaja y en
+que paso va), abre la oficina si nadie la esta mirando, y el personaje se sienta
+a trabajar. El resto del tiempo toman cafe, duermen la siesta, charlan o miran
+por la ventana. La luz sigue la hora real de Buenos Aires.
+
+- Abrirla cuando quieras: `powershell -File oficina\abrir_oficina.ps1`
+- `oficina/servidor.py` (puerto 8765) sirve la escena y `/estado`; lo levanta solo
+  `abrir_oficina.ps1` y queda corriendo en segundo plano.
+- Los botones "Simular" del panel ponen a trabajar a un agente sin correr nada.
+- Si la oficina falla, el estudio sigue igual: todo el enganche va en try/catch.

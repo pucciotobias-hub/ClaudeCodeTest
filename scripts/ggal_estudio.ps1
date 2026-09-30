@@ -140,6 +140,24 @@ if (-not $libre) {
     exit 0
 }
 
+# --- 1.a Oficina 3D ---------------------------------------------------------
+# Solo por diversion: oficina/index.html muestra a los agentes trabajando. Aca se
+# le avisa quien trabaja y en que paso va, y se abre si nadie la esta mirando.
+# Nada de esto puede tirar abajo el estudio: todo va en try/catch.
+$OficinaDir    = Join-Path $RepoDir 'oficina'
+$agenteOficina = if ($Turno -eq 'semanal') { 'redactor' } else { 'analista' }
+$desdeOficina  = Get-Date -Format 's'
+function Set-Oficina {
+    param([string]$Paso, [bool]$Activo = $true, [string]$Resultado = $null)
+    try {
+        $e = [ordered]@{ activo = $Activo; agente = $agenteOficina; turno = $Turno; paso = $Paso; desde = $desdeOficina; pid = $PID; resultado = $Resultado }
+        [IO.File]::WriteAllText((Join-Path $OficinaDir 'estado.json'), ($e | ConvertTo-Json -Compress), (New-Object System.Text.UTF8Encoding $false))
+    } catch { Write-Log "Oficina: no se pudo escribir el estado ($_)" 'WARN' }
+}
+Set-Oficina 'preparando'
+try { & (Join-Path $OficinaDir 'abrir_oficina.ps1') -SiNadieMira | ForEach-Object { Write-Log "Oficina: $_" } }
+catch { Write-Log "Oficina: no se pudo abrir ($_)" 'WARN' }
+
 # --- 1.b Bloquear la suspension -------------------------------------------
 # La corrida tarda ~12 min y nadie toca el teclado mientras tanto, asi que el
 # temporizador de inactividad de Windows se cumple siempre y se lleva puesto el
@@ -179,6 +197,7 @@ foreach ($req in @(@{p = $ClaudeExe; n = 'claude.exe' }, @{p = $PromptFile; n = 
 # La logica vive en relanzar_chrome_cdp.ps1 porque Claude tambien la necesita si
 # el CDP se cae a mitad de la corrida. El script es idempotente.
 Write-Log "Verificando Chrome/CDP..."
+Set-Oficina 'chrome'
 $salidaChrome = & powershell.exe -NoProfile -ExecutionPolicy Bypass -File $RelanzarScript
 $salidaChrome | ForEach-Object { Write-Log "  chrome: $_" }
 if ($LASTEXITCODE -ne 0) {
@@ -203,6 +222,7 @@ $receta
 
 # --- 4. Correr Claude ------------------------------------------------------
 Write-Log "Invocando Claude Code (headless)..."
+Set-Oficina 'claude'
 
 $allowed = @(
     'mcp__tradingview'
@@ -268,6 +288,7 @@ try {
 } finally {
     [GgalPower]::SetThreadExecutionState($ES_CONTINUOUS) | Out-Null
     Write-Log "Suspension desbloqueada."
+    Set-Oficina 'fin' $false $(if ($code -eq 0) { 'ok' } else { 'error' })
     $candado.ReleaseMutex()
     foreach ($f in @($tmpOut, $tmpErr)) {
         if (Test-Path $f) { Add-Content -Path $LogFile -Value (Get-Content $f -Raw -Encoding utf8) -Encoding utf8 }

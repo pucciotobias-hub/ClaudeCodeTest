@@ -11,3 +11,6 @@ monitor_divergencia.log
 # Scratch de los calculos del estudio GGAL (la corrida desatendida los deja sueltos)
 scripts/ggal_bars.json
 scripts/ggal_calc.py
+
+# Estado en vivo de la oficina 3D (lo escribe el wrapper de los estudios)
+oficina/estado.json
