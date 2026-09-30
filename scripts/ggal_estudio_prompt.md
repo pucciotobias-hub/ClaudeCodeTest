@@ -163,10 +163,10 @@ punto 2 y reintentá.
   `trend_line` gris punteada (`rgba(150,150,150,0.40)`, ver la tabla de arriba). OJO: TradingView la plotea en espacio de **barras**,
   no de tiempo lineal — para saber por donde pasa hoy, interpolá por indice de
   barra, no por dias calendario (interpolar por calendario da ~0.35 de mas).
-- Dejá el chart con un rango visible de las ultimas ~40 ruedas y sacá el
-  screenshot con nombre `ggal_TURNO_FECHA`. Si `document.hidden` es `true`,
-  `capture_screenshot` sale en blanco (paso en 8 de las primeras 12 corridas):
-  usá `TradingViewApi.takeClientScreenshot()` + descarga.
+- Dejá el chart con un rango visible de las ultimas ~40 ruedas.
+- **No saques screenshot** ni descargues nada a `Downloads`. Tobias no los usa: el
+  informe lleva los numeros y los dibujos quedan en el chart (se saco el
+  2026-09-30 a pedido suyo).
 - Para guardar el layout, `saveChart()`: `saveChartSilently` ya no existe.
 
 ## 6. Escribir el informe

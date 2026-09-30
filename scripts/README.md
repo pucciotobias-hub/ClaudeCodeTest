@@ -63,7 +63,6 @@ Verificar / borrar:
 - Auditoria: `estudios/ggal/auditorias/YYYY-MM-DD.md`. **Las propuestas de cambio a
   la receta no se aplican solas**: las lee Tobias y decide. Una receta que se
   reescribe sola sin que nadie la mire puede derivar sin que se note.
-- Screenshot del chart: `C:\Users\Tobias\Desktop\tradingview-mcp-jackson\screenshots\`
 - Log de las corridas: `logs/ggal_estudio.log` (gitignoreado).
 
 ## Requisitos y limitaciones

@@ -92,7 +92,7 @@ las barras de las ruedas siguientes:
   los anteriores ("Correccion", "no X", "el informe anterior leyo"). Cada una es
   un error de lectura del agente: anotá cual y por que paso.
 - **Notas de corrida.** Contá las fallas de TradingView (feed pegado, CDP caido,
-  panel en 0, screenshot en blanco) y cuales se resolvieron. Si se repite una que
+  panel en 0) y cuales se resolvieron. Si se repite una que
   la receta no cubre, es candidata a propuesta.
 - **Lectura macro.** Si el informe atribuyo el movimiento a GGAL sola o al bloque
   (contra ARGT/EWZ), ¿se sostuvo en las ruedas siguientes?
