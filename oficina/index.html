@@ -20,7 +20,15 @@
     background: var(--panel); border-radius: 14px; padding: 14px 16px; backdrop-filter: blur(6px);
     box-shadow: 0 6px 24px rgba(0,0,0,.35); font-size: 13px; line-height: 1.4;
   }
-  #hud h1 { font-size: 15px; margin: 0 0 2px; display: flex; justify-content: space-between; align-items: baseline; }
+  #hud h1 { font-size: 15px; margin: 0 0 2px; display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+  #hud .derecha { display: flex; align-items: center; gap: 10px; }
+  #plegar { width: 24px; height: 24px; padding: 0; font-size: 16px; line-height: 1; border-radius: 6px; }
+  #mini { display: none; gap: 5px; }
+  #mini .punto { margin-top: 0; }
+  #hud.plegado { width: auto; padding: 8px 10px 8px 14px; }
+  #hud.plegado h1 { margin: 0; }
+  #hud.plegado #contenido-hud { display: none; }
+  #hud.plegado #mini { display: flex; }
   #reloj { font-variant-numeric: tabular-nums; color: var(--tenue); font-weight: 500; }
   #conexion { color: var(--tenue); font-size: 11px; margin-bottom: 10px; }
   .agente { display: flex; gap: 10px; align-items: flex-start; padding: 8px 0; border-top: 1px solid rgba(255,255,255,.08); }
@@ -58,17 +66,26 @@
 </head>
 <body>
 <div id="hud">
-  <h1>La oficina <span id="reloj">--:--</span></h1>
-  <div id="conexion">conectando…</div>
-  <div class="agente"><div class="punto" id="p-analista"></div><div><div class="nombre">Analista GGAL</div><div class="que" id="q-analista">—</div></div></div>
-  <div class="agente"><div class="punto" id="p-redactor"></div><div><div class="nombre">Redactor semanal</div><div class="que" id="q-redactor">—</div></div></div>
-  <div id="corridas"></div>
-  <div id="botones">
-    <button id="sim-analista">Simular analista</button>
-    <button id="sim-redactor">Simular redactor</button>
+  <h1>
+    <span>La oficina</span>
+    <span class="derecha">
+      <span id="mini" title="Analista · Redactor"><span class="punto" id="m-analista"></span><span class="punto" id="m-redactor"></span></span>
+      <span id="reloj">--:--</span>
+      <button id="plegar" title="Ocultar panel (tecla H)" aria-label="Ocultar panel" aria-expanded="true">–</button>
+    </span>
+  </h1>
+  <div id="contenido-hud">
+    <div id="conexion">conectando…</div>
+    <div class="agente"><div class="punto" id="p-analista"></div><div><div class="nombre">Analista GGAL</div><div class="que" id="q-analista">—</div></div></div>
+    <div class="agente"><div class="punto" id="p-redactor"></div><div><div class="nombre">Redactor semanal</div><div class="que" id="q-redactor">—</div></div></div>
+    <div id="corridas"></div>
+    <div id="botones">
+      <button id="sim-analista">Simular analista</button>
+      <button id="sim-redactor">Simular redactor</button>
+    </div>
   </div>
 </div>
-<div id="ayuda">arrastrá para girar · rueda para zoom</div>
+<div id="ayuda">arrastrá para girar · rueda para zoom · H oculta el panel</div>
 
 <script type="module">
 import * as THREE from 'three';
@@ -1257,6 +1274,7 @@ function aplicarEstado() {
 function actualizarHud() {
   for (const ag of agentes) {
     document.getElementById('p-' + ag.id).classList.toggle('trabajando', ag.trabajando);
+    document.getElementById('m-' + ag.id).classList.toggle('trabajando', ag.trabajando);
     let txt = ag.trabajando ? `trabajando · ${ag.turno || ''}` : ag.actividad;
     const e = ultimoEstado && ultimoEstado.estado;
     if (ag.trabajando && e && e.agente === ag.id && e.desde && !sim[ag.id]) txt += ` (desde ${e.desde.slice(11, 16)})`;
@@ -1264,6 +1282,21 @@ function actualizarHud() {
     document.getElementById('q-' + ag.id).textContent = txt;
   }
 }
+// Panel plegable: el boton o la tecla H. Se recuerda entre visitas (si el navegador deja).
+const hud = document.getElementById('hud'), plegar = document.getElementById('plegar');
+function setPlegado(p) {
+  hud.classList.toggle('plegado', p);
+  plegar.textContent = p ? '+' : '–';
+  plegar.title = (p ? 'Mostrar' : 'Ocultar') + ' panel (tecla H)';
+  plegar.setAttribute('aria-label', p ? 'Mostrar panel' : 'Ocultar panel');
+  plegar.setAttribute('aria-expanded', String(!p));
+  try { localStorage.setItem('oficina-hud-plegado', p ? '1' : '0'); } catch {}
+}
+plegar.onclick = () => setPlegado(!hud.classList.contains('plegado'));
+addEventListener('keydown', e => { if ((e.key === 'h' || e.key === 'H') && !e.ctrlKey && !e.metaKey && !e.altKey) setPlegado(!hud.classList.contains('plegado')); });
+try { if (localStorage.getItem('oficina-hud-plegado') === '1') setPlegado(true); } catch {}
+if (new URLSearchParams(location.search).get('panel') === 'oculto') setPlegado(true);
+
 for (const id of ['analista', 'redactor']) {
   const b = document.getElementById('sim-' + id);
   b.onclick = () => { sim[id] = !sim[id]; b.classList.toggle('activo', sim[id]); aplicarEstado(); };
