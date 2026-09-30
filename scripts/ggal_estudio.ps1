@@ -111,9 +111,13 @@ $salida = switch ($Turno) {
 # "Hecho" es "commiteado", no "el archivo existe": el semanal copia la plantilla
 # al archivo de salida al principio, y una corrida que muere a mitad lo dejaba ahi
 # y los reintentos se salteaban (paso el 2026-09-28).
+# Sin --error-unmatch: con ErrorActionPreference Stop, PowerShell 5.1 convierte el
+# stderr de git en excepcion y el wrapper moria sin loguear justo cuando habia
+# trabajo que hacer (paso del 28 al 29-sep: cierre del 28, aperturas y cierre del
+# 29). ls-files a secas no escribe en stderr: devuelve la ruta o nada.
 if (-not $Forzar) {
-    & git -C $RepoDir ls-files --error-unmatch $salida 2>$null | Out-Null
-    if ($LASTEXITCODE -eq 0) {
+    $trackeado = & git -C $RepoDir ls-files -- $salida
+    if ($trackeado) {
         Write-Log "Ya esta commiteado $salida. Nada que hacer."
         exit 0
     }
