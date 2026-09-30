@@ -6,7 +6,9 @@ TradingView. Este prompt lo dispara una Tarea Programada de Windows, asi que
 informe escrito y commiteado.
 
 El wrapper ya se encargo de levantar Chrome con CDP en el puerto 9222 y te pasa,
-arriba de este texto, la fecha y el turno (`apertura` o `cierre`).
+arriba de este texto, la fecha y el turno (`apertura`, `mediodia` o `cierre`).
+El turno `mediodia` lo dispara Tobias a mano en plena rueda: sigue todo igual y
+suma la seccion 6.bis.
 
 **Nunca esperes.** Corres en modo headless (`claude -p`): cuando terminas tu turno
 se termina la corrida, no hay forma de "seguir despues". Si cortas el turno para
@@ -223,6 +225,34 @@ Reglas de escritura:
 - **No es asesoramiento financiero**: describí el cuadro tecnico y los escenarios,
   no des ordenes de compra/venta con tamanio de posicion.
 - Si el mercado esta cerrado o la vela del dia esta vacia, decilo arriba de todo.
+
+## 6.bis Solo turno `mediodia`: lectura intradia
+
+Es un panorama de mitad de rueda. El informe con que comparas es la **apertura de
+hoy** (si no existe, el ultimo que haya). Ademas de la estructura de siempre, agregá
+despues de "Indicadores" una seccion `## Rueda de hoy (intradia)`:
+
+- Pasá a **15 min** (`chart_set_timeframe` → `15`, verificá `resolution()`; si el
+  feed queda pegado en velas diarias, `location.reload()`). La serie trae maximo
+  300 velas, alcanza para ~11 ruedas. Leé las barras de `mainSeries().bars()` y
+  hacé las cuentas en el `ui_evaluate`, sin volcarlas a archivos.
+- **Rango de apertura** (velas 10:30 y 10:45 ART): maximo, minimo y si se rompio,
+  para que lado y a que hora. Donde esta el precio ahora contra ese rango.
+- **Maximo y minimo del dia hasta ahora**, con hora, y contra que nivel del mapa
+  pegaron (toque, perforacion intradia o rechazo).
+- **Volumen acumulado** hoy contra el acumulado a la misma hora de las ultimas 10
+  ruedas (mediana), en %. El volumen es de BATS, una parte del consolidado: sirve
+  para comparar contra si mismo, no como absoluto.
+- Referencias de horario (paneo del 30-sep, 10 ruedas): la franja 10:30-11:00 hace
+  ~40% del rango del dia, el rango de apertura se rompe casi siempre entre 11:00 y
+  11:45, de 12:30 a 14:30 la rueda es chata (~2% del volumen por vela) y el cierre
+  (16:45) concentra 12-15% del volumen. Usalas para decir que falta por venir, no
+  como senal.
+- En los escenarios, separá **lo que queda de hoy** (niveles intradia a mirar hasta
+  el cierre) de **lo que decide el cierre** (los gatillos de siempre, que siguen
+  siendo cierres diarios). La vela de hoy todavia no cerro: la regla de la
+  apertura sigue valiendo, no inclines el sesgo por ella.
+- Al terminar, **volvé el chart a `D`** antes del macro y del redibujo.
 
 ## 7. Actualizar memoria y commitear
 

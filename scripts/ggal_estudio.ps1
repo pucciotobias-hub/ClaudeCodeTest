@@ -13,6 +13,10 @@
     las barras de GGAL, contrasta los estudios de la semana contra el precio y
     escribe estudios/ggal/auditorias/<fecha>.md.
 
+    Con -Turno mediodia corre la misma receta que apertura/cierre, con el
+    agregado de la lectura intradia (seccion 6.bis de la receta). No tiene tarea
+    programada: se dispara a mano cuando se quiere un panorama de mitad de rueda.
+
     Con -Turno semanal usa scripts/ggal_semanal_prompt.md: arma el reporte de la
     semana (numeros del feed, noticias macro, panorama) en
     estudios/ggal/semanal/<fecha>.json y lo carga en un documento de Claude Docs
@@ -22,8 +26,9 @@
     Si la maquina esta bloqueada o con sesion cerrada, el chart no repinta.
 
 .PARAMETER Turno
-    'apertura' (pre-mercado), 'cierre' (post-mercado), 'auditoria' (semanal) o
-    'semanal' (reporte de la semana con noticias y panorama).
+    'apertura' (pre-mercado), 'mediodia' (mitad de rueda, a mano), 'cierre'
+    (post-mercado), 'auditoria' (semanal) o 'semanal' (reporte de la semana con
+    noticias y panorama).
 
 .PARAMETER Forzar
     Corre aunque el informe de hoy ya exista o este fuera de la ventana horaria.
@@ -32,11 +37,12 @@
 .EXAMPLE
     .\ggal_estudio.ps1 -Turno apertura
     .\ggal_estudio.ps1 -Turno cierre -Forzar
+    .\ggal_estudio.ps1 -Turno mediodia
 #>
 [CmdletBinding()]
 param(
     [Parameter(Mandatory = $true)]
-    [ValidateSet('apertura', 'cierre', 'auditoria', 'semanal')]
+    [ValidateSet('apertura', 'mediodia', 'cierre', 'auditoria', 'semanal')]
     [string]$Turno,
 
     [switch]$Forzar
@@ -46,7 +52,7 @@ $ErrorActionPreference = 'Stop'
 
 # --- Rutas -----------------------------------------------------------------
 $RepoDir     = Split-Path -Parent $PSScriptRoot
-$Recetas     = @{ apertura = 'ggal_estudio_prompt.md'; cierre = 'ggal_estudio_prompt.md'; auditoria = 'ggal_auditoria_prompt.md'; semanal = 'ggal_semanal_prompt.md' }
+$Recetas     = @{ apertura = 'ggal_estudio_prompt.md'; mediodia = 'ggal_estudio_prompt.md'; cierre = 'ggal_estudio_prompt.md'; auditoria = 'ggal_auditoria_prompt.md'; semanal = 'ggal_semanal_prompt.md' }
 $PromptFile  = Join-Path $PSScriptRoot $Recetas[$Turno]
 $RelanzarScript = Join-Path $PSScriptRoot 'relanzar_chrome_cdp.ps1'
 $LogDir      = Join-Path $RepoDir 'logs'
@@ -74,6 +80,7 @@ $TopeMinutos = 40
 # con la apertura (usan el mismo chart), por eso sus disparos son 09:30 y 12:00.
 $Ventanas = @{
     apertura = @{ Desde = '10:00'; Hasta = '16:30' }
+    mediodia = @{ Desde = '11:00'; Hasta = '16:45' }
     cierre   = @{ Desde = '17:00'; Hasta = '23:59' }
     semanal  = @{ Desde = '09:00'; Hasta = '16:30' }
 }
