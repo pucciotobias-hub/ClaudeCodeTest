@@ -84,9 +84,9 @@ document.body.appendChild(renderer.domElement);
 
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(40, innerWidth / innerHeight, 0.1, 200);
-camera.position.set(11, 10.5, 14);
+camera.position.set(14, 12.5, 17);
 const controls = new OrbitControls(camera, renderer.domElement);
-controls.target.set(0, 0.8, -0.3);
+controls.target.set(2, 0.6, -0.3);
 controls.enableDamping = true;
 controls.maxPolarAngle = Math.PI * 0.46;
 controls.minDistance = 7;
@@ -105,11 +105,16 @@ const sol = new THREE.DirectionalLight(0xfff2dd, 2.2);
 sol.position.set(8, 14, 9);
 sol.castShadow = true;
 sol.shadow.mapSize.set(2048, 2048);
-Object.assign(sol.shadow.camera, { left: -12, right: 12, top: 12, bottom: -12 });
-scene.add(sol);
-const luzTecho = new THREE.PointLight(0xffd9a0, 0, 16, 1.6);
-luzTecho.position.set(0, 3.2, 0);
-scene.add(luzTecho);
+Object.assign(sol.shadow.camera, { left: -14, right: 14, top: 14, bottom: -14 });
+sol.target.position.set(2, 0, 0);
+scene.add(sol, sol.target);
+// Luces de noche: una por ambiente, se prenden con el atardecer.
+const lucesNoche = [[-1, 0], [4.5, 0], [8.4, -1.5]].map(([x, z]) => {
+  const l = new THREE.PointLight(0xffd9a0, 0, 12, 1.6);
+  l.position.set(x, 3.0, z);
+  scene.add(l);
+  return l;
+});
 
 const mat = (color, extra = {}) => new THREE.MeshStandardMaterial({ color, flatShading: true, roughness: 0.85, ...extra });
 function caja(w, h, d, color, x, y, z, padre = scene) {
@@ -133,7 +138,7 @@ pasto.rotation.x = -Math.PI / 2;
 pasto.position.y = -0.02;
 pasto.receiveShadow = true;
 scene.add(pasto);
-caja(2, 0.02, 9, 0xd9c7a3, 1.5, 0.0, 9);  // caminito hasta la puerta
+for (let z = 5.2; z < 13; z += 0.9) caja(1.6, 0.04, 0.7, 0xd6d3cd, 1.5, 0.0, z);  // caminito de losetas
 function arbol(x, z, s = 1) {
   cilindro(0.15 * s, 0.2 * s, 1 * s, 0x8a5a3b, x, 0.5 * s, z, 6);
   const copa = new THREE.Mesh(new THREE.ConeGeometry(0.9 * s, 1.8 * s, 7), mat(0x4f9d4a));
@@ -146,35 +151,61 @@ function arbol(x, z, s = 1) {
 // ---------------------------------------------------------------- la casa
 // Corte tipo casa de munecas: paredes del fondo e izquierda altas, derecha baja,
 // sin techo ni frente para ver adentro.
-const ANCHO = 12, FONDO = 9;
-caja(ANCHO + 0.4, 0.2, FONDO + 0.4, 0xc9a27a, 0, -0.1, 0);             // piso de madera
-for (let i = -5; i <= 5; i++) caja(0.02, 0.005, FONDO, 0xb88f68, i + 0.5, 0.005, 0); // tablas
-const pared = mat(0xf1e6d6);
-caja(ANCHO + 0.4, 3, 0.2, pared, 0, 1.5, -FONDO / 2 - 0.1);            // fondo
-caja(0.2, 3, FONDO + 0.4, pared, -ANCHO / 2 - 0.1, 1.5, 0);            // izquierda
-caja(0.2, 1.0, FONDO + 0.4, pared, ANCHO / 2 + 0.1, 0.5, 0);           // derecha (baja)
-caja(ANCHO + 0.4, 0.12, 0.26, 0xa8825f, 0, 3.02, -FONDO / 2 - 0.1);    // moldura
-caja(0.26, 0.12, FONDO + 0.4, 0xa8825f, -ANCHO / 2 - 0.1, 3.02, 0);
-caja(3.2, 0.02, 2.4, 0x5b7fb5, 0.3, 0.02, 1.4);                        // alfombra
-caja(2.8, 0.021, 2.0, 0x7d9dcc, 0.3, 0.02, 1.4);
+// La casa va de x=-6 a x=10: living/oficina a la izquierda y el dormitorio a la
+// derecha, detras de un divisor de listones (x=6.6).
+const X0 = -6, X1 = 10, FONDO = 9, CX = (X0 + X1) / 2, ANCHO = X1 - X0;
+const NEGRO = 0x1f2226, ROBLE = 0xd8b58a;
+caja(ANCHO + 0.4, 0.2, FONDO + 0.4, 0xcfcbc4, CX, -0.1, 0);                 // cemento alisado
+caja(X1 - 6.6, 0.012, FONDO, ROBLE, (6.6 + X1) / 2, 0.006, 0);              // piso de roble en el dormitorio
+for (let x = 6.9; x < X1; x += 0.45) caja(0.01, 0.004, FONDO, 0xc49f74, x, 0.013, 0);
+const pared = mat(0xf4f3f0);
+caja(ANCHO + 0.4, 3, 0.2, pared, CX, 1.5, -FONDO / 2 - 0.1);                // fondo
+caja(0.2, 3, FONDO + 0.4, pared, X0 - 0.1, 1.5, 0);                         // izquierda
+caja(0.2, 0.9, FONDO + 0.4, pared, X1 + 0.1, 0.45, 0);                      // derecha (baja, para ver)
+caja(ANCHO + 0.4, 0.08, 0.24, NEGRO, CX, 3.04, -FONDO / 2 - 0.1);           // remate negro
+caja(0.24, 0.08, FONDO + 0.4, NEGRO, X0 - 0.1, 3.04, 0);
+caja(0.24, 0.05, FONDO + 0.4, NEGRO, X1 + 0.1, 0.92, 0);
+caja(ANCHO + 0.4, 0.1, 0.02, NEGRO, CX, 0.05, -FONDO / 2 + 0.005);          // zocalo
+caja(0.02, 0.1, FONDO + 0.4, NEGRO, X0 + 0.005, 0.05, 0);
+// Tira LED arriba de la pared del fondo (se prende de noche).
+const led = new THREE.MeshStandardMaterial({ color: 0xffe2b0, emissive: 0xffc877, emissiveIntensity: 0 });
+caja(ANCHO, 0.03, 0.05, led, CX, 2.9, -FONDO / 2 + 0.03);
+caja(3.4, 0.015, 2.6, 0xe7e1d6, 0.3, 0.02, 1.4);                            // alfombra
+caja(3.0, 0.016, 2.2, 0xd8cfc0, 0.3, 0.021, 1.4);
 
-// Ventanas: el vidrio cambia de color con el cielo.
-const vidrio = new THREE.MeshStandardMaterial({ color: 0x9fd3f5, emissive: 0x9fd3f5, emissiveIntensity: 0.4, flatShading: true });
-function ventana(x, y, z, rotY) {
+// Ventanales de piso a techo con perfileria negra: el vidrio sigue el color del cielo.
+const vidrio = new THREE.MeshStandardMaterial({ color: 0x9fd3f5, emissive: 0x9fd3f5, emissiveIntensity: 0.4, flatShading: true, roughness: 0.2 });
+function ventanal(x, z, rotY, ancho = 2.0, alto = 2.6, y0 = 0.15) {
   const g = new THREE.Group();
-  g.position.set(x, y, z);
+  g.position.set(x, y0 + alto / 2, z);
   g.rotation.y = rotY;
   scene.add(g);
-  caja(1.7, 1.2, 0.05, vidrio, 0, 0, 0, g);
-  caja(1.85, 0.1, 0.1, 0xffffff, 0, 0.62, 0.03, g);
-  caja(1.85, 0.1, 0.1, 0xffffff, 0, -0.62, 0.03, g);
-  caja(0.1, 1.3, 0.1, 0xffffff, -0.88, 0, 0.03, g);
-  caja(0.1, 1.3, 0.1, 0xffffff, 0.88, 0, 0.03, g);
-  caja(0.06, 1.2, 0.08, 0xffffff, 0, 0, 0.03, g);
-  caja(1.9, 0.08, 0.25, 0xffffff, 0, -0.66, 0.12, g);
+  caja(ancho, alto, 0.05, vidrio, 0, 0, 0, g);
+  const hojas = Math.max(2, Math.round(ancho / 1.0));
+  for (let i = 0; i <= hojas; i++) caja(0.05, alto + 0.05, 0.08, NEGRO, -ancho / 2 + i * ancho / hojas, 0, 0.03, g);
+  caja(ancho + 0.05, 0.05, 0.08, NEGRO, 0, alto / 2, 0.03, g);
+  caja(ancho + 0.05, 0.05, 0.08, NEGRO, 0, -alto / 2, 0.03, g);
 }
-ventana(-1.1, 1.85, -FONDO / 2 + 0.02, 0);
-ventana(-ANCHO / 2 + 0.02, 1.85, -0.2, Math.PI / 2);
+ventanal(-1.1, -FONDO / 2 + 0.02, 0, 2.0);
+ventanal(X0 + 0.02, -0.2, Math.PI / 2, 2.6);
+ventanal(8.3, -FONDO / 2 + 0.02, 0, 3.0, 0.8, 1.9);                         // banderola sobre las camas
+
+// Divisor de listones de roble entre el living y el dormitorio (deja paso adelante).
+for (let z = -4.45; z < -0.6; z += 0.16) caja(0.05, 2.9, 0.07, ROBLE, 6.6, 1.45, z);
+caja(0.08, 0.05, 3.9, NEGRO, 6.6, 2.92, -2.55);
+
+// Colgantes: pantalla negra con foco que se prende de noche o cuando trabajan.
+function colgante(x, z, largo = 1.0) {
+  cilindro(0.008, 0.008, largo, NEGRO, x, 3.0 - largo / 2, z, 4);
+  const p = new THREE.Mesh(new THREE.ConeGeometry(0.22, 0.22, 16, 1, true), mat(NEGRO, { side: THREE.DoubleSide }));
+  p.position.set(x, 3.0 - largo - 0.08, z);
+  scene.add(p);
+  const foco = new THREE.Mesh(new THREE.SphereGeometry(0.07, 10, 8), new THREE.MeshStandardMaterial({ color: 0xfff2c0, emissive: 0xffd36b, emissiveIntensity: 0 }));
+  foco.position.set(x, 3.0 - largo - 0.16, z);
+  scene.add(foco);
+  return foco;
+}
+const focosColgantes = [colgante(5.4, -1.8, 0.9), colgante(5.4, -0.8, 0.9), colgante(0.3, 1.4, 0.7)];
 
 // ---------------------------------------------------------------- pantallas
 function pantalla(ancho = 256, alto = 160) {
@@ -187,8 +218,12 @@ function pantalla(ancho = 256, alto = 160) {
 
 function escritorio(x, colorSilla) {
   const z = -3.75;
-  caja(1.9, 0.08, 1.0, 0xa3714b, x, 0.78, z);
-  for (const dx of [-0.85, 0.85]) for (const dz of [-0.4, 0.4]) caja(0.08, 0.78, 0.08, 0x7a5236, x + dx, 0.39, z + dz);
+  caja(1.9, 0.05, 1.0, 0xf5f5f3, x, 0.78, z);
+  for (const dx of [-0.9, 0.9]) {                                  // patas en marco negro
+    caja(0.04, 0.76, 0.04, NEGRO, x + dx, 0.38, z - 0.42);
+    caja(0.04, 0.76, 0.04, NEGRO, x + dx, 0.38, z + 0.42);
+    caja(0.04, 0.04, 0.88, NEGRO, x + dx, 0.02, z);
+  }
   // monitor
   const p = pantalla();
   caja(0.1, 0.35, 0.1, 0x333a44, x, 1.0, z - 0.15);
@@ -228,7 +263,7 @@ function cartel(x, y, dibujar, ancho = 1.1, alto = 0.75) {
   const p = pantalla(256, 176);
   dibujar(p.ctx, 256, 176);
   p.tex.needsUpdate = true;
-  caja(ancho + 0.08, alto + 0.08, 0.04, 0x6b4a32, x, y, -FONDO / 2 + 0.02);
+  caja(ancho + 0.06, alto + 0.06, 0.03, NEGRO, x, y, -FONDO / 2 + 0.02);
   const m = new THREE.Mesh(new THREE.PlaneGeometry(ancho, alto), new THREE.MeshBasicMaterial({ map: p.tex }));
   m.position.set(x, y, -FONDO / 2 + 0.05);
   scene.add(m);
@@ -270,52 +305,60 @@ const pizarra = pantalla(320, 200);
   c.fillStyle = '#333'; c.font = '18px system-ui'; c.fillText('¿rebote o gap?', 20, 185);
 })();
 pizarra.tex.needsUpdate = true;
-caja(2.2, 1.4, 0.06, 0xdddddd, 4.1, 1.85, -FONDO / 2 + 0.03);
+caja(2.2, 1.4, 0.04, NEGRO, 4.1, 1.85, -FONDO / 2 + 0.03);
 {
   const m = new THREE.Mesh(new THREE.PlaneGeometry(2.05, 1.28), new THREE.MeshBasicMaterial({ map: pizarra.tex }));
   m.position.set(4.1, 1.85, -FONDO / 2 + 0.07);
   scene.add(m);
 }
 
-// Sofa + mesita
-const sofaColor = 0x6c8f5e;
-caja(0.9, 0.45, 2.6, sofaColor, -5.45, 0.25, 2.0);
-caja(0.25, 0.9, 2.6, sofaColor, -5.85, 0.6, 2.0);
-caja(0.9, 0.65, 0.25, sofaColor, -5.45, 0.35, 0.6);
-caja(0.9, 0.65, 0.25, sofaColor, -5.45, 0.35, 3.4);
-caja(0.7, 0.12, 1.1, 0x7fa56e, -5.4, 0.52, 1.45);
-caja(0.7, 0.12, 1.1, 0x7fa56e, -5.4, 0.52, 2.6);
-caja(0.8, 0.06, 1.2, 0x9c6b45, -3.7, 0.45, 2.0);
-for (const dx of [-0.32, 0.32]) for (const dz of [-0.5, 0.5]) caja(0.06, 0.42, 0.06, 0x7a5236, -3.7 + dx, 0.21, 2.0 + dz);
-caja(0.35, 0.05, 0.25, 0xf5f0e0, -3.65, 0.5, 1.85);  // diario
+// Sofa bajo gris con patitas negras + mesa ratona redonda
+const sofaColor = 0x8c9097, almohadon = 0xa3a7ad;
+caja(0.95, 0.3, 2.8, sofaColor, -5.45, 0.27, 2.0);
+caja(0.22, 0.72, 2.8, sofaColor, -5.83, 0.5, 2.0);
+caja(0.95, 0.46, 0.18, sofaColor, -5.45, 0.35, 0.69);
+caja(0.95, 0.46, 0.18, sofaColor, -5.45, 0.35, 3.31);
+caja(0.72, 0.16, 1.2, almohadon, -5.37, 0.5, 1.4);
+caja(0.72, 0.16, 1.2, almohadon, -5.37, 0.5, 2.6);
+for (const dz of [0.7, 3.3]) for (const dx of [-0.4, 0.4]) caja(0.05, 0.12, 0.05, NEGRO, -5.45 + dx, 0.06, dz);
+caja(0.1, 0.35, 0.35, 0xe07b39, -5.62, 0.75, 3.0);  // almohadon de color
+cilindro(0.55, 0.55, 0.05, 0xf5f5f3, -3.7, 0.42, 2.0, 24);
+cilindro(0.05, 0.05, 0.4, NEGRO, -3.7, 0.2, 2.0, 8);
+cilindro(0.3, 0.3, 0.02, NEGRO, -3.7, 0.01, 2.0, 16);
+caja(0.35, 0.03, 0.25, 0xf5f0e0, -3.6, 0.46, 1.85);  // diario
 
-// Cafetera
-caja(0.8, 0.95, 2.2, 0xe4dccf, 5.55, 0.475, -1.0);
-caja(0.85, 0.06, 2.25, 0x8d6e63, 5.55, 0.98, -1.0);
-caja(0.45, 0.55, 0.4, 0x2e2e2e, 5.6, 1.29, -1.0);
-caja(0.3, 0.1, 0.3, 0x555555, 5.45, 1.05, -1.0);
+// Isla de cocina con cafetera y banquetas
+caja(0.9, 0.9, 2.3, 0xf5f5f3, 5.4, 0.45, -1.3);
+caja(0.98, 0.05, 2.4, 0x2b2e33, 5.4, 0.925, -1.3);
+caja(0.42, 0.52, 0.38, 0x2e2e2e, 5.5, 1.21, -1.6);
+caja(0.28, 0.08, 0.28, 0x555555, 5.35, 0.99, -1.6);
 const lucesitaCafe = new THREE.Mesh(new THREE.SphereGeometry(0.03, 6, 4), new THREE.MeshStandardMaterial({ color: 0x33ff66, emissive: 0x33ff66, emissiveIntensity: 1 }));
-lucesitaCafe.position.set(5.36, 1.45, -0.9);
+lucesitaCafe.position.set(5.28, 1.38, -1.5);
 scene.add(lucesitaCafe);
-for (let i = 0; i < 3; i++) cilindro(0.06, 0.05, 0.12, [0xffffff, 0xf7c948, 0x4fa3e0][i], 5.5, 1.07, -0.3 + i * 0.16, 8);
+for (let i = 0; i < 3; i++) cilindro(0.06, 0.05, 0.12, [0xffffff, 0xf7c948, 0x4fa3e0][i], 5.4, 1.01, -0.9 + i * 0.16, 8);
+for (const z of [-1.9, -0.7]) {
+  cilindro(0.2, 0.2, 0.06, ROBLE, 6.2, 0.72, z, 16);
+  cilindro(0.025, 0.025, 0.7, NEGRO, 6.2, 0.36, z, 6);
+  cilindro(0.18, 0.18, 0.02, NEGRO, 6.2, 0.01, z, 12);
+}
 
-// Biblioteca
-caja(0.45, 2.1, 1.6, 0x8a5a3b, -5.75, 1.05, -2.6);
+// Biblioteca de metal negro con estantes de roble
+for (const dz of [-0.78, 0.78]) caja(0.4, 2.2, 0.04, NEGRO, -5.75, 1.1, -2.6 + dz);
 const coloresLibros = [0xc0504d, 0x3d6fb6, 0xf7c948, 0x6c8f5e, 0x8e6bbf, 0xe07b39];
 for (let e = 0; e < 4; e++) {
-  caja(0.42, 0.04, 1.5, 0x6b4a32, -5.7, 0.2 + e * 0.5, -2.6);
-  for (let i = 0; i < 7; i++) {
+  caja(0.4, 0.04, 1.56, ROBLE, -5.75, 0.2 + e * 0.55, -2.6);
+  for (let i = 0; i < 6; i++) {
     const h = 0.3 + ((i * 13 + e * 7) % 10) / 70;
-    caja(0.3, h, 0.14, coloresLibros[(i + e) % 6], -5.66, 0.22 + e * 0.5 + h / 2, -3.2 + i * 0.19);
+    caja(0.28, h, 0.14, coloresLibros[(i + e) % 6], -5.72, 0.22 + e * 0.55 + h / 2, -3.25 + i * 0.2 + (e % 2) * 0.1);
   }
 }
 
-// Plantas
+// Plantas en macetas de cemento
 function planta(x, z, s = 1) {
-  cilindro(0.22 * s, 0.17 * s, 0.4 * s, 0xc46a3d, x, 0.2 * s, z, 8);
+  cilindro(0.2 * s, 0.2 * s, 0.45 * s, 0xe4e1dc, x, 0.225 * s, z, 12);
   for (let i = 0; i < 5; i++) {
     const hoja = new THREE.Mesh(new THREE.IcosahedronGeometry(0.28 * s, 0), mat(0x3f8f45));
-    hoja.position.set(x + Math.cos(i * 1.3) * 0.12 * s, (0.6 + (i % 3) * 0.18) * s, z + Math.sin(i * 1.3) * 0.12 * s);
+    hoja.position.set(x + Math.cos(i * 1.3) * 0.12 * s, (0.65 + (i % 3) * 0.18) * s, z + Math.sin(i * 1.3) * 0.12 * s);
     hoja.castShadow = true;
     scene.add(hoja);
   }
@@ -323,10 +366,33 @@ function planta(x, z, s = 1) {
 planta(-5.3, -4.0, 1.1);
 planta(5.3, 3.6, 1.2);
 planta(2.8, -4.0, 0.8);
+planta(9.5, 3.9, 1.0);
+
+// Dormitorio: una cama para cada uno, con la manta del color de su duenio.
+const ZPIES = -2.73;  // donde quedan los pies del que esta acostado (la cabeza cae en la almohada)
+function cama(x, colorManta) {
+  caja(1.15, 0.28, 2.15, ROBLE, x, 0.14, -3.35);
+  caja(1.05, 0.2, 2.0, 0xfafafa, x, 0.38, -3.38);
+  caja(1.25, 0.95, 0.1, 0x9a9ea5, x, 0.72, -4.4);
+  caja(0.75, 0.12, 0.34, 0xffffff, x, 0.54, -4.12);
+  caja(1.09, 0.07, 1.25, colorManta, x, 0.515, -2.92);
+  caja(1.09, 0.075, 0.12, 0xffffff, x, 0.52, -3.5);
+  const manta = caja(1.02, 0.1, 1.15, colorManta, x, 0.86, -3.0);  // la que lo tapa cuando duerme
+  manta.visible = false;
+  return { x, z: ZPIES, y: 0.66, ang: 0, acceso: [x, -1.8], manta };
+}
+const camaA = cama(7.45, 0x3d6fb6);
+const camaR = cama(9.2, 0xe07b39);
+caja(0.45, 0.45, 0.4, ROBLE, 8.33, 0.225, -4.25);                              // mesita de luz
+cilindro(0.07, 0.09, 0.05, NEGRO, 8.33, 0.475, -4.25, 10);
+const velador = new THREE.Mesh(new THREE.SphereGeometry(0.1, 10, 8), new THREE.MeshStandardMaterial({ color: 0xfff2c0, emissive: 0xffd36b, emissiveIntensity: 0 }));
+velador.position.set(8.33, 0.6, -4.25);
+scene.add(velador);
+caja(2.8, 0.012, 1.4, 0xe7e1d6, 8.3, 0.02, -1.5);                              // alfombra del dormitorio
 
 // Reloj de pared (hora real)
 const reloj3d = new THREE.Group();
-reloj3d.position.set(-ANCHO / 2 + 0.03, 2.3, 2.0);
+reloj3d.position.set(X0 + 0.03, 2.3, 2.0);
 reloj3d.rotation.y = Math.PI / 2;
 scene.add(reloj3d);
 {
@@ -463,7 +529,7 @@ const LUGAR = {
   sillaR: { x: escR.silla.x, z: escR.silla.z, ang: Math.PI, y: 0.56 },
   sofa1: { x: -5.25, z: 1.45, ang: Math.PI / 2, y: 0.58, acceso: [-4.4, 1.45] },
   sofa2: { x: -5.25, z: 2.6, ang: Math.PI / 2, y: 0.58, acceso: [-4.4, 2.6] },
-  cafe: { x: 4.75, z: -1.0, ang: Math.PI / 2 },
+  cafe: { x: 4.55, z: -1.5, ang: Math.PI / 2 },
   ventana: { x: -1.1, z: -3.7, ang: Math.PI },
   ventanaIzq: { x: -4.9, z: -0.2, ang: -Math.PI / 2 },
   pizarra: { x: 4.1, z: -3.5, ang: Math.PI },
@@ -567,14 +633,18 @@ class Agente {
       return;
     }
     const opciones = [
-      ['cafe', 3], ['sofa', 2], ['ventana', 2], ['pasear', 2], ['charla', 2], ['planta', 1], ['pizarra', 1], ['biblioteca', 1], ['diario', 1],
+      ['cafe', 3], ['sofa', 2], ['cama', 2], ['ventana', 2], ['pasear', 2], ['charla', 2], ['planta', 1], ['pizarra', 1], ['biblioteca', 1], ['diario', 1],
     ];
     let total = opciones.reduce((a, o) => a + o[1], 0), r = Math.random() * total, elegida = 'pasear';
     for (const [n, w] of opciones) { if ((r -= w) < 0) { elegida = n; break; } }
+    // De noche (23:30 a 7) se van a dormir a su cama y no salen hasta la manana.
+    const { f: hora } = horaArt();
+    const deNoche = hora >= 23.5 || hora < 7;
+    if (deNoche) elegida = 'cama';
     const otro = this.otro;
-    if (elegida === 'charla' && !(otro && !otro.trabajando && !otro.ocupadoCharla && otro.actividad !== 'durmiendo la siesta')) elegida = 'cafe';
+    if (elegida === 'charla' && !(otro && !otro.trabajando && !otro.ocupadoCharla && otro.pose !== 'acostado' && !otro.actividad.startsWith('durmiendo'))) elegida = 'cafe';
     this.actividad = {
-      cafe: 'tomando un café', sofa: 'descansando en el sofá', ventana: 'mirando por la ventana', pasear: 'dando vueltas',
+      cafe: 'tomando un café', sofa: 'descansando en el sofá', cama: deNoche ? 'durmiendo (buenas noches)' : 'durmiendo la siesta en su cama', ventana: 'mirando por la ventana', pasear: 'dando vueltas',
       charla: 'charlando', planta: 'regando la planta', pizarra: 'mirando la pizarra', biblioteca: 'buscando un libro', diario: 'leyendo el diario',
     }[elegida];
     const L = LUGAR;
@@ -592,6 +662,10 @@ class Agente {
         if (siesta) this.actividad = 'durmiendo la siesta';
         break;
       }
+      case 'cama':
+        this.cola.push(...this.rutaA(this.cama), { tipo: 'decir', txt: deNoche ? azar(['Buenas noches 🌙', 'Mañana seguimos', 'A la cucha']) : azar(['Una siestita…', '5 minutos y vuelvo']) },
+          { tipo: 'acostar', lugar: this.cama, dur: deNoche ? entre(120, 240) : entre(15, 30) }, { tipo: 'decir', txt: deNoche ? 'Mmm… ¿ya es de día?' : '¡Como nuevo!' });
+        break;
       case 'diario':
         this.cola.push(...this.rutaA(sofa), { tipo: 'sentar', lugar: sofa, modo: 'leer', dur: entre(10, 16) });
         break;
@@ -661,13 +735,21 @@ class Agente {
         this.alturaAsiento = a.lugar.y;
         terminada = this.t > a.dur;
         break;
+      case 'acostar':
+        this.pose = 'acostado';
+        this.modo = 'dormir';
+        this.lugarActual = a.lugar;
+        this.pos.set(a.lugar.x, a.lugar.z);
+        this.angObj = a.lugar.ang;
+        terminada = this.t > a.dur;
+        break;
       case 'quieto':
         if (!a.sentado) this.pose = 'parado';
         this.modo = a.modo || null;
         terminada = this.t > a.dur;
         break;
     }
-    if (terminada) { this.accion = null; if (a.tipo === 'sentar' || a.tipo === 'quieto') this.modo = null; }
+    if (terminada) { this.accion = null; if (a.tipo === 'sentar' || a.tipo === 'quieto' || a.tipo === 'acostar') this.modo = null; }
     this.animar(dt, t);
     this.mensajesTrabajo(t);
   }
@@ -685,8 +767,12 @@ class Agente {
     let da = this.angObj - this.ang;
     da = Math.atan2(Math.sin(da), Math.cos(da));
     this.ang += da * Math.min(1, dt * 8);
-    m.raiz.position.set(this.pos.x, 0, this.pos.y);
+    const acostado = this.pose === 'acostado';
+    m.raiz.position.set(this.pos.x, acostado ? this.cama.y : 0, this.pos.y);
     m.raiz.rotation.y = this.ang;
+    // Acostado boca arriba: el cuerpo gira sobre los pies y la cabeza cae en la almohada.
+    m.cuerpo.rotation.x += ((acostado ? -Math.PI / 2 : 0) - m.cuerpo.rotation.x) * Math.min(1, dt * 12);
+    this.cama.manta.visible = acostado;
 
     const s = Math.sin(t * 9);
     const reset = { pI: 0, pD: 0, bI: 0, bD: 0, bIz: 0, bDz: 0, y: 0, cabX: 0, cabZ: 0 };
@@ -702,7 +788,11 @@ class Agente {
     switch (this.modo) {
       case 'tipear': o.bI = -1.25 + Math.sin(t * 22) * 0.08; o.bD = -1.25 + Math.sin(t * 22 + 1.5) * 0.08; o.cabX = 0.12 + Math.sin(t * 1.3) * 0.05; break;
       case 'tomar': { const sorbo = (Math.sin(t * 0.9) + 1) / 2; o.bD = -0.6 - sorbo * 1.9; o.bDz = sorbo * 0.25; break; }
-      case 'dormir': o.cabZ = 0.35; o.cabX = 0.25; o.bI = o.bD = -0.2; if (t % 3 < dt * 1.5) this.decir('Zzz…', 2); break;
+      case 'dormir':
+        if (acostado) { o.y = 0; o.cabZ = Math.sin(t * 0.4) * 0.15; o.bI = o.bD = 0; }
+        else { o.cabZ = 0.35; o.cabX = 0.25; o.bI = o.bD = -0.2; }
+        if (t % 3 < dt * 1.5) this.decir('Zzz…', 2);
+        break;
       case 'leer': o.bI = o.bD = -1.3; o.bIz = -0.25; o.bDz = 0.25; o.cabX = 0.2; break;
       case 'pensar': o.bD = -2.3; o.bDz = 0.5; o.cabZ = Math.sin(t * 0.8) * 0.1; break;
       case 'gesto': o.bD = -0.8 + Math.sin(t * 5) * 0.4; o.bI = -0.4 + Math.sin(t * 4 + 1) * 0.3; o.cabX = Math.sin(t * 6) * 0.06; break;
@@ -744,6 +834,8 @@ class Agente {
 
 const analista = new Agente('analista', modeloAnalista, LUGAR.sillaA, escA, [-1, 2]);
 const redactor = new Agente('redactor', modeloRedactor, LUGAR.sillaR, escR, [2, 2.5]);
+analista.cama = camaA;
+redactor.cama = camaR;
 analista.otro = redactor;
 redactor.otro = analista;
 const agentes = [analista, redactor];
@@ -796,13 +888,17 @@ function dibujarPantallas(t) {
 }
 
 // ---------------------------------------------------------------- dia y noche
+// ?hora=HH fuerza la hora (para ver la casa de noche o de dia sin esperar).
+const horaForzada = new URLSearchParams(location.search).get('hora');
 function horaArt() {
+  if (horaForzada !== null) { const f = +horaForzada; return { h: Math.floor(f), m: Math.round((f % 1) * 60), f }; }
   const partes = new Intl.DateTimeFormat('es-AR', { timeZone: 'America/Argentina/Buenos_Aires', hour: '2-digit', minute: '2-digit', hour12: false }).formatToParts(new Date());
   const h = +partes.find(p => p.type === 'hour').value, m = +partes.find(p => p.type === 'minute').value;
   return { h, m, f: h + m / 60 };
 }
 const esDeNoche = () => { const { f } = horaArt(); return f < 7 || f > 19.5; };
 const CIELO = [[0, 0x0b1530], [6, 0x1d2a55], [7.5, 0xf6b88a], [9, 0x9fd3f5], [17.5, 0x9fd3f5], [19, 0xf08a5d], [20, 0x2a2350], [24, 0x0b1530]];
+let noche = 0;
 function actualizarCielo() {
   const { h, m, f } = horaArt();
   let i = 0;
@@ -815,7 +911,7 @@ function actualizarCielo() {
   const dia = Math.max(0, Math.min(1, Math.min(f - 6.5, 20 - f) / 1.5));
   sol.intensity = 0.25 + dia * 2.0;
   hemi.intensity = 0.35 + dia * 0.8;
-  luzTecho.intensity = (1 - dia) * 18;
+  noche = 1 - dia;
   agHora.rotation.z = -((h % 12) + m / 60) / 12 * Math.PI * 2;
   agMin.rotation.z = -m / 60 * Math.PI * 2;
   document.getElementById('reloj').textContent = String(h).padStart(2, '0') + ':' + String(m).padStart(2, '0');
@@ -881,6 +977,13 @@ renderer.setAnimationLoop(() => {
   for (const ag of agentes) ag.update(dt, t);
   if ((acumPantalla += dt) > 0.12) { acumPantalla = 0; dibujarPantallas(t); }
   lucesitaCafe.material.emissiveIntensity = 0.6 + Math.sin(t * 3) * 0.4;
+  // Luces de la casa: de noche prendidas; si los dos estan en la cama, se apagan (queda el velador).
+  const todosDormidos = agentes.every(ag => ag.pose === 'acostado');
+  const luz = noche * (todosDormidos ? 0.12 : 1);
+  lucesNoche.forEach(l => { l.intensity += (luz * 14 - l.intensity) * 0.05; });
+  led.emissiveIntensity = luz * 1.6;
+  focosColgantes.forEach(f => { f.material.emissiveIntensity = luz * 2.2; });
+  velador.material.emissiveIntensity = noche * (todosDormidos ? 1.2 : 0.8);
   controls.update();
   renderer.render(scene, camera);
   for (const ag of agentes) ag.ubicarHtml();

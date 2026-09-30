@@ -125,12 +125,13 @@ Verificar / borrar:
 
 ## Oficina 3D (por diversion)
 
-`oficina/index.html` es una casita low-poly (Three.js) con los dos agentes: el
+`oficina/index.html` es una casa moderna low-poly (Three.js, living/oficina y dormitorio) con los dos agentes: el
 **analista** (apertura, cierre y auditoria) y el **redactor** (semanal). Cuando
 corre un estudio, el wrapper escribe `oficina/estado.json` (quien trabaja y en
 que paso va), abre la oficina si nadie la esta mirando, y el personaje se sienta
 a trabajar. El resto del tiempo toman cafe, duermen la siesta, charlan o miran
-por la ventana. La luz sigue la hora real de Buenos Aires.
+por la ventana; cada uno tiene su cama para la siesta, y de 23:30 a 7 duermen y se
+apagan las luces. La luz sigue la hora real de Buenos Aires (`?hora=HH` la fuerza).
 
 - Abrirla cuando quieras: `powershell -File oficina\abrir_oficina.ps1`
 - `oficina/servidor.py` (puerto 8765) sirve la escena y `/estado`; lo levanta solo
