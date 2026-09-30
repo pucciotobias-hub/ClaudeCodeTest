@@ -84,13 +84,13 @@ document.body.appendChild(renderer.domElement);
 
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(40, innerWidth / innerHeight, 0.1, 200);
-camera.position.set(14, 12.5, 17);
+camera.position.set(17, 20, 29);
 const controls = new OrbitControls(camera, renderer.domElement);
-controls.target.set(2, 0.6, -0.3);
+controls.target.set(1.2, 0.4, 1.2);
 controls.enableDamping = true;
 controls.maxPolarAngle = Math.PI * 0.46;
 controls.minDistance = 7;
-controls.maxDistance = 32;
+controls.maxDistance = 55;
 controls.update();
 
 addEventListener('resize', () => {
@@ -102,14 +102,14 @@ addEventListener('resize', () => {
 const hemi = new THREE.HemisphereLight(0xdfefff, 0x5a4a3a, 1.1);
 scene.add(hemi);
 const sol = new THREE.DirectionalLight(0xfff2dd, 2.2);
-sol.position.set(8, 14, 9);
+sol.position.set(6, 18, 12);
 sol.castShadow = true;
-sol.shadow.mapSize.set(2048, 2048);
-Object.assign(sol.shadow.camera, { left: -14, right: 14, top: 14, bottom: -14 });
-sol.target.position.set(2, 0, 0);
+sol.shadow.mapSize.set(4096, 4096);
+Object.assign(sol.shadow.camera, { left: -24, right: 24, top: 24, bottom: -24 });
+sol.target.position.set(-1.5, 0, 0);
 scene.add(sol, sol.target);
 // Luces de noche: una por ambiente, se prenden con el atardecer.
-const lucesNoche = [[-1, 0], [4.5, 0], [8.4, -1.5]].map(([x, z]) => {
+const lucesNoche = [[-1, 0], [4.5, 0], [8.4, -1.5], [-10.5, -2.5], [-10.5, 2.5]].map(([x, z]) => {
   const l = new THREE.PointLight(0xffd9a0, 0, 12, 1.6);
   l.position.set(x, 3.0, z);
   scene.add(l);
@@ -146,14 +146,15 @@ function arbol(x, z, s = 1) {
   copa.castShadow = true;
   scene.add(copa);
 }
-[[-9, -7, 1.3], [-11, 2, 1], [9, -8, 1.5], [12, 1, 1.1], [-7, 9, 0.9], [8, 10, 1.2], [-14, -3, 1.4]].forEach(a => arbol(...a));
+[[-9, -7, 1.3], [-19, 2, 1], [9, -8, 1.5], [21, -1, 1.1], [-7, 9, 0.9], [8, 10, 1.2], [-18, -7, 1.4], [-13, 8, 1.1], [20, 8, 1.3]].forEach(a => arbol(...a));
 
 // ---------------------------------------------------------------- la casa
 // Corte tipo casa de munecas: paredes del fondo e izquierda altas, derecha baja,
 // sin techo ni frente para ver adentro.
-// La casa va de x=-6 a x=10: living/oficina a la izquierda y el dormitorio a la
-// derecha, detras de un divisor de listones (x=6.6).
-const X0 = -6, X1 = 10, FONDO = 9, CX = (X0 + X1) / 2, ANCHO = X1 - X0;
+// La casa va de x=-15 a x=10: el ala del gimnasio y la sala de juegos (x<-6, detras
+// de un muro bajo con puerta), el living/oficina, y el dormitorio a la derecha,
+// detras de un divisor de listones (x=6.6).
+const X0 = -15, X1 = 10, FONDO = 9, CX = (X0 + X1) / 2, ANCHO = X1 - X0;
 const NEGRO = 0x1f2226, ROBLE = 0xd8b58a;
 caja(ANCHO + 0.4, 0.2, FONDO + 0.4, 0xcfcbc4, CX, -0.1, 0);                 // cemento alisado
 caja(X1 - 6.6, 0.012, FONDO, ROBLE, (6.6 + X1) / 2, 0.006, 0);              // piso de roble en el dormitorio
@@ -162,6 +163,11 @@ const pared = mat(0xf4f3f0);
 caja(ANCHO + 0.4, 3, 0.2, pared, CX, 1.5, -FONDO / 2 - 0.1);                // fondo
 caja(0.2, 3, FONDO + 0.4, pared, X0 - 0.1, 1.5, 0);                         // izquierda
 caja(0.2, 0.9, FONDO + 0.4, pared, X1 + 0.1, 0.45, 0);                      // derecha (baja, para ver)
+// Muro bajo entre el living y el ala nueva, con la puerta en z=-0.9.
+caja(0.2, 1.0, 3.0, pared, -6, 0.5, -3.0);
+caja(0.2, 1.0, 4.8, pared, -6, 0.5, 2.1);
+caja(0.24, 0.05, 3.0, NEGRO, -6, 1.02, -3.0);
+caja(0.24, 0.05, 4.8, NEGRO, -6, 1.02, 2.1);
 caja(ANCHO + 0.4, 0.08, 0.24, NEGRO, CX, 3.04, -FONDO / 2 - 0.1);           // remate negro
 caja(0.24, 0.08, FONDO + 0.4, NEGRO, X0 - 0.1, 3.04, 0);
 caja(0.24, 0.05, FONDO + 0.4, NEGRO, X1 + 0.1, 0.92, 0);
@@ -187,7 +193,7 @@ function ventanal(x, z, rotY, ancho = 2.0, alto = 2.6, y0 = 0.15) {
   caja(ancho + 0.05, 0.05, 0.08, NEGRO, 0, -alto / 2, 0.03, g);
 }
 ventanal(-1.1, -FONDO / 2 + 0.02, 0, 2.0);
-ventanal(X0 + 0.02, -0.2, Math.PI / 2, 2.6);
+ventanal(X0 + 0.02, -0.5, Math.PI / 2, 2.0);
 ventanal(8.3, -FONDO / 2 + 0.02, 0, 3.0, 0.8, 1.9);                         // banderola sobre las camas
 
 // Divisor de listones de roble entre el living y el dormitorio (deja paso adelante).
@@ -390,10 +396,162 @@ velador.position.set(8.33, 0.6, -4.25);
 scene.add(velador);
 caja(2.8, 0.012, 1.4, 0xe7e1d6, 8.3, 0.02, -1.5);                              // alfombra del dormitorio
 
+// ---------------------------------------------------------------- gimnasio (ala izquierda, fondo)
+caja(8.9, 0.014, 2.9, 0x34373c, -10.5, 0.007, -3.05);                        // piso de goma
+for (let x = -14.5; x < -6.2; x += 1.0) caja(0.01, 0.004, 2.9, 0x2a2c30, x, 0.015, -3.05);
+{
+  const espejo = new THREE.Mesh(new THREE.PlaneGeometry(4.2, 1.9), new THREE.MeshStandardMaterial({ color: 0xdcebf2, emissive: 0x6d8796, emissiveIntensity: 0.35, metalness: 0.2, roughness: 0.1 }));
+  espejo.position.set(-10.9, 1.35, -FONDO / 2 + 0.03);
+  scene.add(espejo);
+  caja(4.3, 2.0, 0.02, NEGRO, -10.9, 1.35, -FONDO / 2 + 0.015);
+}
+// cinta de correr
+caja(0.8, 0.14, 1.9, 0x2b2e33, -13.6, 0.07, -3.2);
+caja(0.62, 0.02, 1.7, 0x111111, -13.6, 0.15, -3.15);
+for (const dx of [-0.36, 0.36]) caja(0.05, 1.05, 0.05, 0x9aa0a6, -13.6 + dx, 0.6, -4.05);
+caja(0.8, 0.3, 0.12, 0x2b2e33, -13.6, 1.2, -4.05);
+const pantallaCinta = new THREE.Mesh(new THREE.PlaneGeometry(0.4, 0.18), new THREE.MeshBasicMaterial({ color: 0x21c7a8 }));
+pantallaCinta.position.set(-13.6, 1.22, -3.985);
+scene.add(pantallaCinta);
+// banco con barra
+caja(0.4, 0.08, 1.4, 0x1f2226, -11.4, 0.48, -3.2);
+caja(0.42, 0.1, 1.2, 0xc0392b, -11.4, 0.56, -3.1);
+for (const dz of [-0.55, 0.55]) caja(0.3, 0.44, 0.06, 0x9aa0a6, -11.4, 0.22, -3.2 + dz);
+for (const dx of [-0.45, 0.45]) caja(0.05, 1.1, 0.05, 0x9aa0a6, -11.4 + dx, 0.55, -3.85);
+cilindro(0.025, 0.025, 1.8, 0xb8bec6, -11.4, 1.05, -3.85, 8).rotation.z = Math.PI / 2;
+for (const dx of [-0.75, 0.75]) cilindro(0.2, 0.2, 0.08, 0x1f2226, -11.4 + dx, 1.05, -3.85, 14).rotation.z = Math.PI / 2;
+// rack de mancuernas
+caja(1.4, 0.5, 0.35, 0x2b2e33, -9.9, 0.25, -4.2);
+for (let i = 0; i < 5; i++) {
+  const x = -10.45 + i * 0.27;
+  cilindro(0.015, 0.015, 0.22, 0x9aa0a6, x, 0.57, -4.2, 6).rotation.x = Math.PI / 2;
+  for (const dz of [-0.1, 0.1]) caja(0.09 + i * 0.01, 0.09 + i * 0.01, 0.05, 0x1f2226, x, 0.57, -4.2 + dz);
+}
+// bolsa de boxeo colgada
+cilindro(0.01, 0.01, 1.0, 0x777777, -7.6, 2.5, -3.5, 4);
+const bolsa = new THREE.Group();
+bolsa.position.set(-7.6, 2.0, -3.5);
+scene.add(bolsa);
+cilindro(0.24, 0.24, 1.1, 0xb71c1c, 0, -0.6, 0, 14, bolsa);
+cilindro(0.245, 0.245, 0.08, 0x111111, 0, -0.2, 0, 14, bolsa);
+// colchoneta de yoga
+caja(0.7, 0.02, 1.8, 0x8e6bbf, -8.2, 0.02, -2.3).rotation.y = Math.PI / 2;
+
+// ---------------------------------------------------------------- sala de juegos (ala izquierda, adelante)
+caja(8.9, 0.014, 4.4, 0x2d3a5c, -10.5, 0.007, 2.3);                          // alfombra azul noche
+// mesa de ping-pong
+caja(2.5, 0.06, 1.4, 0x1f6f4a, -10.0, 0.76, 2.3);
+caja(2.5, 0.061, 0.02, 0xffffff, -10.0, 0.761, 2.3);
+caja(0.02, 0.061, 1.4, 0xffffff, -10.0, 0.762, 2.3);
+caja(0.02, 0.15, 1.5, 0x111111, -10.0, 0.86, 2.3);
+for (const dx of [-1.0, 1.0]) for (const dz of [-0.55, 0.55]) caja(0.05, 0.73, 0.05, NEGRO, -10 + dx, 0.365, 2.3 + dz);
+const pelotita = new THREE.Mesh(new THREE.SphereGeometry(0.04, 8, 6), new THREE.MeshStandardMaterial({ color: 0xff8c1a, emissive: 0xff8c1a, emissiveIntensity: 0.3 }));
+pelotita.visible = false;
+scene.add(pelotita);
+// arcade
+{
+  const g = new THREE.Group();
+  g.position.set(-14.5, 0, 1.5);
+  g.rotation.y = Math.PI / 2;
+  scene.add(g);
+  caja(0.8, 1.8, 0.7, 0x5b2a86, 0, 0.9, 0, g);
+  caja(0.82, 0.25, 0.72, 0xff3d9a, 0, 1.9, 0, g);
+  caja(0.8, 0.12, 0.35, 0x222222, 0, 1.0, 0.35, g);
+  const p = pantalla(128, 96);
+  const scr = new THREE.Mesh(new THREE.PlaneGeometry(0.6, 0.45), new THREE.MeshBasicMaterial({ map: p.tex }));
+  scr.position.set(0, 1.45, 0.36);
+  g.add(scr);
+  var pantallaArcade = p;
+}
+// TV con consola y pufs
+caja(0.06, 0.95, 1.65, 0x111111, X0 + 0.05, 1.45, 3.4);
+const pantallaTv = pantalla(256, 150);
+{
+  const scr = new THREE.Mesh(new THREE.PlaneGeometry(1.55, 0.87), new THREE.MeshBasicMaterial({ map: pantallaTv.tex }));
+  scr.position.set(X0 + 0.085, 1.45, 3.4);
+  scr.rotation.y = Math.PI / 2;
+  scene.add(scr);
+}
+caja(0.45, 0.4, 1.8, 0xf5f5f3, X0 + 0.3, 0.2, 3.4);
+caja(0.3, 0.06, 0.35, 0x111111, X0 + 0.35, 0.43, 3.1);
+function puf(x, z, color) {
+  const m = new THREE.Mesh(new THREE.SphereGeometry(0.42, 12, 8), mat(color));
+  m.scale.set(1, 0.55, 1);
+  m.position.set(x, 0.2, z);
+  m.castShadow = m.receiveShadow = true;
+  scene.add(m);
+}
+puf(-13.05, 3.9, 0x3d6fb6);
+puf(-13.05, 2.9, 0xe07b39);
+// cartel de neon
+{
+  const p = pantalla(256, 80);
+  const c = p.ctx;
+  c.fillStyle = '#12051f'; c.fillRect(0, 0, 256, 80);
+  c.shadowColor = '#ff3d9a'; c.shadowBlur = 14; c.fillStyle = '#ff7ac3';
+  c.font = 'bold 44px system-ui'; c.textAlign = 'center'; c.fillText('GAME ON', 128, 56);
+  p.tex.needsUpdate = true;
+  const m = new THREE.Mesh(new THREE.PlaneGeometry(1.6, 0.5), new THREE.MeshBasicMaterial({ map: p.tex }));
+  m.position.set(X0 + 0.04, 2.45, 1.4);
+  m.rotation.y = Math.PI / 2;
+  scene.add(m);
+}
+focosColgantes.push(colgante(-10.0, 2.3, 1.0));
+
+// ---------------------------------------------------------------- patio con los autos
+caja(7.5, 0.03, 10, 0xc9c5bd, 14.5, 0.0, 1.5);                                  // entrada de cemento
+for (let z = -3.2; z < 6.5; z += 1.6) caja(7.5, 0.005, 0.02, 0xb5b1a9, 14.5, 0.017, z);
+function rueda(g, x, y, z, r) {
+  const n = cilindro(r, r, 0.28, 0x151515, x, y, z, 14, g);
+  n.rotation.z = Math.PI / 2;
+  const l = cilindro(r * 0.55, r * 0.55, 0.3, 0xb8bec6, x, y, z, 10, g);
+  l.rotation.z = Math.PI / 2;
+}
+const vidrioAuto = new THREE.MeshStandardMaterial({ color: 0x1c2733, metalness: 0.6, roughness: 0.15, flatShading: true });
+const farol = new THREE.MeshStandardMaterial({ color: 0xfff6d8, emissive: 0xfff1c0, emissiveIntensity: 0.3 });
+const stop = new THREE.MeshStandardMaterial({ color: 0xc62828, emissive: 0xff2020, emissiveIntensity: 0.4 });
+// camioneta pickup (frente hacia +z)
+{
+  const g = new THREE.Group();
+  g.position.set(13.2, 0, 1.0);
+  scene.add(g);
+  const pintura = mat(0x2f3d4c, { roughness: 0.45, metalness: 0.3 });
+  caja(2.0, 0.55, 5.1, pintura, 0, 0.78, 0, g);                   // chasis
+  caja(1.95, 0.85, 2.0, pintura, 0, 1.47, 0.45, g);                // cabina
+  caja(1.97, 0.5, 0.05, vidrioAuto, 0, 1.55, 1.46, g);             // parabrisas
+  caja(1.97, 0.45, 0.05, vidrioAuto, 0, 1.55, -0.56, g);
+  for (const dx of [-0.985, 0.985]) caja(0.03, 0.45, 1.7, vidrioAuto, dx, 1.55, 0.45, g);
+  for (const dx of [-0.95, 0.95]) caja(0.1, 0.4, 2.3, pintura, dx, 1.25, -1.35, g);   // caja de carga
+  caja(2.0, 0.4, 0.1, pintura, 0, 1.25, -2.5, g);
+  caja(2.05, 0.18, 0.2, 0x1b1b1b, 0, 0.62, 2.55, g);              // paragolpes
+  caja(2.05, 0.18, 0.2, 0x1b1b1b, 0, 0.62, -2.55, g);
+  caja(1.3, 0.3, 0.05, 0x1b1b1b, 0, 0.92, 2.56, g);                // parrilla
+  for (const dx of [-0.75, 0.75]) { caja(0.3, 0.14, 0.05, farol, dx, 0.95, 2.56, g); caja(0.12, 0.3, 0.05, stop, dx * 1.2, 1.1, -2.56, g); }
+  caja(1.4, 0.06, 0.9, 0x1b1b1b, 0, 1.92, 0.45, g);                // barras de techo
+  for (const [x, z] of [[-1.0, 1.6], [1.0, 1.6], [-1.0, -1.6], [1.0, -1.6]]) rueda(g, x, 0.42, z, 0.42);
+}
+// auto deportivo (frente hacia +z)
+{
+  const g = new THREE.Group();
+  g.position.set(16.4, 0, 1.2);
+  scene.add(g);
+  const pintura = mat(0xd62828, { roughness: 0.3, metalness: 0.4 });
+  caja(1.9, 0.42, 4.4, pintura, 0, 0.52, 0, g);                    // carroceria baja
+  const capot = caja(1.8, 0.1, 1.3, pintura, 0, 0.72, 1.45, g);
+  capot.rotation.x = 0.08;
+  caja(1.55, 0.42, 1.8, vidrioAuto, 0, 0.93, -0.2, g);             // cabina de vidrio
+  caja(1.6, 0.06, 1.2, pintura, 0, 1.16, -0.35, g);                // techo
+  caja(1.9, 0.05, 0.35, 0x111111, 0, 1.08, -2.05, g);              // aleron
+  for (const dx of [-0.75, 0.75]) caja(0.06, 0.3, 0.06, 0x111111, dx, 0.9, -2.05, g);
+  caja(1.95, 0.08, 4.45, 0x111111, 0, 0.3, 0, g);                  // zocalo negro
+  for (const dx of [-0.65, 0.65]) { caja(0.4, 0.08, 0.05, farol, dx, 0.64, 2.21, g); caja(0.45, 0.07, 0.05, stop, dx, 0.66, -2.21, g); }
+  for (const dx of [-0.25, 0.25]) caja(0.12, 0.12, 0.05, 0x999999, dx, 0.36, -2.22, g); // escapes
+  for (const [x, z] of [[-0.95, 1.35], [0.95, 1.35], [-0.95, -1.35], [0.95, -1.35]]) rueda(g, x, 0.34, z, 0.34);
+}
+
 // Reloj de pared (hora real)
 const reloj3d = new THREE.Group();
-reloj3d.position.set(X0 + 0.03, 2.3, 2.0);
-reloj3d.rotation.y = Math.PI / 2;
+reloj3d.position.set(-5.1, 2.35, -FONDO / 2 + 0.04);
 scene.add(reloj3d);
 {
   const cara = new THREE.Mesh(new THREE.CylinderGeometry(0.32, 0.32, 0.05, 20), mat(0xffffff));
@@ -478,8 +636,32 @@ function persona({ camisa, pantalon, piel = 0xf1c7a1, pelo, extra }) {
   diario.visible = false;
   cuerpo.add(diario);
 
+  // Paleta de ping-pong, mancuernas y joystick (se ven segun lo que este haciendo)
+  const paleta = new THREE.Group();
+  paleta.position.set(0, -0.6, 0.08);
+  brazoD.add(paleta);
+  const cara = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.1, 0.02, 12), mat(0xc0392b));
+  cara.rotation.x = Math.PI / 2;
+  cara.position.y = -0.1;
+  paleta.add(cara, new THREE.Mesh(new THREE.BoxGeometry(0.03, 0.1, 0.03), mat(0x8a5a3b)));
+  const pesas = [brazoI, brazoD].map(b => {
+    const g = new THREE.Group();
+    g.position.set(0, -0.56, 0);
+    const barra = new THREE.Mesh(new THREE.CylinderGeometry(0.015, 0.015, 0.26, 6), mat(0x9aa0a6));
+    barra.rotation.z = Math.PI / 2;
+    g.add(barra);
+    for (const dx of [-0.12, 0.12]) { const d = new THREE.Mesh(new THREE.BoxGeometry(0.05, 0.11, 0.11), mat(0x1f2226)); d.position.x = dx; g.add(d); }
+    b.add(g);
+    return g;
+  });
+  const joystick = new THREE.Mesh(new THREE.BoxGeometry(0.26, 0.05, 0.12), mat(0x111111));
+  joystick.position.set(0, 0.92, 0.42);
+  cuerpo.add(joystick);
+  paleta.visible = joystick.visible = false;
+  pesas.forEach(p => { p.visible = false; });
+
   extra && extra({ cabeza, torso, mat });
-  return { raiz, cuerpo, piernaI, piernaD, brazoI, brazoD, cabeza, taza, diario };
+  return { raiz, cuerpo, piernaI, piernaD, brazoI, brazoD, cabeza, taza, diario, paleta, pesas, joystick };
 }
 
 const modeloAnalista = persona({
@@ -531,12 +713,35 @@ const LUGAR = {
   sofa2: { x: -5.25, z: 2.6, ang: Math.PI / 2, y: 0.58, acceso: [-4.4, 2.6] },
   cafe: { x: 4.55, z: -1.5, ang: Math.PI / 2 },
   ventana: { x: -1.1, z: -3.7, ang: Math.PI },
-  ventanaIzq: { x: -4.9, z: -0.2, ang: -Math.PI / 2 },
+  ventanaIzq: { x: -14.2, z: -0.5, ang: -Math.PI / 2 },
+  // gimnasio
+  cinta: { x: -13.6, z: -3.1, ang: Math.PI },
+  pesas: { x: -9.9, z: -2.7, ang: Math.PI },
+  bolsa: { x: -7.6, z: -2.55, ang: Math.PI },
+  // sala de juegos
+  arcade: { x: -13.8, z: 1.5, ang: -Math.PI / 2 },
+  puf1: { x: -13.2, z: 3.9, ang: -Math.PI / 2, y: 0.36 },
+  puf2: { x: -13.2, z: 2.9, ang: -Math.PI / 2, y: 0.36 },
+  pingA: { x: -11.9, z: 2.3, ang: Math.PI / 2 },
+  pingB: { x: -8.1, z: 2.3, ang: -Math.PI / 2 },
+  // patio: se sale por adelante y se rodea la casa
+  camioneta: { x: 11.6, z: 1.4, ang: Math.PI / 2, acceso: [[4.4, 5.6], [11.2, 5.6]] },
+  deportivo: { x: 14.8, z: 1.2, ang: Math.PI / 2, acceso: [[4.4, 5.6], [11.2, 5.6], [14.8, 5.6]] },
   pizarra: { x: 4.1, z: -3.5, ang: Math.PI },
   planta: { x: 4.6, z: 3.5, ang: Math.PI / 2 },
   biblioteca: { x: -4.9, z: -2.6, ang: -Math.PI / 2 },
 };
-const PASILLO_Z = 0.4;
+const PASILLO = { casa: 0.4, ala: -0.9 };
+const PUERTA = { casa: [-5.3, -0.9], ala: [-6.7, -0.9] };
+const zona = x => (x < -6 ? 'ala' : 'casa');
+const puntos = a => (Array.isArray(a[0]) ? a.map(p => [...p]) : [[...a]]);
+function tramo(cx, cz, x, z, pz) {
+  const p = [];
+  if (Math.abs(cz - pz) > 0.3 && Math.abs(cx - x) > 0.3) p.push({ tipo: 'ir', x: cx, z: pz });
+  if (Math.abs(z - pz) > 0.3 && Math.abs(cx - x) > 0.3) p.push({ tipo: 'ir', x, z: pz });
+  p.push({ tipo: 'ir', x, z });
+  return p;
+}
 
 // ---------------------------------------------------------------- mensajes
 const MENSAJES = {
@@ -590,23 +795,32 @@ class Agente {
     this.globoHasta = reloj.elapsedTime + seg;
   }
 
+  // Camina por el pasillo de cada zona para no atravesar muebles, y entre la casa
+  // y el ala del gimnasio/juegos pasa por la puerta del muro bajo.
   ruta(x, z) {
-    // Por el pasillo del medio para no atravesar muebles.
     const pasos = [];
     let cx = this.pos.x, cz = this.pos.y;
-    // Si esta sentado en el sofa, primero sale por delante (si no, atraviesa el apoyabrazos).
+    // Si esta en un lugar con acceso (sofa, cama, patio), sale desandando ese camino.
     if (this.lugarActual && this.lugarActual.acceso) {
-      [cx, cz] = this.lugarActual.acceso;
-      pasos.push({ tipo: 'ir', x: cx, z: cz });
+      for (const [ax, az] of puntos(this.lugarActual.acceso).reverse()) {
+        pasos.push({ tipo: 'ir', x: ax, z: az });
+        [cx, cz] = [ax, az];
+      }
     }
     this.lugarActual = null;
-    if (Math.abs(cz - PASILLO_Z) > 0.3 && Math.abs(cx - x) > 0.3) pasos.push({ tipo: 'ir', x: cx, z: PASILLO_Z });
-    if (Math.abs(z - PASILLO_Z) > 0.3 && Math.abs(this.pos.x - x) > 0.3) pasos.push({ tipo: 'ir', x, z: PASILLO_Z });
-    pasos.push({ tipo: 'ir', x, z });
+    const zA = zona(cx), zB = zona(x);
+    if (zA !== zB) {
+      const [pA, pB] = zA === 'casa' ? [PUERTA.casa, PUERTA.ala] : [PUERTA.ala, PUERTA.casa];
+      pasos.push(...tramo(cx, cz, ...pA, PASILLO[zA]), { tipo: 'ir', x: pB[0], z: pB[1] });
+      [cx, cz] = pB;
+    }
+    pasos.push(...tramo(cx, cz, x, z, PASILLO[zB]));
     return pasos;
   }
   rutaA(l) {
-    return l.acceso ? [...this.ruta(...l.acceso), { tipo: 'ir', x: l.x, z: l.z }] : this.ruta(l.x, l.z);
+    if (!l.acceso) return this.ruta(l.x, l.z);
+    const [primero, ...resto] = puntos(l.acceso);
+    return [...this.ruta(...primero), ...resto.map(([x, z]) => ({ tipo: 'ir', x, z })), { tipo: 'ir', x: l.x, z: l.z }];
   }
 
   // El estado real manda: si cambia, se tira el plan y se arma uno nuevo.
@@ -634,6 +848,7 @@ class Agente {
     }
     const opciones = [
       ['cafe', 3], ['sofa', 2], ['cama', 2], ['ventana', 2], ['pasear', 2], ['charla', 2], ['planta', 1], ['pizarra', 1], ['biblioteca', 1], ['diario', 1],
+      ['cinta', 1.5], ['pesas', 1], ['boxeo', 1], ['arcade', 1], ['play', 1.5], ['pingpong', 2], ['autos', 1.5],
     ];
     let total = opciones.reduce((a, o) => a + o[1], 0), r = Math.random() * total, elegida = 'pasear';
     for (const [n, w] of opciones) { if ((r -= w) < 0) { elegida = n; break; } }
@@ -642,9 +857,13 @@ class Agente {
     const deNoche = hora >= 23.5 || hora < 7;
     if (deNoche) elegida = 'cama';
     const otro = this.otro;
-    if (elegida === 'charla' && !(otro && !otro.trabajando && !otro.ocupadoCharla && otro.pose !== 'acostado' && !otro.actividad.startsWith('durmiendo'))) elegida = 'cafe';
+    const otroLibre = otro && !otro.trabajando && !otro.ocupadoCharla && otro.pose !== 'acostado' && !otro.actividad.startsWith('durmiendo');
+    if (elegida === 'charla' && !otroLibre) elegida = 'cafe';
+    if (elegida === 'pingpong' && !otroLibre) elegida = 'arcade';
     this.actividad = {
       cafe: 'tomando un café', sofa: 'descansando en el sofá', cama: deNoche ? 'durmiendo (buenas noches)' : 'durmiendo la siesta en su cama', ventana: 'mirando por la ventana', pasear: 'dando vueltas',
+      cinta: 'corriendo en la cinta', pesas: 'haciendo pesas', boxeo: 'dándole a la bolsa', arcade: 'jugando al arcade', play: 'jugando a la Play',
+      pingpong: 'jugando al ping-pong', autos: 'mirando los autos',
       charla: 'charlando', planta: 'regando la planta', pizarra: 'mirando la pizarra', biblioteca: 'buscando un libro', diario: 'leyendo el diario',
     }[elegida];
     const L = LUGAR;
@@ -666,6 +885,47 @@ class Agente {
         this.cola.push(...this.rutaA(this.cama), { tipo: 'decir', txt: deNoche ? azar(['Buenas noches 🌙', 'Mañana seguimos', 'A la cucha']) : azar(['Una siestita…', '5 minutos y vuelvo']) },
           { tipo: 'acostar', lugar: this.cama, dur: deNoche ? entre(120, 240) : entre(15, 30) }, { tipo: 'decir', txt: deNoche ? 'Mmm… ¿ya es de día?' : '¡Como nuevo!' });
         break;
+      case 'cinta':
+        this.cola.push(...this.rutaA(L.cinta), { tipo: 'girar', ang: L.cinta.ang }, { tipo: 'decir', txt: azar(['A correr 🏃', '5 km y vuelvo', 'Cardio, que hay datos']) },
+          { tipo: 'quieto', dur: entre(15, 25), modo: 'correr' }, { tipo: 'decir', txt: 'Uff 🥵' });
+        break;
+      case 'pesas':
+        this.cola.push(...this.rutaA(L.pesas), { tipo: 'girar', ang: L.pesas.ang }, { tipo: 'decir', txt: azar(['💪 Brazos', 'Una serie más', 'Mirá esos bíceps']) },
+          { tipo: 'quieto', dur: entre(12, 18), modo: 'pesas' });
+        break;
+      case 'boxeo':
+        this.cola.push(...this.rutaA(L.bolsa), { tipo: 'girar', ang: L.bolsa.ang }, { tipo: 'decir', txt: azar(['Esto es por el S2 🥊', '¡Tomá, 36.56!', 'Descargando la rueda']) },
+          { tipo: 'quieto', dur: entre(10, 15), modo: 'boxeo' });
+        break;
+      case 'arcade':
+        this.cola.push(...this.rutaA(L.arcade), { tipo: 'girar', ang: L.arcade.ang }, { tipo: 'decir', txt: azar(['Una ficha más 👾', '¡Récord nuevo!', 'Game over… otra']) },
+          { tipo: 'quieto', dur: entre(12, 18), modo: 'arcade' });
+        break;
+      case 'play': {
+        const pf = this.id === 'analista' ? L.puf1 : L.puf2;
+        this.cola.push(...this.rutaA(pf), { tipo: 'sentar', lugar: pf, modo: 'joystick', dur: entre(15, 25) }, { tipo: 'decir', txt: azar(['¡Gooool! ⚽', 'Uno más y a trabajar', 'Me robaron 😤']) });
+        break;
+      }
+      case 'pingpong': {
+        const d = entre(18, 28);
+        this.ocupadoCharla = otro.ocupadoCharla = true;
+        otro.cola = [];
+        otro.accion = null;
+        otro.actividad = 'jugando al ping-pong';
+        this.cola.push(...this.rutaA(L.pingA), { tipo: 'girar', ang: L.pingA.ang }, { tipo: 'decir', txt: '¿Un ping-pong? 🏓' }, { tipo: 'quieto', dur: d, modo: 'pingpong' },
+          { tipo: 'decir', txt: azar(['¡Gané!', 'Revancha mañana']) }, { tipo: 'fin-charla' });
+        otro.cola.push(...otro.rutaA(L.pingB), { tipo: 'girar', ang: L.pingB.ang }, { tipo: 'decir', txt: 'Dale, te gano' }, { tipo: 'quieto', dur: d, modo: 'pingpong' }, { tipo: 'fin-charla' });
+        break;
+      }
+      case 'autos': {
+        const camioneta = Math.random() < 0.5, l = camioneta ? L.camioneta : L.deportivo;
+        const lavar = Math.random() < 0.5;
+        this.actividad = (lavar ? 'lavando ' : 'mirando ') + (camioneta ? 'la camioneta' : 'el deportivo');
+        this.cola.push(...this.rutaA(l), { tipo: 'en', lugar: l }, { tipo: 'girar', ang: l.ang },
+          { tipo: 'decir', txt: lavar ? (camioneta ? 'A lavar la camioneta 🧽' : 'Que brille 🧽') : azar(camioneta ? ['Qué linda la chata 🛻', '¿Vamos al campo?'] : ['Brum brum 🏎️', '¿Salimos a dar una vuelta?', 'Si GGAL rebota, lo cambio']) },
+          { tipo: 'quieto', dur: entre(8, 14), modo: lavar ? 'lavar' : null });
+        break;
+      }
       case 'diario':
         this.cola.push(...this.rutaA(sofa), { tipo: 'sentar', lugar: sofa, modo: 'leer', dur: entre(10, 16) });
         break;
@@ -726,6 +986,7 @@ class Agente {
       case 'decir': this.decir(a.txt, a.seg); terminada = true; break;
       case 'taza': this.m.taza.visible = a.on; terminada = true; break;
       case 'fin-charla': this.ocupadoCharla = false; terminada = true; break;
+      case 'en': this.lugarActual = a.lugar; terminada = true; break;
       case 'sentar':
         this.pose = 'sentado';
         this.modo = a.modo;
@@ -798,6 +1059,13 @@ class Agente {
       case 'gesto': o.bD = -0.8 + Math.sin(t * 5) * 0.4; o.bI = -0.4 + Math.sin(t * 4 + 1) * 0.3; o.cabX = Math.sin(t * 6) * 0.06; break;
       case 'regar': o.bD = o.bI = -1.1; o.cabX = 0.3; break;
       case 'estirar': o.bI = o.bD = -Math.PI * 0.95; o.bIz = -0.2; o.bDz = 0.2; break;
+      case 'correr': { const c = Math.sin(t * 14); o.pI = c * 0.85; o.pD = -c * 0.85; o.bI = -0.4 - c * 0.7; o.bD = -0.4 + c * 0.7; o.y = Math.abs(Math.cos(t * 14)) * 0.07; break; }
+      case 'pesas': o.bI = -0.2 - (Math.sin(t * 2.6) + 1) / 2 * 1.8; o.bD = -0.2 - (Math.sin(t * 2.6 + Math.PI) + 1) / 2 * 1.8; break;
+      case 'boxeo': o.bI = -1.2 - Math.max(0, Math.sin(t * 8)) * 0.45; o.bD = -1.2 - Math.max(0, Math.sin(t * 8 + Math.PI)) * 0.45; o.y = Math.abs(Math.sin(t * 5)) * 0.04; break;
+      case 'pingpong': o.bD = -0.9 + Math.sin(t * 2.5) * 0.6; o.bDz = Math.cos(t * 2.5) * 0.3; o.y = Math.abs(Math.sin(t * 2.5)) * 0.03; break;
+      case 'arcade': o.bI = -1.15 + Math.sin(t * 17) * 0.06; o.bD = -1.15 + Math.sin(t * 13) * 0.08; break;
+      case 'joystick': o.bI = o.bD = -1.0 + Math.sin(t * 15) * 0.05; o.cabX = -0.08; break;
+      case 'lavar': o.bD = -1.3 + Math.sin(t * 4) * 0.3; o.bDz = Math.cos(t * 4) * 0.35; break;
       case 'festejo': o.bI = o.bD = -Math.PI * 0.9 + Math.sin(t * 12) * 0.2; o.y += Math.abs(Math.sin(t * 8)) * 0.08; break;
     }
     const k = Math.min(1, dt * 10), lerp = (a, b) => a + (b - a) * k;
@@ -811,6 +1079,9 @@ class Agente {
     m.cabeza.rotation.z = lerp(m.cabeza.rotation.z, o.cabZ);
     m.cuerpo.position.y = lerp(m.cuerpo.position.y, o.y);
     m.diario.visible = this.modo === 'leer';
+    m.paleta.visible = this.modo === 'pingpong';
+    m.pesas.forEach(p => { p.visible = this.modo === 'pesas'; });
+    m.joystick.visible = this.modo === 'joystick';
 
     // lampara y foco del escritorio
     const prendida = this.trabajando && this.pose === 'sentado' ? 1 : 0;
@@ -885,6 +1156,41 @@ function dibujarPantallas(t) {
     }
     tex.needsUpdate = true;
   }
+}
+
+// ---------------------------------------------------------------- juegos y gimnasio
+function animarJuegos(t) {
+  // ping-pong: la pelotita va y viene solo si estan los dos en la mesa
+  const mesa = new THREE.Vector2(-10, 2.3);
+  const jugando = agentes.every(ag => ag.modo === 'pingpong' && ag.pos.distanceTo(mesa) < 2.2);
+  pelotita.visible = jugando;
+  if (jugando) {
+    const fase = (t * 0.8) % 2, ida = fase < 1, f = ida ? fase : fase - 1;
+    pelotita.position.set(ida ? -11.55 + f * 3.1 : -8.45 - f * 3.1, 0.82 + Math.abs(Math.sin(f * Math.PI * 2)) * 0.32, 2.3 + Math.sin(f * 3 + fase) * 0.25);
+  }
+  // la bolsa se mueve cuando alguien le pega
+  const boxeando = agentes.some(ag => ag.modo === 'boxeo');
+  bolsa.rotation.x = boxeando ? Math.sin(t * 8) * 0.12 : bolsa.rotation.x * 0.97;
+  // arcade y TV
+  const arc = pantallaArcade.ctx, jugandoArcade = agentes.some(ag => ag.modo === 'arcade');
+  arc.fillStyle = '#0a0a1a'; arc.fillRect(0, 0, 128, 96);
+  for (let i = 0; i < 5; i++) {
+    arc.fillStyle = ['#ff3d9a', '#21c7a8', '#ffd23f', '#6e8bff', '#ff7a45'][i];
+    arc.fillRect((i * 29 + t * (jugandoArcade ? 60 : 12)) % 128, 12 + i * 14, 10, 8);
+  }
+  arc.fillStyle = '#fff'; arc.fillRect(58 + Math.sin(t * (jugandoArcade ? 6 : 1)) * 30, 82, 12, 8);
+  pantallaArcade.tex.needsUpdate = true;
+  const tv = pantallaTv.ctx, enPlay = agentes.some(ag => ag.modo === 'joystick');
+  if (enPlay) {
+    tv.fillStyle = '#2e8b3e'; tv.fillRect(0, 0, 256, 150);
+    tv.strokeStyle = '#fff'; tv.lineWidth = 2; tv.strokeRect(8, 8, 240, 134);
+    tv.beginPath(); tv.moveTo(128, 8); tv.lineTo(128, 142); tv.stroke();
+    tv.beginPath(); tv.arc(128, 75, 20, 0, 7); tv.stroke();
+    tv.fillStyle = '#fff'; tv.beginPath(); tv.arc(128 + Math.sin(t * 1.3) * 90, 75 + Math.sin(t * 2.1) * 45, 4, 0, 7); tv.fill();
+  } else {
+    tv.fillStyle = '#05070b'; tv.fillRect(0, 0, 256, 150);
+  }
+  pantallaTv.tex.needsUpdate = true;
 }
 
 // ---------------------------------------------------------------- dia y noche
@@ -977,6 +1283,7 @@ renderer.setAnimationLoop(() => {
   for (const ag of agentes) ag.update(dt, t);
   if ((acumPantalla += dt) > 0.12) { acumPantalla = 0; dibujarPantallas(t); }
   lucesitaCafe.material.emissiveIntensity = 0.6 + Math.sin(t * 3) * 0.4;
+  animarJuegos(t);
   // Luces de la casa: de noche prendidas; si los dos estan en la cama, se apagan (queda el velador).
   const todosDormidos = agentes.every(ag => ag.pose === 'acostado');
   const luz = noche * (todosDormidos ? 0.12 : 1);
