@@ -83,6 +83,12 @@ td.celda-barra { text-align: left; width: 22%; min-width: 110px; }
   <div class="fichas" id="fichas"></div>
 
   <section>
+    <h2>GGAL y RFX20</h2>
+    <p class="sub">Los futuros de acciones e índice, en vivo.</p>
+    <div class="tabla"><table id="t-operados"></table></div>
+  </section>
+
+  <section>
     <div class="cab">
       <div>
         <h2>Curva del dólar futuro</h2>
@@ -116,6 +122,20 @@ td.celda-barra { text-align: left; width: 22%; min-width: 110px; }
     <div class="tabla"><table id="t-interes"></table></div>
     <p class="nota">El volumen suma el libro común y el libro M del mismo vencimiento. El interés abierto es el último que publica A3.</p>
   </section>
+
+  <div class="dos" style="margin-bottom:16px">
+    <section>
+      <h2>Dólar</h2>
+      <p class="sub">Puntas en vivo dentro de A3.</p>
+      <div class="tabla"><table id="t-dolar"></table></div>
+      <p class="nota">El MEP sale de los bonos que operan en A3, un libro más fino que el de BYMA: tomalo como rango, no como precio.</p>
+    </section>
+    <section>
+      <h2>Caución en dólares</h2>
+      <p class="sub">TNA por plazo, mercado de contado.</p>
+      <div class="tabla"><table id="t-caucion-usd"></table></div>
+    </section>
+  </div>
 
   <div class="dos">
     <section>
@@ -266,6 +286,16 @@ function pintarTablas() {
   });
   $('#t-interes').innerHTML = h;
 
+  const hora = s => s ? new Date(s).toLocaleTimeString('es-AR', { hour12: false }) : '–';
+  $('#t-operados').innerHTML = '<tr><th>Contrato</th><th>Días</th><th>Cant.</th><th>Compra</th><th>Venta</th><th>Cant.</th><th>Último</th><th>Hora</th><th>Var. día</th><th>Mínimo</th><th>Máximo</th><th>Volumen</th></tr>' +
+    d.operados.map(o => `<tr><td>${o.contrato}</td><td>${o.dias}</td><td>${ent(o.bsz)}</td><td>${precio(o.bid)}</td><td>${precio(o.ask)}</td><td>${ent(o.asz)}</td>` +
+      `<td><strong>${precio(o.ultimo)}</strong></td><td>${hora(o.hora)}</td><td>${delta(o.var, v => pct(v))}</td><td>${precio(o.min)}</td><td>${precio(o.max)}</td><td>${ent(o.vol)}</td></tr>`).join('');
+  const may = d.dolar.mayorista;
+  $('#t-dolar').innerHTML = '<tr><th></th><th>Compra</th><th>Venta</th></tr>' +
+    `<tr><td>Mayorista, contado inmediato</td><td>${num(may.bid, 1)}</td><td>${num(may.ask, 1)}</td></tr>` +
+    d.dolar.mep.map(m => `<tr><td>MEP por ${m.bono}</td><td>${num(m.bid, 1)}</td><td>${num(m.ask, 1)}</td></tr>`).join('');
+  const filaCau = c => `<tr><td>${c.plazo} día${c.plazo > 1 ? 's' : ''}</td><td>${pct(c.bid)}</td><td>${pct(c.ask)}</td><td>${pct(c.ultimo)}</td><td>${pct(c.ajuste)}</td></tr>`;
+  $('#t-caucion-usd').innerHTML = '<tr><th>Plazo</th><th>Compra</th><th>Venta</th><th>Último</th><th>Cierre previo</th></tr>' + d.caucion.usd.map(filaCau).join('');
   $('#t-caucion').innerHTML = '<tr><th>Plazo</th><th>Compra</th><th>Venta</th><th>Último</th><th>Cierre previo</th></tr>' +
     d.caucion.plazos.map(c => `<tr><td>${c.plazo} día${c.plazo > 1 ? 's' : ''}</td><td>${pct(c.bid)}</td><td>${pct(c.ask)}</td><td>${pct(c.ultimo)}</td><td>${pct(c.ajuste)}</td></tr>`).join('');
   $('#t-pesos').innerHTML = '<tr><th>Contrato</th><th>Compra</th><th>Venta</th><th>Último</th><th>Ajuste previo</th></tr>' +

@@ -43,8 +43,12 @@ NUMERICOS = {"bsz", "bid", "ask", "asz", "lst", "von", "low", "hgh", "opn", "oin
 FUTURO = re.compile(r"^rx_(?:DDF_DLR|DUAL_GGAL|DUAL_RFX20)_([A-Z]{3}\d{2})(M)?$")
 PASE = re.compile(r"^rx_DDF_DLR_([A-Z]{3}\d{2})_([A-Z]{3}\d{2})(_M)?$")
 TASA_PESOS = re.compile(r"^rx_DUAL_(CAUC|TMR)_([A-Z]{3}\d{2})$")
-CAUCION = re.compile(r"^rx_MAE_CAARS_(\d+)D$")
+CAUCION = re.compile(r"^rx_MAE_(CAARS|CAUSD)_(\d+)D$")
 SPOT = "rx_DDF_DLR_SPOT"
+MAYORISTA = "rx_MAE_UST$T_0D"
+# Dolar MEP con los bonos que operan en el propio A3 (pesos / dolares, 24hs). Es un
+# libro mas finito que el de BYMA: sale como rango, no como un precio.
+BONOS_MEP = {"AL30": ("rx_TIVA_AL30_24hs", "rx_TIVA_AL30D_24hs"), "GD30": ("rx_TIVA_GD30_24hs", "rx_TIVA_GD30D_24hs")}
 MESES = "ENE FEB MAR ABR MAY JUN JUL AGO SEP OCT NOV DIC".split()
 # Puntas mas abiertas que esto (en % del precio) no dicen nada sobre la tasa: el
 # medio de 1921 / 1999 no es un precio. Se muestran, pero marcadas.
@@ -73,7 +77,8 @@ def cargar_referencia():
             nuevos[i] = {"activo": activo, "mes": m.group(1), "m": bool(m.group(2)),
                          "vto": hoy + timedelta(days=int(s["daysToExpiration"]))}
             lista.append(i)
-        elif PASE.match(i) or TASA_PESOS.match(i) or CAUCION.match(i) or i == SPOT:
+        elif (PASE.match(i) or TASA_PESOS.match(i) or CAUCION.match(i) or i in (SPOT, MAYORISTA)
+              or any(i in par for par in BONOS_MEP.values())):
             lista.append(i)
     if not nuevos:
         raise RuntimeError("ref-data no trajo futuros: cambio el formato")
@@ -187,13 +192,23 @@ def calcular():
     spot_prev = spot_t.get("stl")
 
     # Caucion en pesos por plazo. Viene como TNA.
-    cauciones = []
+    cauciones, cauciones_usd = [], []
     for i, t in tk.items():
         m = CAUCION.match(i)
         if m and (t.get("bid") or t.get("ask") or t.get("lst")):
-            cauciones.append({"plazo": int(m.group(1)), "bid": t.get("bid"), "ask": t.get("ask"),
-                              "ultimo": t.get("lst"), "ajuste": t.get("stl"), "monto": t.get("von")})
+            (cauciones if m.group(1) == "CAARS" else cauciones_usd).append(
+                {"plazo": int(m.group(2)), "bid": t.get("bid"), "ask": t.get("ask"),
+                 "ultimo": t.get("lst"), "ajuste": t.get("stl"), "monto": t.get("von")})
     cauciones.sort(key=lambda c: c["plazo"])
+    cauciones_usd.sort(key=lambda c: c["plazo"])
+
+    # Dolar: mayorista en puntas y MEP por bonos, solo si estan las dos puntas de las dos patas.
+    may = tk.get(MAYORISTA, {})
+    mep = []
+    for bono, (en_pesos, en_dolares) in BONOS_MEP.items():
+        p, u = tk.get(en_pesos, {}), tk.get(en_dolares, {})
+        if p.get("bid") and p.get("ask") and u.get("bid") and u.get("ask"):
+            mep.append({"bono": bono, "bid": p["bid"] / u["ask"], "ask": p["ask"] / u["bid"]})
     c1 = next((c for c in cauciones if c["plazo"] == 1), None)
     cau_tna = None
     if c1:
@@ -216,7 +231,7 @@ def calcular():
     orden = sorted(grupos.values(), key=lambda g: (g["activo"], g["vto"]))
 
     fecha_prev, prev = foto_previa(hoy)
-    curva, interes, foto = [], [], {}
+    curva, interes, foto, operados = [], [], {}, []
     for g in orden:
         comun, libro_m = g.get("comun") or {}, g.get("m") or {}
         t = comun if (comun.get("bid") or comun.get("ask") or comun.get("lst")) else (libro_m or comun)
@@ -246,6 +261,11 @@ def calcular():
             foto[nombre] = {"oi": oi, "vol": vol, "ultimo": t.get("lst"), "ajuste": ajuste}
         g["fila"] = fila
         g["t"] = t
+        if g["activo"] != "DLR" and (t.get("bid") or t.get("ask") or t.get("lst")):
+            operados.append({"contrato": nombre, "dias": dias, "bid": t.get("bid"), "ask": t.get("ask"),
+                             "bsz": t.get("bsz"), "asz": t.get("asz"), "ultimo": t.get("lst"), "hora": t.get("lstd"),
+                             "ajuste": ajuste, "var": (t["lst"] / ajuste - 1) * 100 if t.get("lst") and ajuste else None,
+                             "min": t.get("low"), "max": t.get("hgh"), "apertura": t.get("opn"), "vol": vol})
 
     # Pases: tramo entre vencimientos consecutivos de cada activo.
     pases = []
@@ -286,7 +306,9 @@ def calcular():
         "conectado": estado["conectado"], "edadSeg": edad, "error": estado["error"],
         "spot": {"ultimo": spot, "ajuste": spot_prev, "hora": spot_t.get("lstd"),
                  "var": (spot / spot_prev - 1) * 100 if spot and spot_prev else None},
-        "caucion": {"tna": cau_tna, "tea": cau_tea, "plazos": cauciones},
+        "caucion": {"tna": cau_tna, "tea": cau_tea, "plazos": cauciones, "usd": cauciones_usd},
+        "dolar": {"mayorista": {"bid": may.get("bid"), "ask": may.get("ask")}, "mep": mep},
+        "operados": operados,
         "tasasPesos": [{k: v for k, v in x.items() if k != "orden"}
                        for x in sorted(tasas_pesos, key=lambda x: x["orden"])],
         "curva": curva, "pases": pases, "interes": interes, "fechaPrev": fecha_prev,
