@@ -159,6 +159,16 @@ punto 2 y reintentá.
   atenua, la etiqueta tiene que seguir legible.
 - **Zona critica** alrededor del pivote: un `rectangle` azul con borde
   `rgba(41,98,255,0.35)` y fondo transparente.
+- **Si un nivel tiene banda, la banda se dibuja.** Un `rectangle` del color del
+  nivel (borde al 45%, fondo al 10%, `extendRight`) entre la linea y el otro borde,
+  con un `text` que diga que es el borde. No cuenta para el techo de 7 lineas. (El
+  1-oct-2026 el precio fue a 36.10 a cerrar el gap del 27-oct-25 y en el chart solo
+  estaba la linea de 36.56: el borde figuraba en la tabla y en ningun otro lado.)
+- **Gaps abiertos: se nombran.** Si el precio esta a menos de 5% de terminar de
+  cerrar un gap, decilo en "Estructura" con los dos bordes y las fechas (ej. "gap
+  del 27-oct-25, 36.10 → 47.07: se cierra del todo en 36.10, falta 1,7%") y repetilo
+  en el escenario que lo tiene como gatillo. Un gap que se cierra es un evento, no
+  una nota al pie de la tabla.
 - **Directriz bajista** desde el maximo de 58.14 (18-jun-2026) hasta 40.63 (21-sep):
   `trend_line` gris punteada (`rgba(150,150,150,0.40)`, ver la tabla de arriba). OJO: TradingView la plotea en espacio de **barras**,
   no de tiempo lineal — para saber por donde pasa hoy, interpolá por indice de
