@@ -14,3 +14,9 @@ scripts/ggal_calc.py
 
 # Estado en vivo de la oficina 3D (lo escribe el wrapper de los estudios)
 oficina/estado.json
+
+# Historia diaria de interes abierto del tablero de tasas (dato local, se pisa cada minuto)
+tasas/historia/
+
+# Salida del navegador de pruebas
+.playwright-mcp/

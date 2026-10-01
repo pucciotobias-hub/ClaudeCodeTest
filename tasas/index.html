@@ -1,0 +1,291 @@
+<!doctype html>
+<html lang="es-AR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Tasas A3</title>
+<link rel="icon" href="data:,">
+<style>
+:root {
+  color-scheme: light;
+  --plano: #f9f9f7; --superficie: #fcfcfb; --tinta: #0b0b0b; --tinta-2: #52514e; --tenue: #898781;
+  --grilla: #e1e0d9; --eje: #c3c2b7; --borde: rgba(11,11,11,0.10);
+  --serie-1: #2a78d6; --serie-2: #eb6834; --sube: #006300; --baja: #d03b3b; --aviso: #fab219;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    color-scheme: dark;
+    --plano: #0d0d0d; --superficie: #1a1a19; --tinta: #ffffff; --tinta-2: #c3c2b7; --tenue: #898781;
+    --grilla: #2c2c2a; --eje: #383835; --borde: rgba(255,255,255,0.10);
+    --serie-1: #3987e5; --serie-2: #d95926; --sube: #0ca30c; --baja: #e66767; --aviso: #fab219;
+  }
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--plano); color: var(--tinta); font: 14px/1.45 system-ui, -apple-system, "Segoe UI", sans-serif; }
+main { max-width: 1180px; margin: 0 auto; padding: 20px 16px 48px; }
+header { display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px 16px; margin-bottom: 16px; }
+h1 { font-size: 20px; margin: 0; }
+h2 { font-size: 16px; margin: 0 0 2px; }
+.sub { color: var(--tinta-2); margin: 0 0 12px; }
+#estado { color: var(--tinta-2); display: flex; align-items: center; gap: 6px; }
+#estado i { width: 8px; height: 8px; border-radius: 50%; background: var(--tenue); display: inline-block; }
+#estado.vivo i { background: var(--sube); }
+#estado.mal i { background: var(--baja); }
+#reloj { margin-left: auto; color: var(--tenue); font-variant-numeric: tabular-nums; }
+.fichas { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 12px; margin-bottom: 16px; }
+.ficha, section { background: var(--superficie); border: 1px solid var(--borde); border-radius: 10px; }
+.ficha { padding: 12px 14px; }
+.ficha .rot { color: var(--tinta-2); font-size: 12px; }
+.ficha .val { font-size: 26px; font-weight: 600; line-height: 1.2; }
+.ficha .det { color: var(--tinta-2); font-size: 12px; }
+section { padding: 16px; margin-bottom: 16px; }
+.cab { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 8px 16px; }
+.cab > div:first-child { flex: 1 1 320px; }
+.selector { display: inline-flex; border: 1px solid var(--borde); border-radius: 8px; overflow: hidden; }
+.selector button { font: inherit; color: var(--tinta-2); background: none; border: 0; padding: 4px 12px; cursor: pointer; }
+.selector button[aria-pressed="true"] { background: var(--grilla); color: var(--tinta); font-weight: 600; }
+.leyenda { display: flex; flex-wrap: wrap; gap: 4px 16px; color: var(--tinta-2); font-size: 12px; margin: 4px 0; }
+.leyenda span { display: inline-flex; align-items: center; gap: 6px; }
+.leyenda b { width: 14px; height: 0; border-top: 2px solid var(--serie-1); display: inline-block; }
+.leyenda b.c2 { border-top: 2px dashed var(--serie-2); }
+.leyenda b.h { width: 8px; height: 8px; border: 2px solid var(--serie-1); border-radius: 50%; }
+#grafico { position: relative; }
+#grafico svg { display: block; width: 100%; height: 300px; }
+#globo { position: absolute; pointer-events: none; background: var(--superficie); border: 1px solid var(--borde);
+  border-radius: 8px; padding: 8px 10px; font-size: 12px; box-shadow: 0 4px 14px rgba(0,0,0,.18); display: none; white-space: nowrap; }
+#globo strong { display: block; font-size: 13px; }
+#globo span { color: var(--tinta-2); }
+.tabla { overflow-x: auto; margin-top: 8px; }
+table { border-collapse: collapse; width: 100%; font-variant-numeric: tabular-nums; }
+th, td { padding: 6px 10px; text-align: right; white-space: nowrap; border-bottom: 1px solid var(--grilla); }
+th { color: var(--tinta-2); font-weight: 500; font-size: 12px; }
+th:first-child, td:first-child { text-align: left; }
+tr.grupo td { color: var(--tinta-2); font-size: 12px; font-weight: 600; text-align: left; padding-top: 14px; }
+tr.ancho td { color: var(--tenue); }
+.sube { color: var(--sube); } .baja { color: var(--baja); }
+.marca { color: var(--tenue); font-size: 11px; margin-left: 6px; }
+.barra { display: inline-block; height: 8px; border-radius: 0 4px 4px 0; background: var(--serie-1); vertical-align: middle; min-width: 1px; }
+td.celda-barra { text-align: left; width: 22%; min-width: 110px; }
+.nota { color: var(--tinta-2); font-size: 12px; margin: 10px 0 0; }
+.dos { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px; }
+.dos section { margin: 0; }
+#alerta { display: none; background: var(--superficie); border: 1px solid var(--baja); border-radius: 10px; padding: 10px 14px; margin-bottom: 16px; }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <h1>Tasas A3</h1>
+    <div id="estado"><i></i><span>Conectando…</span></div>
+    <div id="reloj"></div>
+  </header>
+  <div id="alerta"></div>
+  <div class="fichas" id="fichas"></div>
+
+  <section>
+    <div class="cab">
+      <div>
+        <h2>Curva del dólar futuro</h2>
+        <p class="sub">Tasa implícita de cada vencimiento contra el dólar spot, con el medio de las puntas.</p>
+      </div>
+      <div class="selector" role="group" aria-label="Tipo de tasa">
+        <button data-tasa="tea" aria-pressed="true">TEA</button>
+        <button data-tasa="tna" aria-pressed="false">TNA</button>
+      </div>
+    </div>
+    <div class="leyenda">
+      <span><b></b>Dólar futuro</span>
+      <span><b class="c2"></b>Caución a 1 día</span>
+      <span><b class="h"></b>Puntas abiertas más de 0,5%</span>
+    </div>
+    <div id="grafico"><svg role="img" aria-label="Curva de tasas implícitas del dólar futuro"></svg><div id="globo"></div></div>
+    <div class="tabla"><table id="t-curva"></table></div>
+    <p class="nota" id="n-curva"></p>
+  </section>
+
+  <section>
+    <h2>Pases entre vencimientos</h2>
+    <p class="sub">Lo que cuesta pasar una posición de un mes al siguiente, y la tasa que eso implica para ese tramo.</p>
+    <div class="tabla"><table id="t-pases"></table></div>
+    <p class="nota">Origen: “contrato” es el pase que cotiza como instrumento propio; “puntas” se arma cruzando las puntas de los dos vencimientos, y por eso sale más abierto. “TNA en las puntas” es la tasa a la que se puede cerrar el pase de cada lado.</p>
+  </section>
+
+  <section>
+    <h2>Interés abierto y volumen</h2>
+    <p class="sub" id="s-interes"></p>
+    <div class="tabla"><table id="t-interes"></table></div>
+    <p class="nota">El volumen suma el libro común y el libro M del mismo vencimiento. El interés abierto es el último que publica A3.</p>
+  </section>
+
+  <div class="dos">
+    <section>
+      <h2>Caución en pesos</h2>
+      <p class="sub">TNA por plazo, mercado de contado.</p>
+      <div class="tabla"><table id="t-caucion"></table></div>
+    </section>
+    <section>
+      <h2>Futuros de tasa</h2>
+      <p class="sub">TNA promedio que el mercado espera para cada mes.</p>
+      <div class="tabla"><table id="t-pesos"></table></div>
+    </section>
+  </div>
+  <p class="nota">Fuente: página pública A3 Realtime. Cuentas propias; no es una recomendación.</p>
+</main>
+
+<script>
+const $ = s => document.querySelector(s);
+const num = (v, d = 2) => v == null || isNaN(v) ? '–' : v.toLocaleString('es-AR', { minimumFractionDigits: d, maximumFractionDigits: d });
+const ent = v => v == null ? '–' : Math.round(v).toLocaleString('es-AR');
+const pct = (v, d = 2) => v == null || isNaN(v) ? '–' : num(v, d) + '%';
+const delta = (v, f) => v == null || isNaN(v) ? '–' : `<span class="${v > 0 ? 'sube' : v < 0 ? 'baja' : ''}">${v > 0 ? '▲ +' : v < 0 ? '▼ −' : ''}${f(Math.abs(v))}</span>`;
+const fecha = s => { const [a, m, d] = s.split('-'); return `${d}/${m}/${a.slice(2)}`; };
+const precio = v => v == null ? '–' : num(v, v % 1 ? (v * 10 % 1 ? 2 : 1) : 0);
+
+let datos = null, tipo = 'tea', foco = null, puntos = [];
+
+document.querySelectorAll('.selector button').forEach(b => b.onclick = () => {
+  tipo = b.dataset.tasa;
+  document.querySelectorAll('.selector button').forEach(x => x.setAttribute('aria-pressed', x === b));
+  if (datos) pintar();
+});
+
+function pintarEstado() {
+  const e = $('#estado'), d = datos, edad = d.edadSeg;
+  let txt, cls = '';
+  if (!d.conectado) { txt = 'Sin conexión con A3' + (d.error ? ` (${d.error})` : ''); cls = 'mal'; }
+  else if (edad == null) txt = 'Conectado, esperando datos';
+  else if (edad < 30) { txt = 'En vivo'; cls = 'vivo'; }
+  else txt = `Conectado · último dato hace ${edad < 120 ? Math.round(edad) + ' s' : Math.round(edad / 60) + ' min'}`;
+  e.className = cls; e.querySelector('span').textContent = txt;
+  $('#reloj').textContent = d.ahora.slice(11);
+  const a = $('#alerta');
+  a.style.display = d.conectado ? 'none' : 'block';
+  a.textContent = 'Sin conexión con A3: los números de abajo son los últimos recibidos, no los de ahora.';
+}
+
+function pintarFichas() {
+  const d = datos, c = d.curva.find(x => x.tasa && !x.ancho), ca = d.caucion;
+  const f = (rot, val, det) => `<div class="ficha"><div class="rot">${rot}</div><div class="val">${val}</div><div class="det">${det}</div></div>`;
+  $('#fichas').innerHTML =
+    f('Dólar spot', precio(d.spot.ultimo), `${delta(d.spot.var, v => pct(v))} contra el cierre previo (${precio(d.spot.ajuste)})`) +
+    f('Caución a 1 día', pct(ca.tna), `TNA · equivale a ${pct(ca.tea)} TEA`) +
+    (c ? f(`${c.contrato} · ${c.dias} días`, pct(c.tasa.tea), `TEA implícita · ${pct(c.tasa.tna)} TNA · ${pct(c.tasa.tem)} mensual`) +
+         f('Dólar futuro contra caución', c.vsCaucion == null ? '–' : (c.vsCaucion > 0 ? '+' : '−') + num(Math.abs(c.vsCaucion)) + ' pp',
+           `${c.contrato} rinde ${c.vsCaucion > 0 ? 'más' : 'menos'} que la caución, en TEA`) : '');
+}
+
+function pintarCurva() {
+  const svg = $('#grafico svg'), W = svg.clientWidth || 800, H = 300, m = { l: 44, r: 110, t: 14, b: 30 };
+  const filas = datos.curva.filter(c => c.tasa);
+  const cau = datos.caucion[tipo];
+  svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+  if (!filas.length) { svg.innerHTML = `<text x="${W / 2}" y="${H / 2}" text-anchor="middle" fill="var(--tenue)">Sin datos todavía</text>`; puntos = []; return; }
+  const vs = [];
+  filas.forEach(c => { vs.push(c.tasa[tipo]); if (!c.ancho) { c.tasaBid && vs.push(c.tasaBid[tipo]); c.tasaAsk && vs.push(c.tasaAsk[tipo]); } });
+  if (cau != null) vs.push(cau);
+  let y0 = Math.floor(Math.min(...vs) - 0.5), y1 = Math.ceil(Math.max(...vs) + 0.5);
+  const xm = Math.max(...filas.map(c => c.dias)) * 1.02;
+  const x = d => m.l + d / xm * (W - m.l - m.r), y = v => m.t + (y1 - v) / (y1 - y0) * (H - m.t - m.b);
+  const paso = (y1 - y0) > 8 ? 2 : 1;
+  let s = '';
+  for (let v = y0; v <= y1; v += paso)
+    s += `<line x1="${m.l}" x2="${W - m.r}" y1="${y(v)}" y2="${y(v)}" stroke="var(--grilla)"/><text x="${m.l - 8}" y="${y(v) + 4}" text-anchor="end" font-size="11" fill="var(--tenue)">${v}%</text>`;
+  for (let d = 0; d <= xm; d += 60)
+    s += `<text x="${x(d)}" y="${H - 8}" text-anchor="middle" font-size="11" fill="var(--tenue)">${d ? d + ' días' : 'hoy'}</text>`;
+  s += `<line x1="${m.l}" x2="${W - m.r}" y1="${H - m.b}" y2="${H - m.b}" stroke="var(--eje)"/>`;
+  if (cau != null)
+    s += `<line x1="${m.l}" x2="${W - m.r}" y1="${y(cau)}" y2="${y(cau)}" stroke="var(--serie-2)" stroke-width="2" stroke-dasharray="6 4"/>` +
+         `<text x="${W - m.r + 8}" y="${y(cau) + 4}" font-size="12" fill="var(--tinta-2)">Caución ${pct(cau, 1)}</text>`;
+  const firmes = filas.filter(c => !c.ancho);
+  firmes.forEach(c => { if (c.tasaBid && c.tasaAsk) s += `<line x1="${x(c.dias)}" x2="${x(c.dias)}" y1="${y(c.tasaBid[tipo])}" y2="${y(c.tasaAsk[tipo])}" stroke="var(--serie-1)" stroke-width="1" opacity=".55"/>`; });
+  if (firmes.length > 1) s += `<polyline fill="none" stroke="var(--serie-1)" stroke-width="2" stroke-linejoin="round" points="${firmes.map(c => x(c.dias) + ',' + y(c.tasa[tipo])).join(' ')}"/>`;
+  filas.forEach(c => s += `<circle cx="${x(c.dias)}" cy="${y(c.tasa[tipo])}" r="4" fill="${c.ancho ? 'var(--superficie)' : 'var(--serie-1)'}" stroke="${c.ancho ? 'var(--serie-1)' : 'var(--superficie)'}" stroke-width="2"/>`);
+  const ult = firmes[firmes.length - 1];
+  if (ult) {
+    let ly = y(ult.tasa[tipo]) + 4;
+    if (cau != null && Math.abs(ly - 4 - y(cau)) < 14) ly += ly - 4 < y(cau) ? -12 : 12;
+    if (ult === filas[filas.length - 1]) s += `<text x="${x(ult.dias) + 10}" y="${ly}" font-size="12" fill="var(--tinta-2)">Dólar ${pct(ult.tasa[tipo], 1)}</text>`;
+  }
+  s += `<line id="mira" y1="${m.t}" y2="${H - m.b}" stroke="var(--eje)" style="display:none"/>`;
+  svg.innerHTML = s;
+  puntos = filas.map(c => ({ c, px: x(c.dias), py: y(c.tasa[tipo]) }));
+  if (foco != null) mostrarGlobo(foco);
+}
+
+function mostrarGlobo(contrato) {
+  const p = puntos.find(q => q.c.contrato === contrato), g = $('#globo'), mira = $('#mira');
+  if (!p) { g.style.display = 'none'; return; }
+  const c = p.c, T = tipo.toUpperCase();
+  mira.setAttribute('x1', p.px); mira.setAttribute('x2', p.px); mira.style.display = '';
+  g.innerHTML = `<strong>${c.contrato} · ${pct(c.tasa[tipo])} ${T}</strong>` +
+    `<span>Vence ${fecha(c.vto)} · ${c.dias} días</span><br>` +
+    `<span>Puntas ${precio(c.bid)} / ${precio(c.ask)}</span><br>` +
+    (c.tasaBid && c.tasaAsk ? `<span>${T} en puntas ${pct(c.tasaBid[tipo])} / ${pct(c.tasaAsk[tipo])}</span><br>` : '') +
+    (c.vsCaucion != null ? `<span>Contra caución ${c.vsCaucion > 0 ? '+' : '−'}${num(Math.abs(c.vsCaucion))} pp (TEA)</span>` : '');
+  g.style.display = 'block';
+  const ancho = $('#grafico').clientWidth, gw = g.offsetWidth;
+  g.style.left = (p.px + 12 + gw > ancho ? Math.max(p.px - gw - 12, 0) : p.px + 12) + 'px';
+  g.style.top = Math.max(p.py - 20, 0) + 'px';
+}
+
+$('#grafico').addEventListener('mousemove', e => {
+  if (!puntos.length) return;
+  const r = $('#grafico svg').getBoundingClientRect(), mx = e.clientX - r.left;
+  const p = puntos.reduce((a, b) => Math.abs(b.px - mx) < Math.abs(a.px - mx) ? b : a);
+  foco = p.c.contrato; mostrarGlobo(foco);
+});
+$('#grafico').addEventListener('mouseleave', () => { foco = null; $('#globo').style.display = 'none'; const m = $('#mira'); if (m) m.style.display = 'none'; });
+
+function pintarTablas() {
+  const d = datos;
+  $('#t-curva').innerHTML = '<tr><th>Contrato</th><th>Vence</th><th>Días</th><th>Compra</th><th>Venta</th><th>Último</th><th>Var. día</th><th>TNA</th><th>TEA</th><th>Mensual</th><th>TEA contra caución</th></tr>' +
+    d.curva.map(c => `<tr class="${c.ancho ? 'ancho' : ''}"><td>${c.contrato}${c.ancho ? '<span class="marca">puntas abiertas</span>' : c.base !== 'puntas' ? `<span class="marca">con ${c.base === 'ultimo' ? 'último' : 'ajuste previo'}</span>` : ''}</td>` +
+      `<td>${fecha(c.vto)}</td><td>${c.dias}</td><td>${precio(c.bid)}</td><td>${precio(c.ask)}</td><td>${precio(c.ultimo)}</td><td>${delta(c.var, v => pct(v))}</td>` +
+      `<td>${pct(c.tasa && c.tasa.tna)}</td><td>${pct(c.tasa && c.tasa.tea)}</td><td>${pct(c.tasa && c.tasa.tem)}</td>` +
+      `<td>${c.vsCaucion == null ? '–' : (c.vsCaucion > 0 ? '+' : '−') + num(Math.abs(c.vsCaucion)) + ' pp'}</td></tr>`).join('');
+  $('#n-curva').textContent = `Dólar spot ${precio(d.spot.ultimo)} · caución a 1 día ${pct(d.caucion.tna)} TNA (${pct(d.caucion.tea)} TEA). La variación del día es contra el ajuste previo.`;
+
+  let h = '<tr><th>Tramo</th><th>Días</th><th>Compra</th><th>Venta</th><th>% directo</th><th>TNA</th><th>TNA en las puntas</th><th>TEA</th><th>Mensual</th><th>Origen</th></tr>', act = null;
+  d.pases.forEach(p => {
+    if (p.activo !== act) { act = p.activo; h += `<tr class="grupo"><td colspan="10">${{ DLR: 'Dólar', GGAL: 'GGAL', RFX20: 'Índice RFX20' }[act]}</td></tr>`; }
+    h += `<tr class="${p.ancho ? 'ancho' : ''}"><td>${p.tramo}${p.ancho ? '<span class="marca">puntas abiertas</span>' : ''}</td><td>${p.dias}</td><td>${precio(p.bid)}</td><td>${precio(p.ask)}</td>` +
+      `<td>${pct(p.pct)}</td><td>${pct(p.tasa && p.tasa.tna)}</td><td>${num(p.tnaBid, 1)} a ${pct(p.tnaAsk, 1)}</td><td>${pct(p.tasa && p.tasa.tea)}</td><td>${pct(p.tasa && p.tasa.tem)}</td><td>${p.fuente}</td></tr>`;
+  });
+  $('#t-pases').innerHTML = h;
+
+  $('#s-interes').textContent = d.fechaPrev
+    ? `Contratos abiertos por vencimiento y cambio contra la foto del ${fecha(d.fechaPrev)}.`
+    : 'Contratos abiertos por vencimiento. El cambio diario aparece desde mañana: la historia se guarda acá, una foto por día, y hoy es la primera.';
+  h = '<tr><th>Contrato</th><th>Días</th><th>Interés abierto</th><th></th><th>Cambio</th><th>Volumen hoy</th><th>de eso, libro M</th><th>Volumen / interés</th></tr>'; act = null;
+  const maxOi = {};
+  d.interes.forEach(i => maxOi[i.activo] = Math.max(maxOi[i.activo] || 0, i.oi || 0));
+  d.interes.forEach(i => {
+    if (i.activo !== act) { act = i.activo; h += `<tr class="grupo"><td colspan="8">${{ DLR: 'Dólar', GGAL: 'GGAL', RFX20: 'Índice RFX20' }[act]}</td></tr>`; }
+    h += `<tr><td>${i.contrato}</td><td>${i.dias}</td><td>${ent(i.oi)}</td><td class="celda-barra"><span class="barra" style="width:${i.oi ? i.oi / maxOi[i.activo] * 100 : 0}%"></span></td>` +
+      `<td>${delta(i.dOi, ent)}</td><td>${ent(i.vol)}</td><td>${i.volM ? ent(i.volM) : '–'}</td><td>${i.oi ? pct(i.vol / i.oi * 100, 1) : '–'}</td></tr>`;
+  });
+  $('#t-interes').innerHTML = h;
+
+  $('#t-caucion').innerHTML = '<tr><th>Plazo</th><th>Compra</th><th>Venta</th><th>Último</th><th>Cierre previo</th></tr>' +
+    d.caucion.plazos.map(c => `<tr><td>${c.plazo} día${c.plazo > 1 ? 's' : ''}</td><td>${pct(c.bid)}</td><td>${pct(c.ask)}</td><td>${pct(c.ultimo)}</td><td>${pct(c.ajuste)}</td></tr>`).join('');
+  $('#t-pesos').innerHTML = '<tr><th>Contrato</th><th>Compra</th><th>Venta</th><th>Último</th><th>Ajuste previo</th></tr>' +
+    d.tasasPesos.map(c => `<tr><td>${c.contrato}</td><td>${pct(c.bid)}</td><td>${pct(c.ask)}</td><td>${pct(c.ultimo)}</td><td>${pct(c.ajuste)}</td></tr>`).join('');
+}
+
+function pintar() { pintarEstado(); pintarFichas(); pintarCurva(); pintarTablas(); }
+
+async function sondear() {
+  try {
+    datos = await (await fetch('/datos', { cache: 'no-store' })).json();
+    pintar();
+  } catch (e) {
+    $('#estado').className = 'mal';
+    $('#estado span').textContent = 'El servidor local no responde';
+  }
+  setTimeout(sondear, 1500);
+}
+window.addEventListener('resize', () => datos && pintarCurva());
+sondear();
+</script>
+</body>
+</html>
