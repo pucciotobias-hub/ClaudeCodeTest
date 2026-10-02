@@ -88,12 +88,17 @@ Tienen que quedar **visibles** y reportando valor **leido del modelo**
 (`dataSources()` de la serie → `data().last()`), sobre el simbolo verificado.
 **No uses `data_get_study_values`**: hace derivar el simbolo solo y se lleva los
 dibujos (paso el 2026-09-22, se perdieron los 12).
-- **EMA 20** (Moving Average Exponential, length 20, source close)
+- **EMA 20** (se crea como `Exponential Moving Average`, length 20, source close;
+  el nombre viejo `Moving Average Exponential` falla en silencio desde el 30-sep-2026)
 - **RSI 14** (Relative Strength Index)
 - **Volume** como overlay
 
 Si el modelo no devuelve valores (estudio mudo, series en 0), aplicá el fix del
 punto 2 y reintentá.
+
+**La SMA 200 no va en el chart.** El plan gratis de TradingView deja 2 indicadores
+por chart (Volume no cuenta) y ya estan ocupados por la EMA y el RSI: agregarla
+desplaza a uno de los dos. Se calcula con las barras (punto 4) y va solo al informe.
 
 ## 4. Datos
 
@@ -102,6 +107,19 @@ punto 2 y reintentá.
   reporta el chart. Si difieren mas de 1%, confiá en el chart y anotalo.
   Si escribís un script auxiliar o volcás las barras a un archivo, **borralo al
   terminar**: el repo solo tiene que quedar con el informe.
+- **SMA 200** (agregada el 2026-10-02 a pedido de Tobias): promedio simple de los
+  ultimos 200 cierres diarios, contando la vela en curso. Las barras salen de
+  `mainSeries().bars()` en diario (trae 300; `data_get_ohlcv` count=60 no alcanza).
+  Calculala en el `ui_evaluate`, sin archivos. Ademas del valor, sacá:
+  - distancia del precio a la SMA200, en %;
+  - pendiente: SMA200 de hoy contra la de 20 ruedas atras (sube / baja / plana si
+    cambio menos de 0,5%);
+  - fecha del ultimo **cierre** que cruzo la SMA200 y para que lado;
+  - posicion de la EMA20 contra la SMA200.
+  Si la serie trae menos de 200 barras, `N/D`: no la calcules con menos.
+  **Es contexto de fondo, no gatillo.** Se mueve centavos por dia: no entra al mapa
+  de niveles ni a los escenarios salvo que quede a menos de 5% del precio; ahi se
+  nombra como referencia (no se dibuja, porque no es un precio fijo).
 - **Macro**: leelo del feed en vivo, NUNCA de la web. `quote_get` ignora el simbolo
   y devuelve el del chart, asi que para cada ticker hay que `chart_set_symbol`,
   leer, y seguir. Tickers: `BATS:SPY`, `AMEX:EWZ`, y si estan a mano `TVC:DXY` y
@@ -192,7 +210,7 @@ Estructura:
 ```markdown
 # GGAL ADR — <FECHA> (<TURNO>)
 
-**Precio** X · **Dia** O/H/L/C · **EMA20** X · **RSI14** X
+**Precio** X · **Dia** O/H/L/C · **EMA20** X · **RSI14** X · **SMA200** X
 
 ## Que cambio desde el informe anterior
 ...
@@ -205,7 +223,8 @@ Estructura:
 (tabla con R3..R1, PIVOTE, S1..S3, y en "Que es" el fundamento con fecha)
 
 ## Indicadores
-(EMA20 vs precio, RSI y si hay divergencia, volumen relativo)
+(EMA20 vs precio, RSI y si hay divergencia, volumen relativo, y la SMA200 como
+tendencia de fondo: valor, distancia, pendiente y ultimo cruce en cierre)
 
 ## Macro del feed
 (SPY, EWZ, DXY, ARGT con % del dia — y si GGAL se mueve con el bloque o solo)
