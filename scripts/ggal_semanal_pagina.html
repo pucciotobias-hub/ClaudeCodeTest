@@ -98,7 +98,6 @@ header h1{font-size:clamp(2rem,6vw,3.1rem);font-weight:700}
 .esc .g{font:500 .82rem/1.4 var(--mono);color:var(--muted)}
 .panorama{font-size:1.02rem}
 
-.aviso{border-left:3px solid var(--amber);background:var(--flat-bg);padding:8px 12px;font-size:.88rem;border-radius:0 4px 4px 0}
 footer .fuente{font-style:italic}
 footer{color:var(--muted);font-size:.8rem;border-top:1px solid var(--line);padding-top:14px;display:grid;gap:4px}
 @media (max-width:520px){
@@ -108,9 +107,8 @@ footer{color:var(--muted);font-size:.8rem;border-top:1px solid var(--line);paddi
 </style>
 
 <!--
-  Datos incorporados: la semana vigente cuando se publico la pagina. Al abrirse,
-  la pagina lee el documento de datos de Claude Docs (lo escribe la corrida de
-  los lunes) y, si trae una semana mas nueva, la muestra en su lugar.
+  Datos de la semana. Los reemplaza scripts/ggal_semanal_incorporar.py y la
+  pagina se republica: no puede leer datos de afuera por su cuenta.
 -->
 <script type="application/json" id="datos">
 {
@@ -354,7 +352,6 @@ footer{color:var(--muted);font-size:.8rem;border-top:1px solid var(--line);paddi
 <div class="wrap" id="app"></div>
 
 <script>
-var FUENTE = {estado: 'incorporado', detalle: ''};
 function render(D){
   var app = document.getElementById('app');
   function esc(s){ return String(s == null ? '' : s).replace(/[&<>"]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
@@ -364,9 +361,6 @@ function render(D){
   var h = [];
   var g = D.ggal || {};
 
-  // Si no se pudo leer el documento, el motivo va arriba: abajo de todo nadie lo ve
-  // y la pagina parece al dia cuando muestra la semana incorporada.
-  if (FUENTE.estado === 'incorporado' && FUENTE.detalle) h.push('<div class="aviso">No pude leer la semana más reciente: ' + esc(FUENTE.detalle) + '. Se muestra la que trae la página.</div>');
   h.push('<header><div class="eyebrow">GGAL ADR · semana del ' + esc(D.semana) + '</div>');
   h.push('<h1>' + esc(D.titular || 'Reporte semanal') + '</h1>');
   h.push('<div class="tape"><span class="px">' + px(g.cierre) + '</span><span class="chg ' + cls(g.var_semana) + '">' + pct(g.var_semana) + ' en la semana</span>');
@@ -441,7 +435,6 @@ function render(D){
   }
 
   h.push('<footer><span>Generado ' + esc(D.generado) + ' · precios del feed de TradingView, noticias de la web con fuente citada.</span>' +
-    '<span class="fuente">' + esc(FUENTE.estado === 'documento' ? 'Datos leídos del documento de Claude Docs.' : FUENTE.estado === 'cargando' ? 'Buscando la semana más reciente…' : 'Datos incorporados a la página' + (FUENTE.detalle ? ' (' + FUENTE.detalle + ')' : '') + '.') + '</span>' +
     (D.notas ? '<span>' + esc(D.notas) + '</span>' : '') +
     '<span>Descripción del cuadro técnico y macro. No es asesoramiento financiero.</span></footer>');
 
@@ -450,66 +443,4 @@ function render(D){
 
 var DATOS = JSON.parse(document.getElementById('datos').textContent);
 render(DATOS);
-
-// La semana mas reciente vive en un documento de Claude Docs que escribe la
-// corrida automatica de los lunes (una corrida desatendida no puede republicar
-// esta pagina). Se lee con el conector del visor; si no se puede, queda la
-// semana incorporada y el pie dice por que.
-var DOC_ID = '076f496b-17a3-44c4-9b7d-008270709458';
-var NODO_ID = '4d342d79-cf49';
-var MOTIVOS = {
-  needs_reauth: 'reconectá Claude Docs en Configuración → Conectores de claude.ai',
-  server_not_connected: 'agregá Claude Docs en Configuración → Conectores de claude.ai',
-  selection_required: 'elegí qué conector de Claude Docs usar',
-  not_in_manifest: 'la página no tiene permiso para leer Claude Docs',
-  blocked_by_policy: 'la organización bloquea este conector',
-  not_granted: 'esta vista no puede usar conectores',
-  capability_disabled: 'esta vista no puede usar conectores'
-};
-function extraerJson(texto){
-  var m = /<codeBlock[^>]*language='json'[^>]*>([\s\S]*?)<\/codeBlock>/.exec(texto);
-  if (!m) return null;
-  var partes = [], re = /<!\[CDATA\[([\s\S]*?)\]\]>/g, x;
-  while ((x = re.exec(m[1]))) partes.push(x[1]);
-  var crudo = partes.length ? partes.join('') : m[1].replace(/<[^>]+>/g, '')
-    .replace(/&quot;/g, '"').replace(/&apos;/g, "'").replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&');
-  try { return JSON.parse(crudo); } catch (e) { return null; }
-}
-function textoDe(res){
-  if (!res) return '';
-  var p = res.payload;
-  if (p && typeof p === 'object') return (p.data && p.data.xml) || p.xml || JSON.stringify(p);
-  if (typeof p === 'string') return p;
-  return (res.content || []).map(function(c){ return c.text || ''; }).join('');
-}
-(async function(){
-  if (!window.claude || !window.claude.use) return;
-  var mcp = null;
-  try { mcp = await window.claude.use('mcp'); } catch (e) {}
-  if (!mcp) { FUENTE = {estado: 'incorporado', detalle: 'sin acceso a conectores en esta vista'}; render(DATOS); return; }
-  FUENTE = {estado: 'cargando', detalle: ''}; render(DATOS);
-  var entrada = {ref: {object: 'node', id: NODO_ID}, engine: 'prose', container: {kind: 'project', id: DOC_ID}, payload: {kind: 'view'}};
-  async function leer(reintento){
-    try {
-      var res = await mcp.callTool('Claude Docs', 'read', entrada);
-      var nuevo = extraerJson(textoDe(res));
-      if (nuevo && nuevo.semana && nuevo.ggal) {
-        FUENTE = {estado: 'documento', detalle: ''};
-        render(nuevo);
-      } else {
-        FUENTE = {estado: 'incorporado', detalle: 'el documento de datos no trae una semana válida'};
-        render(DATOS);
-      }
-    } catch (err) {
-      var code = err && err.code;
-      if (err && err.retryable && !reintento) {
-        setTimeout(function(){ leer(true); }, (err.retryAfterMs || 1500) + Math.random() * 1000);
-        return;
-      }
-      FUENTE = {estado: 'incorporado', detalle: MOTIVOS[code] || (code === 'tool_error' ? 'Claude Docs devolvió un error: ' + (err.message || '') : 'no se pudo leer el documento (' + (code || 'error') + ')')};
-      render(DATOS);
-    }
-  }
-  leer(false);
-})();
 </script>

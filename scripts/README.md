@@ -14,8 +14,9 @@ dos veces por dia habil, y deja el informe versionado en `estudios/ggal/`.
 | `ggal_auditoria_prompt.md` | Receta de la **auditoria semanal**: contrasta los estudios contra lo que hizo el precio y propone cambios a la receta del estudio. |
 | `ggal_semanal_prompt.md` | Receta del **reporte semanal**: numeros de la semana del feed, noticias macro de la web (con fuente) y panorama de la semana que viene. |
 | `licitaciones_tesoro.py` | Fechas de llamado, licitacion y liquidacion del Tesoro, leidas del cronograma oficial de Finanzas (PDF que las marca solo con color). Lo usa el reporte semanal para la agenda. Necesita PyMuPDF. |
-| `ggal_semanal_pagina.html` | Fuente de la pagina del semanal (link fijo en `ggal_semanal_doc.txt`). Trae la ultima semana incorporada y al abrirse lee la mas nueva del documento de datos con el conector de Claude Docs. Se republica solo si cambia el diseño. |
-| `ggal_semanal_doc.txt` | Ids del documento de datos de Claude Docs (un bloque JSON que reemplaza la corrida de cada lunes) y link de la pagina. |
+| `ggal_semanal_pagina.html` | Fuente de la pagina del semanal (link fijo en `ggal_semanal_doc.txt`). Trae la semana adentro, en el bloque `<script id="datos">`: una pagina publicada no puede leer datos de afuera, asi que cada semana se reemplaza ese bloque y se republica. |
+| `ggal_semanal_incorporar.py` | Mete el JSON de la semana en `ggal_semanal_pagina.html`. Despues hay que republicar la pagina con la herramienta Artifact, que **no existe en `claude -p`**: la corrida del lunes deja el archivo listo y avisa `LA PAGINA NO SE ACTUALIZO`; se republica desde una sesion interactiva. |
+| `ggal_semanal_doc.txt` | Link de la pagina e ids del documento de Claude Docs que se uso hasta el 5-oct-2026 (ya no se lee: la pagina no puede leer Docs). |
 | `ggal_auditoria.py` | La parte objetiva de la auditoria (niveles respetados/perforados/rotos, extremos anticipados contra una grilla, encabezados contra la barra). Se puede correr a mano: `python scripts/ggal_auditoria.py --barras scripts/ggal_bars.json`. |
 
 ## Horarios (ART, UTC-3)
@@ -58,9 +59,10 @@ Verificar / borrar:
 ## Salida
 
 - Informe: `estudios/ggal/YYYY-MM-DD-<turno>.md`, commiteado y pusheado solo.
-- Reporte semanal: `estudios/ggal/semanal/YYYY-MM-DD.json`, cargado en el documento de datos
-  que lee la pagina fija. (La corrida no puede republicar la pagina: la herramienta Artifact
-  no existe en `claude -p`. Por eso la pagina lee los datos sola.)
+- Reporte semanal: `estudios/ggal/semanal/YYYY-MM-DD.json`, incorporado a
+  `ggal_semanal_pagina.html`. La corrida no puede republicar la pagina (la herramienta Artifact
+  no existe en `claude -p`, reverificado el 2026-10-05) y la pagina no puede leer datos sola:
+  **hay que republicarla a mano** desde una sesion interactiva de Claude Code.
 - Auditoria: `estudios/ggal/auditorias/YYYY-MM-DD.md`. **Las propuestas de cambio a
   la receta no se aplican solas**: las lee Tobias y decide. Una receta que se
   reescribe sola sin que nadie la mire puede derivar sin que se note.

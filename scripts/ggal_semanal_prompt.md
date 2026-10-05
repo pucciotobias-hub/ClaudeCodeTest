@@ -125,9 +125,9 @@ Reglas:
 ## 5. Armar los datos de la semana
 
 Tobias lee el reporte en una pagina con diseño fijo
-(https://claude.ai/artifact/7MVXWjsWK6TgPye87j3R67) que, al abrirse, lee los
-datos de un documento de Claude Docs. Vos **no tocás la pagina**: escribís el
-JSON de la semana en el ARCHIVO DE SALIDA y despues en el documento de datos.
+(https://claude.ai/artifact/7MVXWjsWK6TgPye87j3R67). Vos **no tocás el diseño**:
+escribís el JSON de la semana en el ARCHIVO DE SALIDA, un script lo mete en la
+pagina y la republicás (seccion 6).
 
 Formato (los numeros son de ejemplo del formato, no datos):
 
@@ -161,31 +161,30 @@ Formato (los numeros son de ejemplo del formato, no datos):
 - Validá antes de seguir:
   `python -c "import json,sys;d=json.load(open(sys.argv[1],encoding='utf-8'));assert d['semana'] and d['ggal'];print('ok')" <ARCHIVO>`
 
-## 6. Cargar los datos en el documento
+## 6. Republicar la pagina
 
-Los ids estan en `scripts/ggal_semanal_doc.txt` (`doc` y `body` del documento
-de datos). El documento tiene un parrafo de aviso y **un solo bloque de codigo
-json**: lo reemplazás entero por el de esta semana.
+La pagina muestra la semana que trae adentro; no puede leer datos de afuera
+(hasta el 5-oct-2026 intentaba leer un documento de Claude Docs y eso falla
+para cualquier visor: mostro la semana vieja sin avisar). Por eso se republica.
 
-1. `mcp__claude_ai_Claude_Docs__guide` con `items: ["topic.index"]` (una vez).
-2. Cargá `mcp__claude_ai_Claude_Docs__read` con ToolSearch y leé el outline:
-   `read(ref={"object":"node","id":"<body>"}, engine="prose", container={"kind":"project","id":"<doc>"}, payload={"projection":"outline"})`.
-   Anotá el id completo del `<codeBlock ... language='json'>` y su `h`.
-3. Un solo `update`:
-   `{"op":"replace","target":{"kind":"blocks","ids":["<id del codeBlock>"]},"ifHash":"<h>","with":{"as":"markdown","from":{"kind":"inline","content":"```json
-<el JSON en una sola linea>
-```"}}}`
-   con `ref={"object":"node","id":"<body>"}`, `engine="prose"` y el `container` del doc.
-4. Verificá: `read` con `payload={"kind":"view","parentId":"<id nuevo del codeBlock, del ack>"}`
-   y confirmá que empieza con `{"semana":"<la semana de hoy>"`.
-5. Si una llamada se rechaza, leé el `code`, `guide(items=["refusal.<code>"])`,
-   corregí y reenviá una vez. Si sigue fallando, no reintentes en loop: el
-   archivo queda commiteado y lo anotás al final de tu respuesta.
-6. No agregues bloques ni borres el parrafo de aviso.
+1. `python scripts/ggal_semanal_incorporar.py <ARCHIVO DE SALIDA>`: reemplaza el
+   bloque de datos de `scripts/ggal_semanal_pagina.html`. No edites ese archivo
+   a mano.
+2. Con la herramienta `Artifact` (si no esta en tu lista, cargala con
+   ToolSearch `select:Artifact`): primero `action: "read"` con
+   `url: "https://claude.ai/artifact/7MVXWjsWK6TgPye87j3R67"` (sin esa lectura
+   el publish se rechaza), despues `action: "publish"` con
+   `file_path: "scripts/ggal_semanal_pagina.html"` y la misma `url`. Sin `icon`,
+   sin `capabilities`, sin `title`. El link no cambia.
+3. El publish responde `Published ... (Version N)`. Si la herramienta no existe,
+   se rechaza o falla, **no reintentes en loop** y no publiques una pagina
+   nueva sin `url`: commiteá igual y empezá tu respuesta final con
+   `LA PAGINA NO SE ACTUALIZO: <motivo>`, para que se republique a mano.
 
 ## 7. Commitear
 
-- `git add` del ARCHIVO DE SALIDA. Nunca `git add -A`.
+- `git add` del ARCHIVO DE SALIDA y de `scripts/ggal_semanal_pagina.html`.
+  Nunca `git add -A`.
 - Commit `reporte semanal GGAL <semana>` y `git push origin master`.
 - Si el push falla, no reintentes en loop.
 

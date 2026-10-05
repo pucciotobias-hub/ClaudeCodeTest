@@ -19,8 +19,8 @@
 
     Con -Turno semanal usa scripts/ggal_semanal_prompt.md: arma el reporte de la
     semana (numeros del feed, noticias macro, panorama) en
-    estudios/ggal/semanal/<fecha>.json y lo carga en un documento de Claude Docs
-    que lee la pagina fija del semanal (scripts/ggal_semanal_doc.txt).
+    estudios/ggal/semanal/<fecha>.json, lo incorpora a la pagina fija del semanal
+    (scripts/ggal_semanal_incorporar.py) y la republica.
 
     Requiere una sesion de escritorio activa: Chrome tiene que poder renderizar.
     Si la maquina esta bloqueada o con sesion cerrada, el chart no repinta.
@@ -252,9 +252,10 @@ $allowed = @(
     # el informe sale parcial (paso el 2026-09-09: se perdio el macro y el
     # retrazado). El patron apunta solo al script de relanzamiento.
     'Bash(powershell*relanzar_chrome_cdp.ps1*)'
-    # Solo el reporte semanal: noticias de la web y el documento de Claude Docs.
-    # (La herramienta Artifact no existe en claude -p: paso el 2026-09-28.)
-    if ($Turno -eq 'semanal') { 'WebSearch'; 'WebFetch'; 'ToolSearch'; 'mcp__claude_ai_Claude_Docs' }
+    # Solo el reporte semanal: noticias de la web y republicar la pagina.
+    # (Hasta el 2026-10-05 cargaba un documento de Claude Docs que la pagina
+    # leia al abrirse; una pagina publicada no puede leer Docs, falla self_only.)
+    if ($Turno -eq 'semanal') { 'WebSearch'; 'WebFetch'; 'ToolSearch'; 'Artifact'; 'Skill' }
 ) -join ','
 
 # Claude corre como proceso aparte (no con el pipe de siempre) para poder
