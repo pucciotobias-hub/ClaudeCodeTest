@@ -13,6 +13,7 @@ dos veces por dia habil, y deja el informe versionado en `estudios/ggal/`.
 | `install_ggal_tasks.ps1` | Registra/borra las tres Tareas Programadas de Windows. |
 | `ggal_auditoria_prompt.md` | Receta de la **auditoria semanal**: contrasta los estudios contra lo que hizo el precio y propone cambios a la receta del estudio. |
 | `ggal_semanal_prompt.md` | Receta del **reporte semanal**: numeros de la semana del feed, noticias macro de la web (con fuente) y panorama de la semana que viene. |
+| `licitaciones_tesoro.py` | Fechas de llamado, licitacion y liquidacion del Tesoro, leidas del cronograma oficial de Finanzas (PDF que las marca solo con color). Lo usa el reporte semanal para la agenda. Necesita PyMuPDF. |
 | `ggal_semanal_pagina.html` | Fuente de la pagina del semanal (link fijo en `ggal_semanal_doc.txt`). Trae la ultima semana incorporada y al abrirse lee la mas nueva del documento de datos con el conector de Claude Docs. Se republica solo si cambia el diseño. |
 | `ggal_semanal_doc.txt` | Ids del documento de datos de Claude Docs (un bloque JSON que reemplaza la corrida de cada lunes) y link de la pagina. |
 | `ggal_auditoria.py` | La parte objetiva de la auditoria (niveles respetados/perforados/rotos, extremos anticipados contra una grilla, encabezados contra la barra). Se puede correr a mano: `python scripts/ggal_auditoria.py --barras scripts/ggal_bars.json`. |

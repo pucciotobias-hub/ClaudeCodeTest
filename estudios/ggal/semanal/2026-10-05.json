@@ -20,15 +20,72 @@
   "Hoy cambia el arranque: tras el primer turno en Brasil, EWZ abre +12% y arrastra a la región. GGAL abrió en 37.20, arriba del pivote 36.56; lo que cuenta es dónde cierra."
  ],
  "mercados": [
-  { "ticker": "GGAL", "nombre": "Galicia ADR", "cierre": 35.89, "var": -7.36 },
-  { "ticker": "ARGT", "nombre": "ETF Argentina", "cierre": 84.52, "var": -4.61 },
-  { "ticker": "EWZ", "nombre": "ETF Brasil", "cierre": 38.19, "var": 3.72 },
-  { "ticker": "SPY", "nombre": "S&P 500", "cierre": 769.64, "var": -0.22 },
-  { "ticker": "DXY", "nombre": "Índice dólar", "cierre": 101.923, "var": 0.88 },
-  { "ticker": "US10Y", "nombre": "Tasa 10 años EE.UU.", "cierre": 5.275, "var": 2.09 }
+  {
+   "ticker": "GGAL",
+   "nombre": "Galicia ADR",
+   "cierre": 35.89,
+   "var": -7.36
+  },
+  {
+   "ticker": "ARGT",
+   "nombre": "ETF Argentina",
+   "cierre": 84.52,
+   "var": -4.61
+  },
+  {
+   "ticker": "EWZ",
+   "nombre": "ETF Brasil",
+   "cierre": 38.19,
+   "var": 3.72
+  },
+  {
+   "ticker": "SPY",
+   "nombre": "S&P 500",
+   "cierre": 769.64,
+   "var": -0.22
+  },
+  {
+   "ticker": "DXY",
+   "nombre": "Índice dólar",
+   "cierre": 101.923,
+   "var": 0.88
+  },
+  {
+   "ticker": "US10Y",
+   "nombre": "Tasa 10 años EE.UU.",
+   "cierre": 5.275,
+   "var": 2.09
+  }
  ],
  "mercados_nota": "GGAL cayó con el bloque argentino pero −2,75 pp peor que ARGT, y a contramano de Brasil (EWZ +3,72%): la debilidad es argentina y, dentro de Argentina, más marcada en GGAL.",
  "noticias": [
+  {
+   "bloque": "Grupo Galicia",
+   "titulo": "El CEO de Galicia: la mora ya hizo pico, pero no baja en serio hasta 2027",
+   "detalle": "Fabián Kon dijo que este año la mora “no va a bajar sustancialmente” y que la normalización se verá recién en 2027; el 80% de los clientes con atrasos está refinanciando. Galicia es el banco más expuesto al consumo (mora consolidada de 10,6% en el 2T, contra 7,7% del sistema): es la noticia propia de una semana en la que volvió a caer más que ARGT.",
+   "impacto": "negativo",
+   "fuente": "Bloomberg Línea",
+   "url": "https://www.bloomberglinea.com/latinoamerica/argentina/la-mora-bajara-mas-lento-de-lo-previsto-80-de-los-clientes-ya-esta-refinanciando-segun-fabian-kon-ceo-de-banco-galicia/",
+   "fecha": "29-sep"
+  },
+  {
+   "bloque": "Grupo Galicia",
+   "titulo": "La mora del sistema quedó en 7,7% en agosto; familias 12,8% y refinanciaciones récord",
+   "detalle": "Con datos del BCRA procesados por 1816 y Analytica, la mora de familias bajó una décima (de 12,9% a 12,8%) y la de empresas subió a 3,8%; empeoró en 17 de las 30 entidades más grandes. Dejó de subir, pero no afloja: el costo de previsiones de los bancos sigue alto por varios trimestres.",
+   "impacto": "neutro",
+   "fuente": "Bloomberg Línea",
+   "url": "https://www.bloomberglinea.com/latinoamerica/argentina/datos-del-bcra-sugieren-que-la-mora-se-mantuvo-estable-en-agosto-con-leve-descenso-en-familias/",
+   "fecha": "29-sep"
+  },
+  {
+   "bloque": "Grupo Galicia",
+   "titulo": "Dividendo mensual: USD 0,0479 por ADR, cortó el 28-sep y se paga hoy",
+   "detalle": "Es menor al anterior (USD 0,0531) y equivale a un rendimiento anual de ~1,5%. Explica 0,12 pp de la caída de la semana (−7,36% sin ajustar, −7,24% ajustada); no cambia la lectura.",
+   "impacto": "neutro",
+   "fuente": "The Cerbat Gem",
+   "url": "https://www.thecerbatgem.com/2026/09/26/grupo-financiero-galicia-s-a-nasdaqggal-plans-monthly-dividend-of-0-05.html",
+   "fecha": "26-sep"
+  },
   {
    "bloque": "Argentina",
    "titulo": "El riesgo país subió 6% en la semana y cerró en 646 puntos, máximo desde noviembre de 2025",
@@ -105,18 +162,54 @@
  "tecnico": {
   "texto": "Tendencia bajista intacta en diario: precio 10,3% debajo de la EMA20 (40.00) y 24% debajo de la SMA200 (47.36). Máximos más bajos toda la semana salvo el miércoles (38.53 → 37.83 → 38.04 → 37.225 → 36.68) y cierres 36.98 → 37.02 → 37.24 → 36.07 → 35.89. Se rompió: el estante 38.155–38.55 de sep-2025 el lunes, con gap de apertura y 152% de volumen (quedó abierto el gap 38.53–38.74); y el 36.56 el jueves, con 239% de volumen, después de tres ruedas apoyado ahí (toque al centavo el martes). Se respetó: 35.21, mínimo exacto del jueves con rebote, y 36.56 como techo el viernes (máximo 36.68, cierre 35.89). El viernes fue una vela interna con el segundo cierre debajo de 36.10. RSI 21.4, siete ruedas en sobreventa y mínimo del tramo, sin divergencia. Los dos gatillos a favor de la tendencia (38.40 y 36.10) se cumplieron; ninguno de rebote se activó. La auditoría del viernes marcó que el rango que cinco informes dieron como más probable duró una rueda: con la tendencia intacta, la sobreventa sola no frenó nada.",
   "niveles": [
-   { "tipo": "R1", "nivel": 38.4, "que": "Estante 3/4/5-sep-2025, perdido en cierre el 28-sep, más el gap 38.53–38.74 del 25/28-sep. Banda hasta 38.74; única línea a más de 5% arriba" },
-   { "tipo": "PIVOTE", "nivel": 36.56, "que": "Mínimo 2-sep-2025 y del 29-sep; perdido en cierre el 1-oct y techo el 2-oct (máximo 36.68). Zona crítica 36.10–36.56, con dos cierres seguidos debajo" },
-   { "tipo": "S1", "nivel": 35.21, "que": "Máximo de swing del 14-oct-2025 y mínimo del 1-oct, toque exacto con rebote. Mínimo de la vela de rotura" },
-   { "tipo": "S2", "nivel": 34.54, "que": "Máximo doble 9/10-oct-2025, gatillo de fondo. Debajo no hay nada hasta 31.14–32.00 de oct-2025" }
+   {
+    "tipo": "R1",
+    "nivel": 38.4,
+    "que": "Estante 3/4/5-sep-2025, perdido en cierre el 28-sep, más el gap 38.53–38.74 del 25/28-sep. Banda hasta 38.74; única línea a más de 5% arriba"
+   },
+   {
+    "tipo": "PIVOTE",
+    "nivel": 36.56,
+    "que": "Mínimo 2-sep-2025 y del 29-sep; perdido en cierre el 1-oct y techo el 2-oct (máximo 36.68). Zona crítica 36.10–36.56, con dos cierres seguidos debajo"
+   },
+   {
+    "tipo": "S1",
+    "nivel": 35.21,
+    "que": "Máximo de swing del 14-oct-2025 y mínimo del 1-oct, toque exacto con rebote. Mínimo de la vela de rotura"
+   },
+   {
+    "tipo": "S2",
+    "nivel": 34.54,
+    "que": "Máximo doble 9/10-oct-2025, gatillo de fondo. Debajo no hay nada hasta 31.14–32.00 de oct-2025"
+   }
   ]
  },
  "agenda": [
-  { "dia": "Lun 5", "evento": "Primera rueda después del primer turno en Brasil; ISM de servicios de septiembre (EE.UU., se espera 55,1)", "por_que": "El salto de EWZ arrastra a la región en la apertura; el ISM, con su componente de precios, es el primer test para la tasa a 10 años" },
-  { "dia": "Mar 6", "evento": "Datos de industria y construcción (INDEC); balanza comercial de EE.UU.", "por_que": "Actividad local floja alimenta el ruido político y la mora de los bancos; pesa poco en el día" },
-  { "dia": "Mié 7", "evento": "Minutas de la Fed de septiembre (15:00 ART) y subasta de bonos a 10 años", "por_que": "Las minutas son anteriores al dato de empleo, pero muestran cuánto consenso hay para otra suba; una subasta floja empuja la tasa, el principal viento en contra externo" },
-  { "dia": "Jue 8", "evento": "Pedidos de subsidio por desempleo y subasta de bonos a 30 años (EE.UU.)", "por_que": "Segunda prueba de demanda por deuda larga con la tasa arriba de 5,2%" },
-  { "dia": "Vie 9", "evento": "Confianza del consumidor de Michigan (preliminar de octubre) e IPCA de septiembre en Brasil", "por_que": "Las expectativas de inflación de Michigan mueven la apuesta por la Fed; el IPCA, a EWZ en plena euforia electoral" }
+  {
+   "dia": "Lun 5",
+   "evento": "Primera rueda después del primer turno en Brasil; ISM de servicios de septiembre (EE.UU., se espera 55,1)",
+   "por_que": "El salto de EWZ arrastra a la región en la apertura; el ISM, con su componente de precios, es el primer test para la tasa a 10 años"
+  },
+  {
+   "dia": "Mar 6",
+   "evento": "Datos de industria y construcción (INDEC); balanza comercial de EE.UU.",
+   "por_que": "Actividad local floja alimenta el ruido político y la mora de los bancos; pesa poco en el día"
+  },
+  {
+   "dia": "Mié 7",
+   "evento": "Minutas de la Fed de septiembre (15:00 ART) y subasta de bonos a 10 años",
+   "por_que": "Las minutas son anteriores al dato de empleo, pero muestran cuánto consenso hay para otra suba; una subasta floja empuja la tasa, el principal viento en contra externo"
+  },
+  {
+   "dia": "Jue 8",
+   "evento": "Pedidos de subsidio por desempleo y subasta de bonos a 30 años (EE.UU.)",
+   "por_que": "Segunda prueba de demanda por deuda larga con la tasa arriba de 5,2%"
+  },
+  {
+   "dia": "Vie 9",
+   "evento": "Llamado a la licitación del Tesoro del miércoles 14; confianza del consumidor de Michigan (preliminar de octubre) e IPCA de septiembre en Brasil",
+   "por_que": "El llamado muestra el menú y cuánto vence: la licitación es el mié 14 y liquida el vie 16, con feriado el lun 12 en el medio. Las expectativas de inflación de Michigan mueven la apuesta por la Fed; el IPCA, a EWZ en plena euforia electoral"
+  }
  ],
  "escenarios": [
   {
@@ -139,5 +232,5 @@
   }
  ],
  "panorama": "GGAL terminó la semana en 35.89, el cierre más bajo en once meses, con la tendencia bajista intacta y el RSI en 21 sin divergencia: perdió 38.40 y 36.56 con volumen y dejó la zona 36.10–36.56 como techo. La viene moviendo el bloque argentino (riesgo país en 646, bonos arriba de 11%, tasa a 10 años de EE.UU. en 5,28%), pero otra vez cayó casi 3 puntos más que ARGT y no reaccionó ni al rollover del Tesoro, ni a las compras del BCRA, ni al rally de Brasil. Hoy el cuadro arranca distinto: el resultado del primer turno brasileño hizo saltar a EWZ y GGAL abrió con gap en 37.20, arriba del pivote y justo debajo de la directriz (37.94). Lo que hay que mirar es el cierre, no la apertura: en este tramo todos los cruces intradía contra la tendencia se devolvieron en el día, y el rebote recién se confirma con dos cierres arriba de 36.56. Afuera, las minutas de la Fed y la subasta a 10 años del miércoles son la prueba para la tasa larga.",
- "notas": "Faltan el informe de cierre del 28-sep y la apertura del 29-sep (la rueda del lunes se tomó del cierre del 29-sep). El cierre oficial del 1-oct es 36.07, no el 36.10 del informe de ese día (corregido en la auditoría). Precios del feed de TradingView leídos a las 10:38 ART; EMA20, RSI y SMA200 del informe de cierre del 2-oct. La variación de GGAL incluye el corte del dividendo de USD 0,0479 del 28-sep (ajustada, −7,24%). DXY y US10Y vienen fechados un día antes en el feed: se leyeron por orden. El promedio de volumen incluye una semana de 4 ruedas (feriado del 7-sep). Los datos de apertura de hoy son de los primeros 8 minutos de rueda. No encontré noticias propias de Grupo Galicia en la semana ni la fecha publicada de la próxima licitación del Tesoro. La nota de CNBC sobre empleo no se pudo abrir (403): las cifras salen del resumen del buscador. La auditoría del 2-oct tiene tres propuestas para la receta diaria pendientes de aprobar."
+ "notas": "Faltan el informe de cierre del 28-sep y la apertura del 29-sep (la rueda del lunes se tomó del cierre del 29-sep). El cierre oficial del 1-oct es 36.07, no el 36.10 del informe de ese día (corregido en la auditoría). Precios del feed de TradingView leídos a las 10:38 ART; EMA20, RSI y SMA200 del informe de cierre del 2-oct. La variación de GGAL incluye el corte del dividendo de USD 0,0479 del 28-sep (ajustada, −7,24%). DXY y US10Y vienen fechados un día antes en el feed: se leyeron por orden. El promedio de volumen incluye una semana de 4 ruedas (feriado del 7-sep). Los datos de apertura de hoy son de los primeros 8 minutos de rueda. La nota de CNBC sobre empleo no se pudo abrir (403): las cifras salen del resumen del buscador. La auditoría del 2-oct tiene tres propuestas para la receta diaria pendientes de aprobar. Corregido el 5-oct a las 11:04: se agregaron las noticias propias de Grupo Galicia (mora y dividendo) y la fecha de la próxima licitación del Tesoro, que la primera corrida no había encontrado; la fecha sale del cronograma oficial de Finanzas 2026, publicado en enero."
 }

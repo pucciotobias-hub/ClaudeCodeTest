@@ -59,12 +59,38 @@ Buscá con `WebSearch` (y `WebFetch` para leer la nota si hace falta) las notici
 de la semana que importan para un banco argentino que cotiza en Nueva York. Por
 bloque, en este orden:
 
-1. **Argentina**: BCRA y tasas, reservas y compras del BCRA, tipo de cambio y
+1. **Grupo Galicia** (bloque propio, va primero): lo que salio de la empresa y
+   de los bancos en la semana. Como minimo, una busqueda por cada uno de estos
+   temas: declaraciones de la gerencia (el CEO, Fabián Kon), mora (de
+   Galicia, de Naranja X y la del sistema que publica el BCRA), dividendos
+   (GGAL paga uno mensual: fecha de corte, de pago y monto), cambios de
+   recomendacion o precio objetivo, resultados trimestrales o su fecha, y normas
+   del BCRA para bancos (encajes, capital). Un dato de la empresa que ya tengas
+   por otro lado (por ejemplo el corte de dividendo que ajusta la variacion
+   semanal) **es noticia de este bloque**: buscale la fuente y cargalo.
+2. **Argentina**: BCRA y tasas, reservas y compras del BCRA, tipo de cambio y
    bandas, inflacion, riesgo pais y bonos, acuerdos con el FMI, emisiones de
-   deuda, politica que mueva el mercado. Noticias de Grupo Galicia en particular
-   (resultados, calificaciones, dividendos, cambios regulatorios a bancos).
-2. **EE.UU. y global**: Fed, datos (empleo, CPI), tasa a 10 años, dolar, petroleo.
-3. **Brasil**: solo si movio a EWZ o a la region.
+   deuda, politica que mueva el mercado.
+3. **EE.UU. y global**: Fed, datos (empleo, CPI), tasa a 10 años, dolar, petroleo.
+4. **Brasil**: solo si movio a EWZ o a la region.
+
+Como buscar (el 5-oct-2026 el reporte salio diciendo "no encontre noticias de
+Grupo Galicia" despues de **una sola** busqueda, y esa semana el CEO habia
+hablado de la mora y se pagaba un dividendo):
+- **Una busqueda por tema, corta.** Tres o cuatro palabras y el mes
+  (`Galicia mora septiembre 2026`). Una consulta que junta seis temas devuelve
+  notas viejas de cualquiera de ellos y ninguna de la semana.
+- **Una busqueda sin resultados de la semana no es "no hay noticias".** Antes de
+  escribir en `notas` que algo no se encontro, reformulá por lo menos dos veces:
+  otras palabras, en ingles (`GGAL dividend`, `Grupo Financiero Galicia`), el
+  nombre de la persona, o `allowed_domains` con bloomberglinea.com,
+  cronista.com, iprofesional.com, ambito.com, infobae.com. Y en `notas` poné
+  que buscaste, no solo que no aparecio.
+- **La fecha se confirma abriendo la nota** con `WebFetch`. El resumen del
+  buscador mezcla notas de meses distintos: una nota de afuera de la semana es
+  contexto, no noticia.
+- **Si una pagina da 403 o no abre**, buscá el mismo dato en otro medio y citá
+  el que si pudiste leer. No cites una `url` que no abriste.
 
 Reglas:
 - 3 a 5 noticias por bloque como mucho. Si una no cambio nada para GGAL, no va.
@@ -83,6 +109,13 @@ Reglas:
   (datos de EE.UU., reunion de la Fed, licitaciones del Tesoro argentino, datos
   del INDEC, vencimientos de deuda, resultados de bancos argentinos, feriados en
   Argentina o EE.UU.). Buscalos; no inventes fechas.
+- **Licitaciones del Tesoro: no se buscan en la web.** Corré
+  `python scripts/licitaciones_tesoro.py` (lee el cronograma oficial de
+  Finanzas, un PDF que marca las fechas solo con color y que `WebFetch` no
+  puede leer) y cargá en `agenda` el llamado, la licitacion o la liquidacion
+  que caigan en la semana. Si no cae ninguna, nombrá la proxima licitacion en
+  el `por_que` del dia mas cercano o en `panorama`. Si el script falla, decilo
+  en `notas` con el error.
 - `escenarios`: 2 o 3, con el gatillo **por cierre** tomado del mapa del ultimo
   estudio (misma regla: contra la tendencia, dos cierres para confirmar).
   `sesgo` es `alcista`, `bajista` o `rango`.
@@ -109,7 +142,7 @@ Formato (los numeros son de ejemplo del formato, no datos):
   "resumen": ["3 a 5 lineas, lo que Tobias tiene que saber si lee solo esto"],
   "mercados": [ { "ticker": "GGAL", "nombre": "Galicia ADR", "cierre": 39.59, "var": -3.4 } ],
   "mercados_nota": "Una linea: GGAL con el bloque o sola, en pp contra ARGT",
-  "noticias": [ { "bloque": "Argentina", "titulo": "", "detalle": "",
+  "noticias": [ { "bloque": "Grupo Galicia", "titulo": "", "detalle": "",
                   "impacto": "negativo", "fuente": "Ambito", "url": "https://...", "fecha": "23-sep" } ],
   "tecnico": { "texto": "Estructura y que se rompio o se respeto en la semana",
                "niveles": [ { "tipo": "R1", "nivel": 40.60, "que": "fundamento con fecha" },
