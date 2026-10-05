@@ -1,0 +1,143 @@
+{
+ "semana": "28 de septiembre al 2 de octubre de 2026",
+ "generado": "2026-10-05 10:55 ART",
+ "titular": "GGAL −7,4%: perdió el soporte de 2025 y cerró en el mínimo de once meses",
+ "ggal": {
+  "cierre": 35.89,
+  "var_semana": -7.36,
+  "cierre_previo": 38.74,
+  "maximo": 38.53,
+  "minimo": 35.21,
+  "ema20": 40.0,
+  "rsi": 21.4,
+  "volumen_rel": "156% del promedio de las 4 semanas previas"
+ },
+ "resumen": [
+  "GGAL cerró la semana en 35.89 (−7,36%), segunda semana seguida de −7%: es el cierre más bajo desde el 24-oct-2025. Tres de las cinco ruedas fueron rojas y las dos verdes sumaron menos de 1%.",
+  "Perdió en cierre el estante de sep-2025 (38.40, el lunes con gap) y el mínimo del 2-sep-2025 (36.56, el jueves con el volumen más alto en seis semanas). El viernes dio el segundo cierre debajo de 36.10: la zona 36.10–36.56 quedó como techo.",
+  "Volvió a caer más que el bloque: ARGT −4,61%, SPY −0,22% y EWZ +3,72%. Contra ARGT, −2,75 pp; desde el 11-sep la brecha acumulada es de casi 7 pp.",
+  "Detrás: riesgo país en 646 pb (máximo desde noviembre de 2025), bonos con rendimientos arriba de 11% y la tasa a 10 años de EE.UU. en 5,28%. A favor, y sin efecto en el precio: el Tesoro renovó el 100% y el BCRA compró USD 369 M, la mejor semana desde julio.",
+  "Hoy cambia el arranque: tras el primer turno en Brasil, EWZ abre +12% y arrastra a la región. GGAL abrió en 37.20, arriba del pivote 36.56; lo que cuenta es dónde cierra."
+ ],
+ "mercados": [
+  { "ticker": "GGAL", "nombre": "Galicia ADR", "cierre": 35.89, "var": -7.36 },
+  { "ticker": "ARGT", "nombre": "ETF Argentina", "cierre": 84.52, "var": -4.61 },
+  { "ticker": "EWZ", "nombre": "ETF Brasil", "cierre": 38.19, "var": 3.72 },
+  { "ticker": "SPY", "nombre": "S&P 500", "cierre": 769.64, "var": -0.22 },
+  { "ticker": "DXY", "nombre": "Índice dólar", "cierre": 101.923, "var": 0.88 },
+  { "ticker": "US10Y", "nombre": "Tasa 10 años EE.UU.", "cierre": 5.275, "var": 2.09 }
+ ],
+ "mercados_nota": "GGAL cayó con el bloque argentino pero −2,75 pp peor que ARGT, y a contramano de Brasil (EWZ +3,72%): la debilidad es argentina y, dentro de Argentina, más marcada en GGAL.",
+ "noticias": [
+  {
+   "bloque": "Argentina",
+   "titulo": "El riesgo país subió 6% en la semana y cerró en 646 puntos, máximo desde noviembre de 2025",
+   "detalle": "Sumó 37 pb en la semana, con un pico de 655 el viernes; Bonares y Globales cayeron cerca de 2% y rinden más de 11% anual, y el Merval perdió 4,6% en dólares (mínimo de once meses). Es el mismo castigo al riesgo argentino que arrastra a los bancos, cargados de deuda soberana.",
+   "impacto": "negativo",
+   "fuente": "Infobae",
+   "url": "https://www.infobae.com/economia/2026/10/03/semana-financiera-el-riesgo-pais-se-disparo-6-y-las-acciones-argentinas-cayeron-hasta-12-en-wall-street/",
+   "fecha": "3-oct"
+  },
+  {
+   "bloque": "Argentina",
+   "titulo": "La Argentina no acompañó el alivio global: bonos largos −2% y riesgo país en máximo del año",
+   "detalle": "En la rueda del jueves el riesgo país pasó los 635 pb y el Merval cayó 2,3% en dólares mientras afuera había alivio; los analistas le atribuyen la mayor parte al escenario internacional y el resto a la incertidumbre electoral de 2027. Fue el día en que GGAL perdió 36.56 con el doble de volumen.",
+   "impacto": "negativo",
+   "fuente": "Infobae",
+   "url": "https://www.infobae.com/economia/2026/10/02/la-argentina-no-logro-capitalizar-el-alivio-de-los-mercados-globales-y-el-riesgo-pais-toco-el-mayor-nivel-del-ano/",
+   "fecha": "1-oct"
+  },
+  {
+   "bloque": "Argentina",
+   "titulo": "El Tesoro renovó el 100% de los vencimientos en la licitación del lunes",
+   "detalle": "Adjudicó $8,62 billones (rollover de 100,08%) sin inyectar pesos, con la Lecap a enero de 2027 a 2,17% mensual y sin plazos más allá de 2027; dejó afuera el Bonar 2029 en dólares por la suba del riesgo país. Saca un riesgo de corto plazo para los bancos, pero la curva sigue sin estirarse.",
+   "impacto": "neutro",
+   "fuente": "Infobae",
+   "url": "https://www.infobae.com/economia/2026/09/28/licitacion-clave-el-gobierno-renovo-todos-los-vencimientos-y-evito-inyectar-pesos-en-el-mercado/",
+   "fecha": "28-sep"
+  },
+  {
+   "bloque": "Argentina",
+   "titulo": "El BCRA compró USD 369 M en la semana, la mayor cifra desde julio",
+   "detalle": "Las reservas brutas subieron a USD 48.653 M y el mayorista cerró en $1.520, abajo en la semana y lejos del techo de la banda. Es el dato local a favor: revierte la sequía de compras de septiembre (USD 22 M por día), aunque no alcanzó para frenar a los bonos ni a los bancos.",
+   "impacto": "positivo",
+   "fuente": "Ámbito",
+   "url": "https://www.ambito.com/finanzas/el-bcra-acelero-su-compra-dolares-sumo-us369-millones-la-semana-la-mayor-cifra-julio-n6329587",
+   "fecha": "2-oct"
+  },
+  {
+   "bloque": "EE.UU. y global",
+   "titulo": "Empleo de septiembre: sólo 29.000 puestos y se enfría la suba de la Fed en octubre",
+   "detalle": "Se esperaban 84.000; el desempleo subió a 4,2% y las revisiones restaron 60.000 puestos. La probabilidad de que la Fed no toque la tasa el 27-28 de octubre saltó a 83%: le saca presión a los emergentes, y es lo que sostuvo a SPY el viernes.",
+   "impacto": "positivo",
+   "fuente": "CNBC",
+   "url": "https://www.cnbc.com/2026/10/02/jobs-report-september-2026.html",
+   "fecha": "2-oct"
+  },
+  {
+   "bloque": "EE.UU. y global",
+   "titulo": "La tasa a 10 años siguió arriba de 5,2%, en máximos de más de dos décadas",
+   "detalle": "En el feed tocó 5,34% el jueves y cerró la semana en 5,275% (+2,1%); el viernes bajó a 5,16% con el dato de empleo y lo recuperó todo antes del cierre. Con el dólar también arriba (DXY +0,9%), el viento externo sigue en contra de la deuda emergente y de los bancos argentinos.",
+   "impacto": "negativo",
+   "fuente": "Infobae",
+   "url": "https://www.infobae.com/economia/2026/10/03/semana-financiera-el-riesgo-pais-se-disparo-6-y-las-acciones-argentinas-cayeron-hasta-12-en-wall-street/",
+   "fecha": "3-oct"
+  },
+  {
+   "bloque": "Brasil",
+   "titulo": "Ibovespa +4,7% en la semana previa a la elección; GGAL no acompañó",
+   "detalle": "El viernes subió 2,63% y cerró en el máximo, a 192.115 puntos; EWZ ganó 3,72% en la semana. El rally regional fue brasileño y no llegó a la Argentina: ARGT cerró el viernes casi plano y GGAL en rojo.",
+   "impacto": "neutro",
+   "fuente": "Finance News",
+   "url": "https://financenews.com.br/2026/10/ibovespa-fecha-em-263-na-semana-acumulou-alta-de-471/",
+   "fecha": "2-oct"
+  },
+  {
+   "bloque": "Brasil",
+   "titulo": "Primer turno: Flávio Bolsonaro 47,1%, Lula 45,0%; EWZ salta más de 10%",
+   "detalle": "Las encuestas daban empate técnico y el balotaje es el 25 de octubre. EWZ subió 10% en la operatoria nocturna del domingo y hoy abrió +12% en el feed; el contagio llegó a la región: ARGT abrió +2,6% y GGAL en 37.20 (+3,6%), arriba del pivote 36.56.",
+   "impacto": "positivo",
+   "fuente": "Exame",
+   "url": "https://exame.com/invest/mercados/ewz-fundo-que-replica-bolsa-brasileira-nos-eua-dispara-10-apos-1o-turno-da-eleicao/",
+   "fecha": "4-oct"
+  }
+ ],
+ "tecnico": {
+  "texto": "Tendencia bajista intacta en diario: precio 10,3% debajo de la EMA20 (40.00) y 24% debajo de la SMA200 (47.36). Máximos más bajos toda la semana salvo el miércoles (38.53 → 37.83 → 38.04 → 37.225 → 36.68) y cierres 36.98 → 37.02 → 37.24 → 36.07 → 35.89. Se rompió: el estante 38.155–38.55 de sep-2025 el lunes, con gap de apertura y 152% de volumen (quedó abierto el gap 38.53–38.74); y el 36.56 el jueves, con 239% de volumen, después de tres ruedas apoyado ahí (toque al centavo el martes). Se respetó: 35.21, mínimo exacto del jueves con rebote, y 36.56 como techo el viernes (máximo 36.68, cierre 35.89). El viernes fue una vela interna con el segundo cierre debajo de 36.10. RSI 21.4, siete ruedas en sobreventa y mínimo del tramo, sin divergencia. Los dos gatillos a favor de la tendencia (38.40 y 36.10) se cumplieron; ninguno de rebote se activó. La auditoría del viernes marcó que el rango que cinco informes dieron como más probable duró una rueda: con la tendencia intacta, la sobreventa sola no frenó nada.",
+  "niveles": [
+   { "tipo": "R1", "nivel": 38.4, "que": "Estante 3/4/5-sep-2025, perdido en cierre el 28-sep, más el gap 38.53–38.74 del 25/28-sep. Banda hasta 38.74; única línea a más de 5% arriba" },
+   { "tipo": "PIVOTE", "nivel": 36.56, "que": "Mínimo 2-sep-2025 y del 29-sep; perdido en cierre el 1-oct y techo el 2-oct (máximo 36.68). Zona crítica 36.10–36.56, con dos cierres seguidos debajo" },
+   { "tipo": "S1", "nivel": 35.21, "que": "Máximo de swing del 14-oct-2025 y mínimo del 1-oct, toque exacto con rebote. Mínimo de la vela de rotura" },
+   { "tipo": "S2", "nivel": 34.54, "que": "Máximo doble 9/10-oct-2025, gatillo de fondo. Debajo no hay nada hasta 31.14–32.00 de oct-2025" }
+  ]
+ },
+ "agenda": [
+  { "dia": "Lun 5", "evento": "Primera rueda después del primer turno en Brasil; ISM de servicios de septiembre (EE.UU., se espera 55,1)", "por_que": "El salto de EWZ arrastra a la región en la apertura; el ISM, con su componente de precios, es el primer test para la tasa a 10 años" },
+  { "dia": "Mar 6", "evento": "Datos de industria y construcción (INDEC); balanza comercial de EE.UU.", "por_que": "Actividad local floja alimenta el ruido político y la mora de los bancos; pesa poco en el día" },
+  { "dia": "Mié 7", "evento": "Minutas de la Fed de septiembre (15:00 ART) y subasta de bonos a 10 años", "por_que": "Las minutas son anteriores al dato de empleo, pero muestran cuánto consenso hay para otra suba; una subasta floja empuja la tasa, el principal viento en contra externo" },
+  { "dia": "Jue 8", "evento": "Pedidos de subsidio por desempleo y subasta de bonos a 30 años (EE.UU.)", "por_que": "Segunda prueba de demanda por deuda larga con la tasa arriba de 5,2%" },
+  { "dia": "Vie 9", "evento": "Confianza del consumidor de Michigan (preliminar de octubre) e IPCA de septiembre en Brasil", "por_que": "Las expectativas de inflación de Michigan mueven la apuesta por la Fed; el IPCA, a EWZ en plena euforia electoral" }
+ ],
+ "escenarios": [
+  {
+   "nombre": "Continuación bajista",
+   "sesgo": "bajista",
+   "gatillo": "1 cierre < 35.21 (limpio: 1 cierre < 34.54)",
+   "lectura": "Es el escenario base mientras la tendencia siga intacta, y ya está activo con dos cierres debajo de 36.10. A favor de la tendencia vale con un cierre. Debajo de 34.54 no hay nada con fundamento hasta 31.14–32.00. Un cierre de hoy de vuelta debajo de 36.56 dejaría el gap de apertura como otra suba devuelta, igual que las cinco anteriores del tramo."
+  },
+  {
+   "nombre": "Rango debajo del techo",
+   "sesgo": "rango",
+   "gatillo": "cierres entre 35.21 y 36.56",
+   "lectura": "Compresión adentro de la vela del 1-oct. Un cierre entre 36.10 y 36.56 frena la extensión pero no arma rebote: el precio sigue debajo del pivote."
+  },
+  {
+   "nombre": "Rebote",
+   "sesgo": "alcista",
+   "gatillo": "2 cierres seguidos > 36.56 (serio: 2 cierres seguidos > 38.74)",
+   "lectura": "Contra la tendencia, pide dos cierres. Un solo cierre arriba de 36.56 es rebote en curso, sin confirmar; dos devuelven el rango 36.56–38.40. Arriba espera la directriz bajista (37.94 hoy, 37.67 el martes) y la banda 38.40–38.74 con el gap abierto; la EMA20 (40.00) queda por encima de todo."
+  }
+ ],
+ "panorama": "GGAL terminó la semana en 35.89, el cierre más bajo en once meses, con la tendencia bajista intacta y el RSI en 21 sin divergencia: perdió 38.40 y 36.56 con volumen y dejó la zona 36.10–36.56 como techo. La viene moviendo el bloque argentino (riesgo país en 646, bonos arriba de 11%, tasa a 10 años de EE.UU. en 5,28%), pero otra vez cayó casi 3 puntos más que ARGT y no reaccionó ni al rollover del Tesoro, ni a las compras del BCRA, ni al rally de Brasil. Hoy el cuadro arranca distinto: el resultado del primer turno brasileño hizo saltar a EWZ y GGAL abrió con gap en 37.20, arriba del pivote y justo debajo de la directriz (37.94). Lo que hay que mirar es el cierre, no la apertura: en este tramo todos los cruces intradía contra la tendencia se devolvieron en el día, y el rebote recién se confirma con dos cierres arriba de 36.56. Afuera, las minutas de la Fed y la subasta a 10 años del miércoles son la prueba para la tasa larga.",
+ "notas": "Faltan el informe de cierre del 28-sep y la apertura del 29-sep (la rueda del lunes se tomó del cierre del 29-sep). El cierre oficial del 1-oct es 36.07, no el 36.10 del informe de ese día (corregido en la auditoría). Precios del feed de TradingView leídos a las 10:38 ART; EMA20, RSI y SMA200 del informe de cierre del 2-oct. La variación de GGAL incluye el corte del dividendo de USD 0,0479 del 28-sep (ajustada, −7,24%). DXY y US10Y vienen fechados un día antes en el feed: se leyeron por orden. El promedio de volumen incluye una semana de 4 ruedas (feriado del 7-sep). Los datos de apertura de hoy son de los primeros 8 minutos de rueda. No encontré noticias propias de Grupo Galicia en la semana ni la fecha publicada de la próxima licitación del Tesoro. La nota de CNBC sobre empleo no se pudo abrir (403): las cifras salen del resumen del buscador. La auditoría del 2-oct tiene tres propuestas para la receta diaria pendientes de aprobar."
+}
