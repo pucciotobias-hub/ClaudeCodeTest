@@ -24,6 +24,12 @@ auditoria en `estudios/ggal/auditorias/` si es de esa semana. De ahi salen el
 mapa de niveles, la estructura y los gatillos: **no rehagas el estudio tecnico**,
 resumilo. El mapa de niveles es el del ultimo cierre de la semana.
 
+**Los niveles se llaman soporte o resistencia, y nada mas.** No escribas
+"estante", "repisa", "plataforma", "zona" ni "banda" para nombrar un nivel, aunque
+un informe viejo de la semana lo diga asi: pasalo a "soporte de..." o "resistencia
+de...", con su precio y su fecha. (Regla del 2026-10-06, a pedido de Tobias: los
+semanales del 28-sep y del 5-oct hablaban del "estante de sep-2025".)
+
 Si faltan informes, decilo en `notas` y seguí con lo que haya.
 
 ## 2. Numeros de la semana, del feed

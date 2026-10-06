@@ -146,7 +146,7 @@ desplaza a uno de los dos. Se calcula con las barras (punto 4) y va solo al info
   despues, un numero redondo, ni "el punto medio" entre dos niveles.
 - **Separacion minima de 1,5% entre lineas** (~0,60 USD con GGAL en 40). Si dos
   candidatos quedan mas cerca, quedate con el que tiene mas toques o es de mayor
-  temporalidad, o marcalos como **una zona** con un rectangulo en vez de dos lineas.
+  temporalidad; el otro se nombra en la columna "Que es" de ese nivel, no se dibuja.
 - Candidatos: swings de las ultimas ~60 ruedas, el mapa del informe anterior, y
   si hacia donde va la tendencia no hay nada, swings de meses o del año anterior.
   Si aun asi un lado queda con 1 nivel, se deja con 1 y se dice: **mejor un lado
@@ -158,9 +158,16 @@ desplaza a uno de los dos. Se calcula con las barras (punto 4) y va solo al info
 - **R o S se decide por la posicion contra el ultimo precio, no por la historia del
   nivel.** Un "ex soporte" que quedo debajo del precio es S. La historia va en la
   columna "Que es".
-- **Los niveles son bandas, no lineas.** Los que aguantaron se perforaron en el
+- **Un nivel no es un precio exacto.** Los que aguantaron se perforaron en el
   intradia una mediana de 0,8% antes de recuperar. En el texto, un nivel "se
   perdio" cuando se perdio en cierre; una perforacion intradia se describe como tal.
+  Esto vale para leer el precio, **no para dibujar**: en el chart cada nivel es una
+  linea (ver "Solo lineas" mas abajo).
+- **Se llaman soporte o resistencia, y nada mas.** No uses "estante", "repisa",
+  "plataforma", "zona" ni "banda" para nombrar un nivel, ni en el chart ni en el
+  informe: es S o R (o el pivote), con su precio y su fundamento. (Sacado el
+  2026-10-06 a pedido de Tobias: "no me gustan los estantes que arma el bot,
+  quiero solo resistencias y soportes".)
 - **Colores, siempre con opacidad baja.** Las lineas son referencia, no protagonistas:
   a full color tapan las velas y molestan para leer el precio. Pasá el alfa dentro
   del color, en `rgba(...)`, que es lo que acepta `linecolor` en los `overrides`:
@@ -175,13 +182,19 @@ desplaza a uno de los dos. Se calcula con las barras (punto 4) y va solo al info
   Etiquetá cada linea con `showLabel:true` y un `text` corto (ej. `S1 43.50 piso triple`).
   **El `textcolor` va aparte y sin alfa** (`#ef5350`, `#26a69a`, `#ffb300`): la linea se
   atenua, la etiqueta tiene que seguir legible.
-- **Zona critica** alrededor del pivote: un `rectangle` azul con borde
-  `rgba(41,98,255,0.35)` y fondo transparente.
-- **Si un nivel tiene banda, la banda se dibuja.** Un `rectangle` del color del
-  nivel (borde al 45%, fondo al 10%, `extendRight`) entre la linea y el otro borde,
-  con un `text` que diga que es el borde. No cuenta para el techo de 7 lineas. (El
-  1-oct-2026 el precio fue a 36.10 a cerrar el gap del 27-oct-25 y en el chart solo
-  estaba la linea de 36.56: el borde figuraba en la tabla y en ningun otro lado.)
+- **Solo lineas: ningun `rectangle`.** En el chart van unicamente las lineas
+  horizontales de soporte y resistencia (con el pivote) y la directriz. No se dibuja
+  la zona critica alrededor del pivote ni la banda de ningun nivel. (Hasta el
+  5-oct-2026 se dibujaban un rectangulo azul en el pivote y uno por cada nivel con
+  banda; el chart quedaba lleno de "estantes" y Tobias pidio el 2026-10-06 dejar
+  solo resistencias y soportes.)
+- **El otro borde de un nivel va en la etiqueta, o como linea propia.** Si un nivel
+  tiene un segundo borde que importa (el otro lado de un gap, el fondo de un
+  rango), ponelo en el `text` de la linea (ej. `S2 36.56 gap hasta 36.10`). Si ese
+  borde cumple por si solo un criterio de nivel y entra en el techo de 7 y en la
+  separacion de 1,5%, se dibuja como una linea mas, con su S o R. (El 1-oct-2026
+  el precio fue a 36.10 a cerrar el gap del 27-oct-25 y en el chart solo estaba la
+  linea de 36.56: el borde figuraba en la tabla y en ningun otro lado.)
 - **Gaps abiertos: se nombran.** Si el precio esta a menos de 5% de terminar de
   cerrar un gap, decilo en "Estructura" con los dos bordes y las fechas (ej. "gap
   del 27-oct-25, 36.10 → 47.07: se cierra del todo en 36.10, falta 1,7%") y repetilo
