@@ -53,12 +53,14 @@ Windows Scheduled Tasks (`scripts/install_ggal_tasks.ps1`) fire `ggal_estudio.ps
 - **Permissions are an allowlist in the wrapper** (`$allowed` in `ggal_estudio.ps1`). A recipe step that needs a new tool or command fails silently unless it is added there.
 - **The wrapper is Windows PowerShell 5.1**, saved as UTF-8 with BOM and CRLF. No `&&`, no ternary, and git's stderr becomes a terminating error under `$ErrorActionPreference = 'Stop'`.
 - **Diagnosing a missing or late report:** read `logs/ggal_estudio.log` first. The usual cause is the laptop sleeping at trigger time, not the recipe.
+- **Telegram notice:** when a run ends the wrapper calls `scripts/telegram_aviso.py`, which sends the report's header, "Qué cambió" and "Escenarios" (or a failure line). Credentials are `TELEGRAM_BOT_TOKEN` and `TELEGRAM_CHAT_ID` in the root `.env`; without them it logs one line and the run is unaffected.
+- **Running a study by hand:** the `/estudio [turno]` skill (`.claude/skills/estudio`) checks for a run in progress and for an existing report before launching the wrapper with `-Forzar`.
 
 ### Weekly report page
 
 The weekly report is read on a published page, https://claude.ai/artifact/7MVXWjsWK6TgPye87j3R67, whose source is `scripts/ggal_semanal_pagina.html`. The page renders the JSON embedded in its `<script id="datos">` block and cannot read data from anywhere else.
 
-The Monday run writes the JSON and embeds it with `python scripts/ggal_semanal_incorporar.py <json>`, but **it cannot publish**: the `Artifact` tool does not exist in `claude -p`. The page stays on the previous week until an interactive session republishes it (`Artifact` read of that URL, then publish `scripts/ggal_semanal_pagina.html` with the same `url`).
+The Monday run writes the JSON and embeds it with `python scripts/ggal_semanal_incorporar.py <json>`, but **it cannot publish**: the `Artifact` tool does not exist in `claude -p`. The page stays on the previous week until an interactive session republishes it (`Artifact` read of that URL, then publish `scripts/ggal_semanal_pagina.html` with the same `url`). The `/semanal` skill (`.claude/skills/semanal`) does exactly that.
 
 ### TradingView
 

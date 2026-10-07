@@ -304,16 +304,39 @@ try {
     Remove-Item $tmpIn, $tmpOut, $tmpErr -ErrorAction SilentlyContinue
 }
 
+# Aviso por Telegram (scripts/telegram_aviso.py). Nunca tumba la corrida: si no
+# hay credenciales, red o python, queda una linea en el log y se sigue. El script
+# escribe solo en stdout, porque con ErrorActionPreference Stop el stderr de un
+# ejecutable se vuelve excepcion.
+function Send-Aviso {
+    param([string[]]$Argumentos)
+    try {
+        $py = Get-Command python.exe -All -ErrorAction SilentlyContinue |
+            Sort-Object { $_.Source -like '*WindowsApps*' } | Select-Object -First 1
+        if (-not $py) { Write-Log 'Aviso de Telegram: no se encontro python.exe.' 'WARN'; return }
+        $r = & $py.Source (Join-Path $PSScriptRoot 'telegram_aviso.py') @Argumentos
+        Write-Log "Aviso: $r"
+    } catch {
+        Write-Log "Aviso de Telegram fallo: $($_.Exception.Message)" 'WARN'
+    }
+}
+
 if ($code -ne 0) {
     Write-Log "Claude salio con codigo $code." 'ERROR'
+    Send-Aviso @('--texto', "GGAL $Turno ${fecha}: la corrida fallo (codigo $code). Ver logs/ggal_estudio.log.")
     exit $code
 }
 
 $informe = Join-Path $RepoDir $salida
 if (Test-Path $informe) {
     Write-Log "OK. Informe: $informe"
+    Send-Aviso @('--informe', $informe)
 } else {
     Write-Log "Claude termino OK pero no aparecio $informe." 'WARN'
+    Send-Aviso @('--texto', "GGAL $Turno ${fecha}: Claude termino OK pero no aparecio el informe.")
 }
 
 Write-Log "=== FIN estudio GGAL - turno: $Turno ==="
+# Explicito: sin esto la tarea hereda el codigo del ultimo ejecutable, y el aviso
+# de Telegram sale con 2 cuando no hay credenciales.
+exit 0
