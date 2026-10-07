@@ -28,6 +28,7 @@ The unattended GGAL runs commit and push on their own to the same branch, so the
 | `scripts/`, `estudios/ggal/` | Automated GGAL ADR studies (the active project, see below) | `.\scripts\ggal_estudio.ps1 -Turno <apertura\|mediodia\|cierre\|auditoria\|semanal> [-Forzar]` |
 | `oficina/` | Three.js scene showing which study agent is working; server on port 8765 | `powershell -File oficina\abrir_oficina.ps1` |
 | `tasas/` | Live dashboard of A3 futures (implied dollar rates, rolls, open interest); server on port 8766 | `powershell -File tasas\abrir_tasas.ps1` |
+| `flujo/` | Dashboard of estimated buy/sell flow on the GGAL ADR (volume delta, anchored VWAP, relative volume, weekly volume profile) from yfinance 5-minute bars; server on port 8767 | `powershell -File flujo\abrir_flujo.ps1` |
 | `app.py`, `modules/` | Streamlit screener (macro, multi-timeframe technicals, fundamentals) on yfinance | `streamlit run app.py` |
 | `monitor.py` | GGAL/RFX20 spread z-score monitor over pyRofex. **Signals only: it must never send or cancel orders** (`NOTA_BROKER.md` is the broker homologation request that states this) | `python monitor.py` (needs `.env`, see `.env.example`; deps in `requirements-monitor.txt`) |
 | `quant_bot/` | Weekly equity-research PDF sent by Telegram | `python main.py --once` from `quant_bot/` |
