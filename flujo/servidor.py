@@ -18,9 +18,17 @@ El volumen de las velas de 5 minutos no incluye las subastas de apertura y
 cierre, por eso suma algo menos que el volumen diario oficial. Las variaciones
 de precio si salen de los cierres diarios oficiales.
 
+La pagina trae ademas un chat para preguntar lo que no se entiende (ver chat()):
+cada pregunta se le pasa a `claude -p` junto con los numeros que el tablero esta
+mostrando en ese momento. Usa la cuenta de Claude Code de esta maquina, sin
+herramientas: solo lee lo que se le manda y contesta.
+
 Uso:  pythonw flujo/servidor.py      (lo levanta solo abrir_flujo.ps1)
 """
 import json
+import re
+import subprocess
+import tempfile
 import threading
 import time
 from datetime import datetime
@@ -37,6 +45,26 @@ HUSO = "America/Argentina/Buenos_Aires"
 VIGENCIA_SEG = 60       # no pedirle a yfinance mas de una vez por minuto
 RUEDAS_PROMEDIO = 20    # base del volumen relativo
 ESCALON = 0.10          # alto de cada escalon del perfil de volumen, en USD
+CLAUDE = Path.home() / ".local" / "bin" / "claude.exe"
+MODELO_CHAT = "sonnet"
+# Carpeta neutra para correr claude: desde el repo cargaria CLAUDE.md y la memoria del proyecto.
+DIR_CHAT = Path(tempfile.gettempdir()) / "flujo-chat"
+UUID = re.compile(r"^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$")
+SISTEMA = """Sos el ayudante del tablero de flujo del ADR de GGAL (Grupo Financiero Galicia, NASDAQ) de Tobías, operador de futuros en Matba Rofex. Él te pregunta lo que no entiende del tablero; en cada mensaje recibís los números que el tablero muestra en ese momento y después su pregunta.
+
+Cómo se calcula cada cosa (velas de 5 minutos de yfinance, últimas 60 ruedas):
+- Delta de una vela = volumen × (2×cierre − máximo − mínimo) / (máximo − mínimo). Cierra en el máximo: todo compra; en el mínimo: todo venta; en el medio: cero. Es una estimación, no el flujo real de órdenes. "deltaPct" es el delta neto como porcentaje del volumen.
+- VWAP anclado: precio promedio ponderado por volumen desde el inicio del día, de la semana o del mes. "vsVwap" es la distancia del precio a ese VWAP, en porcentaje.
+- Volumen relativo ("rvol"): volumen acumulado hasta esta hora contra el promedio de las 20 ruedas anteriores a la misma hora; 1,0 es normal.
+- "gap" es el salto entre el cierre anterior y la apertura; "intra" es lo que se movió con el mercado abierto. El delta solo ve lo intradía: no ve gaps ni subastas.
+- Perfil de volumen: volumen por escalón de 0,10 USD en la semana. POC = precio más operado; área de valor (val a vah) = franja que concentra el 70% del volumen.
+
+Cómo contestar:
+- En español rioplatense, claro y corto: lo justo para que se entienda, sin relleno. Texto plano, sin títulos ni tablas; como mucho alguna palabra en **negrita**.
+- Explicá con los números del tablero de ahora, no en abstracto.
+- No inventes datos que no estén en lo que recibiste. Si pregunta por algo que el tablero no tiene (noticias, niveles del gráfico, opciones, la plaza local), decilo.
+- Podés decir qué sugiere la lectura del flujo y qué la confirmaría o la desmentiría, pero no des órdenes de compra o venta."""
+
 DIAS = "Lun Mar Mié Jue Vie Sáb Dom".split()
 MESES = "ene feb mar abr may jun jul ago sep oct nov dic".split()
 
@@ -248,6 +276,59 @@ def datos():
         return _cache["datos"]
 
 
+def foto_para_chat():
+    """Lo que el tablero muestra ahora, resumido para mandarselo a Claude con cada pregunta."""
+    d = datos()
+    if not d.get("hoy"):
+        return {"error": d.get("error", "sin datos")}
+    hoy = {k: v for k, v in d["hoy"].items() if k != "barras"}
+    hoy["velas"] = [{k: b[k] for k in ("t", "c", "vwap", "v", "vProm", "dAcum")} for b in d["hoy"]["barras"][-24:]]
+    area = lambda p: p and {"poc": p["poc"], "val": p["val"], "vah": p["vah"]}
+    return {
+        "ultimaVela": d["ultimaVela"], "mercadoAbierto": d["enRueda"], "hoy": hoy, "mes": d["mes"],
+        "ruedas": [{k: g[k] for k in ("dia", "fecha", "c", "var", "gap", "intra", "deltaPct", "vol", "rvol", "vsVwap")}
+                   for g in d["dias"][-15:]],
+        "semanas": d["semanas"][-8:],
+        "perfilSemanaEnCurso": area(d["perfil"]["actual"]), "perfilSemanaAnterior": area(d["perfil"]["previa"]),
+    }
+
+
+def chat(pregunta, sesion, primera):
+    """Genera la respuesta de Claude de a pedazos, a medida que la escribe."""
+    DIR_CHAT.mkdir(exist_ok=True)
+    orden = [str(CLAUDE), "-p", "--model", MODELO_CHAT, "--tools", "", "--strict-mcp-config",
+             "--system-prompt", SISTEMA, "--output-format", "stream-json", "--verbose", "--include-partial-messages",
+             "--session-id" if primera else "--resume", sesion]
+    mensaje = "Tablero ahora:\n" + json.dumps(foto_para_chat(), ensure_ascii=False) + "\n\nPregunta: " + pregunta
+    p = subprocess.Popen(orden, cwd=DIR_CHAT, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL,
+                         creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0))
+    reloj = threading.Timer(180, p.kill)
+    reloj.start()
+    try:
+        p.stdin.write(mensaje.encode("utf-8"))
+        p.stdin.close()
+        hubo = False
+        for linea in p.stdout:
+            try:
+                e = json.loads(linea)
+            except ValueError:
+                continue
+            if e.get("type") == "stream_event":
+                delta = e["event"].get("delta", {})
+                if delta.get("type") == "text_delta":
+                    hubo = True
+                    yield delta["text"]
+            elif e.get("type") == "result" and (e.get("is_error") or not hubo):
+                yield ("\n[Error] " if e.get("is_error") else "") + str(e.get("result") or "Claude no devolvió respuesta.")
+                hubo = True
+        if not hubo:
+            yield "[Error] Claude no respondió. ¿Está abierta la sesión de Claude Code en esta máquina?"
+    finally:
+        reloj.cancel()
+        if p.poll() is None:
+            p.kill()
+
+
 class Manejador(BaseHTTPRequestHandler):
     def log_message(self, *a):
         pass
@@ -267,6 +348,27 @@ class Manejador(BaseHTTPRequestHandler):
             self.responder((DIR / "index.html").read_bytes(), "text/html; charset=utf-8")
         else:
             self.send_error(404)
+
+    def do_POST(self):
+        # Solo JSON: asi otra pagina abierta en el navegador no puede gastar la cuenta mandando un formulario.
+        if self.path != "/chat" or "application/json" not in self.headers.get("Content-Type", ""):
+            return self.send_error(404)
+        try:
+            c = json.loads(self.rfile.read(int(self.headers.get("Content-Length", 0))))
+            pregunta, sesion = str(c["pregunta"]).strip()[:2000], str(c["sesion"])
+            assert pregunta and UUID.match(sesion)
+        except Exception:
+            return self.send_error(400)
+        self.send_response(200)
+        self.send_header("Content-Type", "text/plain; charset=utf-8")
+        self.send_header("Cache-Control", "no-store")
+        self.end_headers()   # sin Content-Length: la respuesta va saliendo y termina al cerrar la conexion
+        try:
+            for pedazo in chat(pregunta, sesion, bool(c.get("primera"))):
+                self.wfile.write(pedazo.encode("utf-8"))
+                self.wfile.flush()
+        except OSError:
+            pass   # el navegador cerro la pagina a mitad de la respuesta
 
 
 if __name__ == "__main__":

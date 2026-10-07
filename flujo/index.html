@@ -70,6 +70,29 @@ tr.curso td { font-weight: 600; }
 .notas { color: var(--tinta-2); font-size: 13px; }
 .notas li { margin-bottom: 4px; }
 svg text { fill: var(--tenue); font-size: 11px; font-family: inherit; }
+/* ---------- chat con Claude ---------- */
+#abrir-chat { position: fixed; right: 20px; bottom: 20px; z-index: 5; font: inherit; font-weight: 600; cursor: pointer;
+  background: var(--serie-1); color: #fff; border: 0; border-radius: 22px; padding: 10px 18px; box-shadow: 0 4px 14px rgba(0,0,0,.25); }
+#chat { position: fixed; right: 20px; bottom: 20px; z-index: 6; width: min(420px, calc(100vw - 32px)); height: min(600px, calc(100vh - 40px));
+  display: none; flex-direction: column; background: var(--superficie); border: 1px solid var(--borde); border-radius: 12px;
+  box-shadow: 0 8px 30px rgba(0,0,0,.3); overflow: hidden; }
+#chat.abierto { display: flex; }
+#chat .barra { display: flex; align-items: center; gap: 8px; padding: 10px 14px; border-bottom: 1px solid var(--grilla); }
+#chat .barra strong { flex: 1; }
+#chat .barra button { font: inherit; background: none; border: 0; color: var(--tinta-2); cursor: pointer; padding: 2px 6px; }
+#mensajes { flex: 1; overflow-y: auto; padding: 12px 14px; display: flex; flex-direction: column; gap: 10px; }
+.msj { max-width: 92%; padding: 8px 11px; border-radius: 10px; white-space: pre-wrap; overflow-wrap: anywhere; }
+.msj.yo { align-self: flex-end; background: var(--serie-1); color: #fff; }
+.msj.claude { align-self: flex-start; background: var(--plano); border: 1px solid var(--borde); }
+.msj.claude.pensando { color: var(--tenue); font-style: italic; }
+#sugeridas { display: flex; flex-wrap: wrap; gap: 6px; }
+#sugeridas button { font: inherit; font-size: 12px; text-align: left; background: none; color: var(--tinta-2); cursor: pointer;
+  border: 1px solid var(--borde); border-radius: 14px; padding: 4px 10px; }
+#chat form { display: flex; gap: 8px; padding: 10px; border-top: 1px solid var(--grilla); }
+#chat textarea { flex: 1; font: inherit; color: var(--tinta); background: var(--plano); border: 1px solid var(--borde);
+  border-radius: 8px; padding: 8px 10px; resize: none; height: 40px; }
+#chat form button { font: inherit; font-weight: 600; background: var(--serie-1); color: #fff; border: 0; border-radius: 8px; padding: 0 14px; cursor: pointer; }
+#chat form button:disabled { opacity: .5; cursor: default; }
 </style>
 </head>
 <body>
@@ -143,6 +166,16 @@ svg text { fill: var(--tenue); font-size: 11px; font-family: inherit; }
     </ul>
   </section>
 </main>
+
+<button id="abrir-chat">Preguntarle a Claude</button>
+<div id="chat" role="dialog" aria-label="Chat con Claude">
+  <div class="barra"><strong>Claude · sobre este tablero</strong><button id="nuevo-chat" title="Empezar de cero">Nuevo</button><button id="cerrar-chat" title="Cerrar">✕</button></div>
+  <div id="mensajes"></div>
+  <form id="form-chat">
+    <textarea id="pregunta" placeholder="Preguntá lo que no entiendas…" maxlength="2000"></textarea>
+    <button id="enviar">Enviar</button>
+  </form>
+</div>
 
 <script>
 const $ = id => document.getElementById(id);
@@ -340,6 +373,65 @@ $('sel-dias').addEventListener('click', e => {
   for (const x of $('sel-dias').children) x.setAttribute('aria-pressed', x === b);
   pintarDias();
 });
+// ---------- chat con Claude: cada pregunta viaja con los numeros que el tablero muestra en ese momento
+const SUGERIDAS = ['¿Qué me está diciendo el flujo de hoy?', '¿Cómo viene la semana contra las anteriores?',
+  '¿Qué es el delta y cómo lo leo?', '¿Para qué me sirve el VWAP de la semana?', '¿Qué significa el perfil de volumen de esta semana?'];
+let sesion, turnos, ocupado = false;
+
+function burbuja(clase, texto) {
+  const m = Object.assign(document.createElement('div'), { className: 'msj ' + clase, textContent: texto });
+  $('mensajes').appendChild(m); $('mensajes').scrollTop = $('mensajes').scrollHeight;
+  return m;
+}
+// Texto plano con **negrita**: se escapa todo y solo se convierte eso.
+const conNegrita = s => s.replace(/[&<>]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c])).replace(/\*\*(.+?)\*\*/g, '<b>$1</b>');
+
+function chatNuevo() {
+  sesion = crypto.randomUUID(); turnos = 0;
+  $('mensajes').innerHTML = '';
+  burbuja('claude', 'Preguntame lo que no entiendas del tablero. Veo los mismos números que vos en este momento.');
+  const s = Object.assign(document.createElement('div'), { id: 'sugeridas' });
+  for (const q of SUGERIDAS) s.appendChild(Object.assign(document.createElement('button'), { type: 'button', textContent: q }));
+  s.addEventListener('click', e => { if (e.target.tagName === 'BUTTON') preguntar(e.target.textContent); });
+  $('mensajes').appendChild(s);
+}
+
+async function preguntar(texto) {
+  texto = texto.trim();
+  if (!texto || ocupado) return;
+  ocupado = true; $('enviar').disabled = true; $('pregunta').value = '';
+  $('sugeridas')?.remove();
+  burbuja('yo', texto);
+  const m = burbuja('claude pensando', 'Pensando…');
+  let todo = '';
+  try {
+    const r = await fetch('/chat', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ pregunta: texto, sesion, primera: turnos === 0 }) });
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    const lector = r.body.getReader(), deco = new TextDecoder();
+    for (;;) {
+      const { done, value } = await lector.read();
+      if (done) break;
+      todo += deco.decode(value, { stream: true });
+      const abajo = $('mensajes').scrollHeight - $('mensajes').scrollTop - $('mensajes').clientHeight < 60;
+      m.classList.remove('pensando'); m.innerHTML = conNegrita(todo);
+      if (abajo) $('mensajes').scrollTop = $('mensajes').scrollHeight;
+    }
+    if (!todo) throw new Error('respuesta vacía');
+    turnos++;
+  } catch (e) {
+    m.classList.remove('pensando'); m.textContent = (todo ? todo + '\n' : '') + 'No pude obtener la respuesta (' + e.message + ').';
+  }
+  ocupado = false; $('enviar').disabled = false; $('pregunta').focus();
+}
+
+$('abrir-chat').addEventListener('click', () => { $('chat').classList.add('abierto'); $('abrir-chat').style.display = 'none'; $('pregunta').focus(); });
+$('cerrar-chat').addEventListener('click', () => { $('chat').classList.remove('abierto'); $('abrir-chat').style.display = ''; });
+$('nuevo-chat').addEventListener('click', () => { if (!ocupado) chatNuevo(); });
+$('form-chat').addEventListener('submit', e => { e.preventDefault(); preguntar($('pregunta').value); });
+$('pregunta').addEventListener('keydown', e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); preguntar($('pregunta').value); } });
+chatNuevo();
+
 let espera; addEventListener('resize', () => { clearTimeout(espera); espera = setTimeout(pintar, 150); });
 cargar(); setInterval(cargar, 60000);
 </script>
