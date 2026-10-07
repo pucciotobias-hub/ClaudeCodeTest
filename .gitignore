@@ -20,3 +20,6 @@ tasas/historia/
 
 # Salida del navegador de pruebas
 .playwright-mcp/
+
+# Diario de trades: operaciones personales, quedan solo en esta maquina
+diario/trades/
