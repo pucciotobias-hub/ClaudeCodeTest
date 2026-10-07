@@ -244,7 +244,28 @@ tendencia de fondo: valor, distancia, pendiente y ultimo cruce en cierre)
 
 ## Escenarios
 (rotura / recuperacion / rango, con los niveles que gatillan cada uno)
+
+## En criollo
+(la conclusion en 3 a 5 oraciones, como se la contarias a alguien por telefono)
 ```
+
+**La seccion "En criollo" es la conclusion para leer en el celular**: llega al
+final del aviso de Telegram (`scripts/telegram_aviso.py` la busca por ese titulo
+exacto, no lo cambies). (Regla del 2026-10-07. El usuario, al recibir el primer
+aviso: "me gustaría tambien que tenga una conclusion mas en criollo al final y no
+tanto lenguaje tecnico".)
+- Un solo parrafo corrido, de 3 a 5 oraciones. Sin viñetas, sin negritas.
+- Contá tres cosas, en este orden: como viene la accion (sube, baja, esta
+  trabada, y desde cuando), que paso hoy que importe, y que hay que mirar en la
+  proxima rueda con **uno o dos precios como mucho**.
+- Palabras de todos los dias. Nada de "pivote", "directriz", "gatillo", "EMA",
+  "RSI", "S1/R1", "gap", "macro" ni "sesgo": decí "el techo de 38.40", "el piso
+  de 36.56", "el promedio de las ultimas 20 ruedas", "abrio con un salto para
+  abajo", "afuera tambien cayo todo".
+- No agrega nada que no este en las secciones de arriba, ni lo contradice: es el
+  mismo cuadro dicho simple. Vale igual lo de "todo gatillo es un cierre": "si
+  cierra debajo de 36.56", nunca "si pierde 36.56".
+- Tampoco aca van ordenes de compra o venta.
 
 Reglas de escritura:
 - Español rioplatense, directo, sin relleno. Nada de "es importante notar que".

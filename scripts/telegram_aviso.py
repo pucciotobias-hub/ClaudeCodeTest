@@ -2,8 +2,8 @@
 
 Lo llama ggal_estudio.ps1 al final de cada corrida. Manda lo que alcanza para
 decidir si hace falta abrir el informe: el encabezado con precio e indicadores,
-"Que cambio desde el informe anterior" y "Escenarios". El informe entero pasa los
-4096 caracteres que admite un mensaje.
+"Que cambio desde el informe anterior", "Escenarios" y, cerrando, la conclusion
+"En criollo". El informe entero pasa los 4096 caracteres que admite un mensaje.
 
 Credenciales: TELEGRAM_BOT_TOKEN y TELEGRAM_CHAT_ID en el .env de la raiz del repo
 (gitignoreado) o en el entorno. Sin ellas no manda nada y sale con codigo 2: el
@@ -31,6 +31,7 @@ REPO = pathlib.Path(__file__).resolve().parent.parent
 TOPE = 3900  # Telegram corta en 4096
 PAGINA_SEMANAL = "https://claude.ai/artifact/7MVXWjsWK6TgPye87j3R67"
 SECCIONES = ("Qué cambió desde el informe anterior", "Escenarios")
+CONCLUSION = "En criollo"   # mismo titulo que pide la receta (ggal_estudio_prompt.md, seccion 6)
 
 
 def credenciales():
@@ -87,7 +88,16 @@ def de_informe(ruta):
     partes = [cabeza] + [seccion(texto, s) for s in SECCIONES]
     if not any(partes[1:]):      # auditoria u otro formato: lo que entre desde el principio
         partes = [texto]
-    return plano("\n\n".join(p for p in partes if p))
+    cuerpo = plano("\n\n".join(p for p in partes if p))
+    # La conclusion cierra el mensaje y no se recorta nunca: si no entra todo, se acorta lo de arriba.
+    cierre = plano(seccion(texto, CONCLUSION))
+    if not cierre:               # informes anteriores al 2026-10-07 no la traen
+        return cuerpo
+    lugar = TOPE - len(cierre) - 2
+    if len(cuerpo) > lugar:
+        aviso = "\n\n[sigue en el informe]"
+        cuerpo = cuerpo[:lugar - len(aviso)].rsplit("\n", 1)[0] + aviso
+    return cuerpo + "\n\n" + cierre
 
 
 def main():
