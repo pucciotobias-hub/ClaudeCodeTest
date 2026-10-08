@@ -103,17 +103,21 @@ def filas(d):
 def resumen(d):
     res = [resultado(t)[1] for t in d["trades"] if t.get("salida") is not None]
     gan, per = [r for r in res if r > 0], [r for r in res if r < 0]
+    # Salvo el total, todo va como texto: la planilla le pegaba el formato de porcentaje a la celda
+    # donde antes habia caido "Acierto" (el resumen baja una fila con cada trade) y 8 trades se veian "800%".
+    plata = lambda x: "$ " + f"{x:,.2f}".replace(",", "_").replace(".", ",").replace("_", ".")
+    cuantos = lambda n: f"{n} trade" + ("" if n == 1 else "s")
     return [
         ["Resultado del día $", round(sum(res), 2)],
-        ["Trades cerrados", len(res)],
-        ["Ganadores", len(gan)],
-        ["Perdedores", len(per)],
-        ["Acierto", f"{len(gan) / len(res):.0%}" if res else "—"],
-        ["Ganancia promedio $", round(sum(gan) / len(gan), 2) if gan else "—"],
-        ["Pérdida promedio $", round(sum(per) / len(per), 2) if per else "—"],
-        ["Mejor trade $", round(max(res), 2) if res else "—"],
-        ["Peor trade $", round(min(res), 2) if res else "—"],
-        ["Abiertos", sum(1 for t in d["trades"] if t.get("salida") is None)],
+        ["Trades cerrados", cuantos(len(res))],
+        ["Ganadores", cuantos(len(gan))],
+        ["Perdedores", cuantos(len(per))],
+        ["Acierto", f"{len(gan)} de {len(res)} ({len(gan) / len(res):.0%})" if res else "—"],
+        ["Ganancia promedio", plata(sum(gan) / len(gan)) if gan else "—"],
+        ["Pérdida promedio", plata(sum(per) / len(per)) if per else "—"],
+        ["Mejor trade", plata(max(res)) if res else "—"],
+        ["Peor trade", plata(min(res)) if res else "—"],
+        ["Abiertos", cuantos(sum(1 for t in d["trades"] if t.get("salida") is None))],
     ]
 
 
