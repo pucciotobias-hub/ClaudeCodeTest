@@ -101,6 +101,40 @@ def filas(d):
     return salida
 
 
+MOVIMIENTOS = ["Hora", "Instrumento", "Operación", "Cantidad", "Precio", "Posición", "Resultado $", "Nota"]
+
+
+def movimientos(d):
+    """Lo que va a la planilla: una fila por orden ejecutada, con la posicion que queda despues.
+
+    Los trades (entrada + salida) son la cuenta interna; el usuario piensa en ordenes ("compre 12",
+    "vendi 2") y una tabla de trades donde todo dice "comprado" le parecia que nunca vendia.
+    Un cierre parcial parte el trade en dos con la misma entrada: aca se vuelven a juntar.
+    """
+    ordenes = {}
+    def sumar(t, hora, lado, precio, res, entra):
+        clave = (hora, t["instrumento"], lado, precio, entra)
+        o = ordenes.setdefault(clave, {"cant": 0, "res": None, "notas": [], "n": t["n"]})
+        o["cant"] += t["cantidad"]
+        o["n"] = min(o["n"], t["n"])
+        if res is not None:
+            o["res"] = (o["res"] or 0) + res
+        if t.get("nota") and t["nota"] not in o["notas"]:
+            o["notas"].append(t["nota"])
+    for t in d["trades"]:
+        sumar(t, t["hora_entrada"], t["lado"], t["entrada"], None, True)
+        if t.get("salida") is not None:
+            sumar(t, t["hora_salida"], "venta" if t["lado"] == "compra" else "compra", t["salida"], resultado(t)[1], False)
+    salida, posicion = [], {}
+    # Misma hora: primero las entradas, despues las salidas, y entre iguales por numero de trade.
+    for (hora, inst, lado, precio, entra), o in sorted(ordenes.items(), key=lambda x: (x[0][0], not x[0][4], x[1]["n"])):
+        firmada = o["cant"] if lado == "compra" else -o["cant"]
+        posicion[inst] = posicion.get(inst, 0) + firmada
+        salida.append([hora, inst, lado, firmada, precio, posicion[inst],
+                       "" if o["res"] is None else round(o["res"], 2), " · ".join(o["notas"])])
+    return salida
+
+
 def resumen(d):
     res = [resultado(t)[1] for t in d["trades"] if t.get("salida") is not None]
     gan, per = [r for r in res if r > 0], [r for r in res if r < 0]
@@ -125,7 +159,7 @@ def sincronizar(d):
     url = env("DIARIO_SHEET_URL")
     if not url:
         return "planilla: sin configurar (falta DIARIO_SHEET_URL en .env); quedó anotado solo acá"
-    cuerpo = json.dumps({"fecha": d["fecha"], "encabezado": ENCABEZADO, "filas": filas(d), "resumen": resumen(d)}).encode("utf-8")
+    cuerpo = json.dumps({"fecha": d["fecha"], "encabezado": MOVIMIENTOS, "filas": movimientos(d), "resumen": resumen(d)}).encode("utf-8")
     try:
         pedido = urllib.request.Request(url, data=cuerpo, headers={"Content-Type": "application/json"})
         with urllib.request.urlopen(pedido, timeout=40) as r:   # Apps Script contesta con una redireccion; urllib la sigue
