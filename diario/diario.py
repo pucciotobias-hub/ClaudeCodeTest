@@ -36,7 +36,7 @@ TRADES = DIR / "trades"
 
 # Unidades del subyacente por contrato en Matba Rofex. Un instrumento que no esta aca vale 1 y se avisa.
 MULTIPLICADOR = {"GGAL": 100, "RFX20": 1, "DLR": 1000}
-ENCABEZADO = ["N°", "Instrumento", "Lado", "Cantidad", "Hora entrada", "Precio entrada", "Hora salida",
+ENCABEZADO = ["N°", "Instrumento", "Posición", "Cantidad", "Hora entrada", "Precio entrada", "Hora salida",
               "Precio salida", "Diferencia", "Resultado $", "Duración (min)", "Estado", "Nota"]
 
 
@@ -92,7 +92,8 @@ def filas(d):
     salida = []
     for t in sorted(d["trades"], key=lambda x: (x["hora_entrada"], x["n"])):
         dif, res = resultado(t)
-        salida.append([t["n"], t["instrumento"], t["lado"], t["cantidad"], t["hora_entrada"], t["entrada"],
+        # "comprado"/"vendido" y no "compra"/"venta": cada fila es un trade entero (entrada y salida), no una orden.
+        salida.append([t["n"], t["instrumento"], "comprado" if t["lado"] == "compra" else "vendido", t["cantidad"], t["hora_entrada"], t["entrada"],
                        t.get("hora_salida") or "", t.get("salida") if t.get("salida") is not None else "",
                        "" if dif is None else round(dif, 4), "" if res is None else round(res, 2),
                        minutos(t["hora_entrada"], t["hora_salida"]) if t.get("hora_salida") else "",
@@ -103,21 +104,20 @@ def filas(d):
 def resumen(d):
     res = [resultado(t)[1] for t in d["trades"] if t.get("salida") is not None]
     gan, per = [r for r in res if r > 0], [r for r in res if r < 0]
-    # Salvo el total, todo va como texto: la planilla le pegaba el formato de porcentaje a la celda
-    # donde antes habia caido "Acierto" (el resumen baja una fila con cada trade) y 8 trades se veian "800%".
+    # El acierto va como texto ("7 de 8 (88%)"): con "88%" a secas la planilla lo tomaba como porcentaje y
+    # le pegaba ese formato a las celdas vecinas del resumen (8 trades cerrados se veian "800%").
     plata = lambda x: "$ " + f"{x:,.2f}".replace(",", "_").replace(".", ",").replace("_", ".")
-    cuantos = lambda n: f"{n} trade" + ("" if n == 1 else "s")
     return [
         ["Resultado del día $", round(sum(res), 2)],
-        ["Trades cerrados", cuantos(len(res))],
-        ["Ganadores", cuantos(len(gan))],
-        ["Perdedores", cuantos(len(per))],
+        ["Trades cerrados", len(res)],
+        ["Ganadores", len(gan)],
+        ["Perdedores", len(per)],
         ["Acierto", f"{len(gan)} de {len(res)} ({len(gan) / len(res):.0%})" if res else "—"],
         ["Ganancia promedio", plata(sum(gan) / len(gan)) if gan else "—"],
         ["Pérdida promedio", plata(sum(per) / len(per)) if per else "—"],
         ["Mejor trade", plata(max(res)) if res else "—"],
         ["Peor trade", plata(min(res)) if res else "—"],
-        ["Abiertos", cuantos(sum(1 for t in d["trades"] if t.get("salida") is None))],
+        ["Abiertos", sum(1 for t in d["trades"] if t.get("salida") is None)],
     ]
 
 
