@@ -62,7 +62,9 @@ export function avanzar(e, dt) {
       e.vy = 0; e.rodando = true;
     } else {
       e.vy = -e.vy * RESTITUCION * (1 + 0.15 * e.spin);
-      e.vx *= ROCE_PIQUE; e.vz *= ROCE_PIQUE;
+      // El efecto hacia atras (dropshot) frena la pelota contra el pasto: pica y se queda.
+      const roce = ROCE_PIQUE * (e.spin < 0 ? 1 + 0.3 * e.spin : 1);
+      e.vx *= roce; e.vz *= roce;
       e.spin *= 0.4;
     }
   }

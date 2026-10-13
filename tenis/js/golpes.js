@@ -86,6 +86,17 @@ export function puedeGolpear(jug, e) {
   };
 }
 
+// Punto de la cancha rival al que se apunta, antes de sumarle el error.
+export function objetivo(jug, tipo, apX, apZ) {
+  let prof;
+  if (tipo === 'dropshot') prof = 1.7 + (10 - jug.datos.attrs.toque) * 0.14 + (apZ + 1) * 0.3;
+  else if (tipo === 'globo') prof = MEDIO_LARGO - 2.0 + apZ * 0.6;
+  else if (tipo === 'smash') prof = MEDIO_LARGO - 4.5 + apZ * 1.5;
+  else if (tipo === 'volea') prof = MEDIO_LARGO - 3.6 + apZ * 1.8;
+  else prof = MEDIO_LARGO - 2.6 + apZ * 1.5;
+  return { x: apX * (MEDIO_ANCHO - 0.9), z: -lado(jug.indice) * prof };
+}
+
 // op: { tecla: 'golpe'|'dropshot'|'globo', apX: -1..1 (x del mundo), apZ: -1 corto..1 profundo,
 //       potencia: 0..1, calidad: 0..1, error: multiplicador de dispersion (maquina) }
 export function ejecutarGolpe(jug, pelota, contacto, op) {
@@ -104,13 +115,7 @@ export function ejecutarGolpe(jug, pelota, contacto, op) {
   else tipo = (contacto.derecha !== !!d.zurdo) ? 'drive' : 'reves';
   const g = GOLPES[tipo];
 
-  let prof;
-  if (tipo === 'dropshot') prof = 2.1 + (10 - a.toque) * 0.14 + (apZ + 1) * 0.3;
-  else if (tipo === 'globo') prof = MEDIO_LARGO - 2.0 + apZ * 0.6;
-  else if (tipo === 'smash') prof = MEDIO_LARGO - 4.5 + apZ * 1.5;
-  else if (tipo === 'volea') prof = MEDIO_LARGO - 3.6 + apZ * 1.8;
-  else prof = MEDIO_LARGO - 2.6 + apZ * 1.5;
-  const obj = { x: apX * (MEDIO_ANCHO - 0.9), z: -L * prof };
+  const obj = objetivo(jug, tipo, apX, apZ);
 
   const fino = tipo === 'dropshot' || tipo === 'globo' || tipo === 'volea' ? a.toque : a.precision;
   const velEntrada = Math.hypot(e.vx, e.vz);

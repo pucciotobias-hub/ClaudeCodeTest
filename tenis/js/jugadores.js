@@ -276,7 +276,7 @@ export class Jugador {
     this.x = 0; this.z = lado(indice) * 12.5;
     this.vx = 0; this.vz = 0;
     this.energia = 1;
-    this.velMax = 5.2 + datos.attrs.velocidad * 0.32;
+    this.velMax = 4.7 + datos.attrs.velocidad * 0.29;
     this.anim = null;                 // { clave, fase: 'prep' | 'swing', t }
     this.pose = copiarPose(LISTO);    // pose actual, suavizada
     this.meta = copiarPose(LISTO);

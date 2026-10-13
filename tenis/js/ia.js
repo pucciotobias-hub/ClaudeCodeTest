@@ -13,6 +13,30 @@ export const DIFICULTADES = {
 
 const azar = (a, b) => a + Math.random() * (b - a);
 
+// Donde conviene pararse para pegarle a la pelota que viene. `dejar` avisa que se va afuera.
+// astucia 0..1: cuanto margen necesita para darse cuenta de que es mala.
+export function leerPelota(j, e, astucia = 1) {
+  const { muestras, primerPique, red } = trayectoria(e);
+  const L = lado(j.indice);
+  if (red || !primerPique || primerPique.z * L <= 0) return { dejar: true, x: j.x, z: j.z };
+  const margen = 0.12 + (1 - astucia) * 0.5;
+  const afuera = Math.abs(primerPique.x) > MEDIO_ANCHO + margen || Math.abs(primerPique.z) > MEDIO_LARGO + margen;
+
+  const adentro = (m) => m.z * L > 0.8 && Math.abs(m.z) < LIMITE_Z - 0.4 && Math.abs(m.x) < LIMITE_X - 0.4;
+  let punto = null;
+  // En la red: volea donde la pelota pasa a su altura.
+  if (Math.abs(j.z) < 5) {
+    punto = muestras.find((m) => m.piques === 0 && adentro(m) && m.y > 0.6 && m.y < 2.4 && Math.abs(m.z) >= Math.abs(j.z) - 1.2);
+  }
+  if (!punto) {
+    const tras = muestras.filter((m) => m.piques === 1 && adentro(m));
+    punto = tras.find((m) => m.vy < 0 && m.y < 1.45) ?? tras[tras.length - 1];
+  }
+  if (!punto) return { dejar: true, x: j.x, z: j.z };
+  const costado = j.x < punto.x ? 1 : -1;
+  return { dejar: afuera, x: punto.x - costado * 0.75, z: punto.z + L * 0.45 };
+}
+
 export class IA {
   constructor(jugador, dificultad) {
     this.j = jugador;
@@ -26,33 +50,15 @@ export class IA {
   reiniciar() { this.plan = null; this.pendiente = false; }
 
   // El rival acaba de pegar: despues del tiempo de reaccion lee la pelota.
-  alGolpeRival() {
+  alGolpeRival(tipo) {
     this.plan = null;
     this.pendiente = true;
     this.espera = this.dif.reaccion * azar(0.8, 1.25);
-  }
-
-  #leer(pelota) {
-    const { muestras, primerPique, red } = trayectoria(pelota.e);
-    const L = this.L, j = this.j;
-    if (red || !primerPique || primerPique.z * L <= 0) return { dejar: true, x: j.x, z: j.z };
-    // La deja pasar si la ve claramente afuera (los mas flojos leen peor).
-    const margen = 0.12 + (1 - this.dif.astucia) * 0.5;
-    const afuera = Math.abs(primerPique.x) > MEDIO_ANCHO + margen || Math.abs(primerPique.z) > MEDIO_LARGO + margen;
-
-    const adentro = (m) => m.z * L > 0.8 && Math.abs(m.z) < LIMITE_Z - 0.4 && Math.abs(m.x) < LIMITE_X - 0.4;
-    let punto = null;
-    // En la red: volea donde la pelota pasa a su altura.
-    if (Math.abs(j.z) < 5) {
-      punto = muestras.find((m) => m.piques === 0 && adentro(m) && m.y > 0.6 && m.y < 2.4 && Math.abs(m.z) >= Math.abs(j.z) - 1.2);
+    // El dropshot engania: tarda en darse cuenta, y mas cuanto mas atras lo agarra.
+    if (tipo === 'dropshot') {
+      const atras = Math.max(0, Math.abs(this.j.z) - (MEDIO_LARGO - 2.5)) / 3;
+      this.espera += (0.72 - 0.25 * this.dif.astucia) * (0.5 + Math.min(1, atras));
     }
-    if (!punto) {
-      const tras = muestras.filter((m) => m.piques === 1 && adentro(m));
-      punto = tras.find((m) => m.vy < 0 && m.y < 1.45) ?? tras[tras.length - 1];
-    }
-    if (!punto) return { dejar: true, x: j.x, z: j.z };
-    const costado = j.x < punto.x ? 1 : -1;
-    return { dejar: afuera, x: punto.x - costado * 0.75, z: punto.z + L * 0.45 };
   }
 
   // ctx: { pelota, rival, viene (la pelota es para mi), golpear(jugador, op) }
@@ -66,7 +72,7 @@ export class IA {
     }
     if (this.pendiente) {
       this.espera -= dt;
-      if (this.espera <= 0) { this.plan = this.#leer(ctx.pelota); this.pendiente = false; }
+      if (this.espera <= 0) { this.plan = leerPelota(this.j, ctx.pelota.e, this.dif.astucia); this.pendiente = false; }
     }
     if (!this.plan) { j.mover(0, 0, dt); return; }
     j.irA(this.plan.x, this.plan.z, dt, dif.velocidad);

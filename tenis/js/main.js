@@ -4,9 +4,9 @@ import { MEDIO_ANCHO, MEDIO_LARGO, lado } from './cancha.js';
 import { crearEstadio } from './estadio.js';
 import { PLANTEL, ATRIBUTOS, Jugador } from './jugadores.js';
 import { Pelota, PASO, trayectoria } from './pelota.js';
-import { puedeGolpear, ejecutarGolpe, ejecutarSaque, saqueBueno, pelotaBuena, nombreGolpe } from './golpes.js';
+import { puedeGolpear, ejecutarGolpe, ejecutarSaque, saqueBueno, pelotaBuena, nombreGolpe, objetivo } from './golpes.js';
 import { Control, TECLAS_GOLPE } from './control.js';
-import { IA, DIFICULTADES } from './ia.js';
+import { IA, DIFICULTADES, leerPelota } from './ia.js';
 import { Puntaje } from './puntaje.js';
 import { sonido } from './sonido.js';
 
@@ -54,7 +54,16 @@ function marcarPique() {
   const pq = trayectoria(pelota.e).primerPique;
   marca.visible = !!pq && pq.z > 0 && !DEMO;
   if (pq) marca.position.set(pq.x, 0.02, pq.z);
+  P.usuario.plan = leerPelota(P.jug[0], pelota.e);
 }
+
+// Mira: mientras se arma el golpe, muestra en la cancha rival adonde se esta apuntando.
+const mira = new THREE.Mesh(
+  new THREE.RingGeometry(0.3, 0.45, 28),
+  new THREE.MeshBasicMaterial({ color: 0xffd84a, transparent: true, opacity: 0.8, depthWrite: false }));
+mira.rotation.x = -Math.PI / 2;
+mira.visible = false;
+scene.add(mira);
 
 // ---------- Estado del partido ----------
 let P = null;          // partido en curso
@@ -79,7 +88,7 @@ function nuevoPartido() {
     estado: 'presaque', t: 0, pausa: 0,
     sacador: 0, segundo: false, repetir: false,
     ultimo: 0, ultimoTipo: 'saque', golpes: 0, esSaque: false, cinta: false,
-    usuario: { activo: false, tecla: 'golpe', carga: 0, gracia: 0 },
+    usuario: { activo: false, tecla: 'golpe', carga: 0, gracia: 0, apX: 0, apZ: 0, plan: null },
     stats: [0, 1].map(() => ({ puntos: 0, winners: 0, errores: 0, aces: 0, dobles: 0 })),
   };
   pausado = false;
@@ -104,7 +113,8 @@ function prepararPunto() {
   P.repetir = false;
   P.estado = 'presaque'; P.t = 0;
   P.golpes = 0; P.esSaque = false; P.cinta = false;
-  P.usuario.activo = false; P.usuario.carga = 0;
+  P.usuario.activo = false; P.usuario.carga = 0; P.usuario.plan = null;
+  mira.visible = false;
   P.ias.forEach((ia) => ia?.reiniciar());
   P.jug.forEach((j) => j.soltar());
   pelotaEnMano();
@@ -154,8 +164,8 @@ function golpear(j, op) {
   if (r.tipo === 'dropshot' || r.tipo === 'volea') sonido.toque(); else sonido.golpe(op.potencia ?? 0.6);
   P.ultimo = j.indice; P.ultimoTipo = r.tipo;
   P.golpes++; P.esSaque = false; P.cinta = false;
-  P.ias[1 - j.indice]?.alGolpeRival();
-  if (j.indice === 1) marcarPique(); else marca.visible = false;
+  P.ias[1 - j.indice]?.alGolpeRival(r.tipo);
+  if (j.indice === 1) marcarPique(); else { marca.visible = false; P.usuario.plan = null; }
   if (r.tipo !== 'dropshot' && r.tipo !== 'globo') mostrarVelocidad(`${nombreGolpe(r.tipo)} <b>${r.kmh}</b> km/h`);
   else mostrarVelocidad(nombreGolpe(r.tipo));
   return true;
@@ -183,6 +193,7 @@ function alPique() {
 }
 
 function repetirSaque(texto) {
+  mira.visible = false;
   cartel(texto, '', 1.2);
   P.repetir = true;
   P.estado = 'punto'; P.t = 0; P.pausa = 1.4;
@@ -195,6 +206,7 @@ function falta(texto) {
 }
 
 function finPunto(ganador, texto, tipo) {
+  mira.visible = false;
   const autor = tipo === 'error' || tipo === 'doble' ? 1 - ganador : ganador;
   const st = P.stats;
   st[ganador].puntos++;
@@ -237,7 +249,7 @@ function terminarPartido() {
 function controlUsuario(dt, flancos) {
   const j = P.jug[0], u = P.usuario, e = pelota.e;
   for (const k of TECLAS_GOLPE) {
-    if (flancos.recien[k]) { u.activo = true; u.tecla = k; u.carga = 0; u.gracia = 0.22; }
+    if (flancos.recien[k]) { u.activo = true; u.tecla = k; u.carga = 0; u.gracia = 0.22; u.apX = 0; u.apZ = 0; }
   }
   if (u.activo) {
     if (control.abajo[u.tecla]) { u.carga = Math.min(1, u.carga + dt / 0.75); u.gracia = 0.22; }
@@ -250,17 +262,29 @@ function controlUsuario(dt, flancos) {
       }
     }
   }
-  // Mientras prepara el golpe se mueve mas lento: hay que llegar antes y armar.
-  j.mover(control.dirX, -control.dirZ, dt, u.activo ? 0.65 : 1);
+  // Con la tecla de golpe apretada las flechas dejan de mover y pasan a apuntar: el jugador se
+  // acomoda solo a la pelota, mas lento que corriendo (conviene llegar primero y armar despues).
+  // La ultima flecha tocada queda como direccion, no hace falta tenerla apretada en el impacto.
+  const armando = u.activo && P.ultimo === 1 && u.plan;
+  if (armando) j.irA(u.plan.x, u.plan.z, dt, 0.75);
+  else j.mover(control.dirX, -control.dirZ, dt, 1);
+  mira.visible = !!armando;
   if (!u.activo) return;
+  if (control.dirX) u.apX = control.dirX;
+  if (control.dirZ) u.apZ = control.dirZ;
+  if (armando) {
+    const o = objetivo(j, u.tecla === 'golpe' ? 'drive' : u.tecla, u.apX, u.apZ);
+    mira.position.set(o.x, 0.02, o.z);
+  }
   j.preparar(...animacionDe(u.tecla, j));
   const ok = golpear(j, {
     tecla: u.tecla,
-    apX: control.dirX, apZ: control.dirZ,
+    apX: u.apX, apZ: u.apZ,
     potencia: 0.35 + 0.65 * u.carga,
     calidad: clamp(0.3 + u.carga * 2.8, 0, 1), // armar tarde es pegar mal
+    error: 0.8,
   });
-  if (ok) { u.activo = false; u.carga = 0; }
+  if (ok) { u.activo = false; u.carga = 0; mira.visible = false; }
 }
 
 // [tipo de animacion, si la pelota viene del lado del reves]
@@ -416,7 +440,7 @@ function alternarPausa() {
 function alMenu() {
   if (P) P.jug.forEach((j) => scene.remove(j.grupo));
   P = null; pausado = false;
-  pelota.visible = marca.visible = false;
+  pelota.visible = marca.visible = mira.visible = false;
   sonido.silenciar(false);
   sonido.murmullo(0.3);
   ['fin', 'pausa', 'hud'].forEach((id) => $(id).classList.add('oculto'));
