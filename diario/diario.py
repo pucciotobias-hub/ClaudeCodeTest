@@ -35,7 +35,10 @@ REPO = DIR.parent
 TRADES = DIR / "trades"
 
 # Unidades del subyacente por contrato en Matba Rofex. Un instrumento que no esta aca vale 1 y se avisa.
-MULTIPLICADOR = {"GGAL": 100, "RFX20": 1, "DLR": 1000}
+MULTIPLICADOR = {"GGAL": 100, "RFX20": 1, "DLR": 1000,
+                 # Caucion: cotiza en tasa (TNA %). 8.219 es el "Tamaño" que muestra eTrader (3.000.000 / 365), y con
+                 # el el resultado coincide con el del broker (13-oct-2026: 16 contratos, 21,25 -> 21,30 = $ 6.575,20).
+                 "CAUC": 8219}
 ENCABEZADO = ["N°", "Instrumento", "Posición", "Cantidad", "Hora entrada", "Precio entrada", "Hora salida",
               "Precio salida", "Diferencia", "Resultado $", "Duración (min)", "Estado", "Nota"]
 
