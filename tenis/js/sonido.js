@@ -5,6 +5,7 @@ export const sonido = {
   // Estado privado
   _ctx: null,
   _master: null,
+  _eco: null,
   _noiseBuffer: null,
   _murmullo: {
     fuente: null,
@@ -27,6 +28,16 @@ export const sonido = {
       this._master = ctx.createGain();
       this._master.gain.value = 0.6;
       this._master.connect(ctx.destination);
+
+      // Eco corto del estadio: los golpes rebotan en las tribunas.
+      this._eco = ctx.createGain();
+      const retardo = ctx.createDelay(0.5);
+      retardo.delayTime.value = 0.13;
+      const opaco = ctx.createBiquadFilter();
+      opaco.type = 'lowpass'; opaco.frequency.value = 1400;
+      const nivelEco = ctx.createGain();
+      nivelEco.gain.value = 0.3;
+      this._eco.connect(retardo); retardo.connect(opaco); opaco.connect(nivelEco); nivelEco.connect(this._master);
 
       // Generar buffer de ruido blanco (~2s) reutilizable
       const sampleRate = ctx.sampleRate;
@@ -97,124 +108,72 @@ export const sonido = {
     this._osciladores.push({ fuente: source, fin: now + duracion });
   },
 
-  // Raquetazo (golpe)
+  // --- Golpes ---
+  // Un raquetazo real no es un soplido: es un chasquido seco del encordado, un "poc" hueco que cae
+  // de tono en centesimas de segundo y un golpe grave de la pelota aplastandose. Cada capa va aparte.
+
+  // Envolvente percusiva: sube en 2 ms y decae exponencial.
+  _env(param, t, pico, dur) {
+    param.setValueAtTime(0.0001, t);
+    param.exponentialRampToValueAtTime(Math.max(0.0002, pico), t + 0.002);
+    param.exponentialRampToValueAtTime(0.0001, t + dur);
+  },
+
+  // Tono que barre de f0 a f1.
+  _tono(tipo, f0, f1, barrido, pico, dur, eco = 0) {
+    const ctx = this._ctx, t = ctx.currentTime;
+    const osc = ctx.createOscillator();
+    osc.type = tipo;
+    osc.frequency.setValueAtTime(f0, t);
+    osc.frequency.exponentialRampToValueAtTime(f1, t + barrido);
+    const g = ctx.createGain();
+    this._env(g.gain, t, pico, dur);
+    osc.connect(g);
+    g.connect(this._master);
+    if (eco && this._eco) { const e = ctx.createGain(); e.gain.value = eco; g.connect(e); e.connect(this._eco); }
+    osc.start(t);
+    osc.stop(t + dur + 0.02);
+  },
+
+  // Rafaga cortisima de ruido filtrado.
+  _chasquido(tipo, freq, q, pico, dur, eco = 0) {
+    const ctx = this._ctx, t = ctx.currentTime;
+    const src = ctx.createBufferSource();
+    src.buffer = this._noiseBuffer;
+    const f = ctx.createBiquadFilter();
+    f.type = tipo; f.frequency.value = freq; f.Q.value = q;
+    const g = ctx.createGain();
+    this._env(g.gain, t, pico, dur);
+    src.connect(f); f.connect(g); g.connect(this._master);
+    if (eco && this._eco) { const e = ctx.createGain(); e.gain.value = eco; g.connect(e); e.connect(this._eco); }
+    src.start(t, Math.random() * 1.5);
+    src.stop(t + dur + 0.02);
+  },
+
+  // Raquetazo (drive, reves, saque, smash). fuerza 0..1.
   golpe(fuerza) {
     if (!this._ctx) return;
-
-    fuerza = Math.max(0, Math.min(1, fuerza || 0)); // clamp 0..1
-    const ctx = this._ctx;
-    const now = ctx.currentTime;
-
-    // Pop corto de ruido filtrado + cuerpo tonal
-    const duracion = 0.15 + fuerza * 0.1;
-
-    // Ruido percusivo en altos-medios
-    this._reproducirRuido(duracion * 0.7, {
-      type: 'highpass',
-      freq: 1500 + fuerza * 2000,
-      q: 2,
-    }, {
-      start: 0.15 * fuerza,
-      peak: 0.15 * (1 + fuerza),
-      attack: 0.01,
-      release: 0.08,
-      end: 0.01,
-    });
-
-    // Cuerpo tonal: oscilador en 200-350 Hz según fuerza
-    const osc = ctx.createOscillator();
-    osc.type = 'sine';
-    osc.frequency.setValueAtTime(180 + fuerza * 170, now);
-    osc.frequency.linearRampToValueAtTime(120, now + duracion * 0.6);
-
-    const oscGain = ctx.createGain();
-    oscGain.gain.setValueAtTime(0.1 * fuerza, now);
-    oscGain.gain.linearRampToValueAtTime(0, now + duracion);
-
-    osc.connect(oscGain);
-    oscGain.connect(this._master);
-    osc.start(now);
-    osc.stop(now + duracion);
-
-    this._osciladores.push({ fuente: osc, fin: now + duracion });
+    const f = Math.max(0, Math.min(1, fuerza || 0));
+    const v = 0.94 + Math.random() * 0.12; // ningun golpe suena igual al anterior
+    this._chasquido('bandpass', 2600 * v, 0.8, 0.5 + 0.5 * f, 0.012, 0.5);
+    this._tono('triangle', (820 + 260 * f) * v, 330 * v, 0.03, 0.55 + 0.35 * f, 0.085, 0.6);
+    this._tono('sine', 210 * v, 85, 0.06, 0.35 + 0.5 * f, 0.13, 0.4);
   },
 
-  // Golpe suave (dropshot/volea)
+  // Golpe suave (dropshot, volea): el mismo "poc" sin el latigazo ni el grave.
   toque() {
     if (!this._ctx) return;
-
-    const ctx = this._ctx;
-    const now = ctx.currentTime;
-    const duracion = 0.08;
-
-    // Ruido apagado y corto en graves-medios
-    this._reproducirRuido(duracion, {
-      type: 'lowpass',
-      freq: 800,
-      q: 0.8,
-    }, {
-      start: 0.08,
-      peak: 0.1,
-      attack: 0.005,
-      release: 0.05,
-      end: 0,
-    });
-
-    // Cuerpo tonal suave en ~150 Hz
-    const osc = ctx.createOscillator();
-    osc.type = 'sine';
-    osc.frequency.value = 150;
-
-    const oscGain = ctx.createGain();
-    oscGain.gain.setValueAtTime(0.05, now);
-    oscGain.gain.linearRampToValueAtTime(0, now + duracion);
-
-    osc.connect(oscGain);
-    oscGain.connect(this._master);
-    osc.start(now);
-    osc.stop(now + duracion);
-
-    this._osciladores.push({ fuente: osc, fin: now + duracion });
+    const v = 0.94 + Math.random() * 0.12;
+    this._chasquido('bandpass', 1900 * v, 0.9, 0.22, 0.01);
+    this._tono('triangle', 620 * v, 300 * v, 0.03, 0.4, 0.07, 0.25);
   },
 
-  // Pelota contra el césped
+  // Pelota contra el cesped: un golpe sordo, corto y grave.
   pique(fuerza) {
     if (!this._ctx) return;
-
-    fuerza = Math.max(0, Math.min(1, fuerza || 0)); // clamp 0..1
-    const ctx = this._ctx;
-    const now = ctx.currentTime;
-    const duracion = 0.12;
-
-    // Tup sordo y grave: ruido filtrado en graves
-    this._reproducirRuido(duracion, {
-      type: 'lowpass',
-      freq: 250 + fuerza * 150,
-      q: 1,
-    }, {
-      start: 0.12 * (1 - fuerza * 0.3),
-      peak: 0.12 * (1 + fuerza * 0.4),
-      attack: 0.008,
-      release: 0.08,
-      end: 0,
-    });
-
-    // Cuerpo tonal grave en ~120 Hz
-    const osc = ctx.createOscillator();
-    osc.type = 'sine';
-    osc.frequency.setValueAtTime(120, now);
-    osc.frequency.linearRampToValueAtTime(80, now + duracion * 0.7);
-
-    const oscGain = ctx.createGain();
-    oscGain.gain.setValueAtTime(0.08 * fuerza, now);
-    oscGain.gain.linearRampToValueAtTime(0, now + duracion);
-
-    osc.connect(oscGain);
-    oscGain.connect(this._master);
-    osc.start(now);
-    osc.stop(now + duracion);
-
-    this._osciladores.push({ fuente: osc, fin: now + duracion });
+    const f = Math.max(0, Math.min(1, fuerza || 0));
+    this._chasquido('lowpass', 520, 0.7, 0.18 + 0.2 * f, 0.03);
+    this._tono('sine', 150, 68, 0.05, 0.22 + 0.3 * f, 0.09);
   },
 
   // Pelota en la red
