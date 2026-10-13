@@ -10,7 +10,7 @@ import { G, ARRASTRE, MAGNUS } from './pelota.js';
 const GOLPES = {
   drive:    { ang0: 3,   vBase: 21, vPot: 1.6, spin: 0.45,  sigma: 0.52, margen: 0.22, nombre: 'Drive' },
   reves:    { ang0: 3,   vBase: 20, vPot: 1.4, spin: 0.35,  sigma: 0.56, margen: 0.22, nombre: 'Revés' },
-  dropshot: { ang0: 16,  vBase: 15, vPot: 0,   spin: -0.85, sigma: 0.42, margen: 0.22, nombre: 'Dropshot' },
+  dropshot: { ang0: 14,  vBase: 20, vPot: 0,   spin: -0.85, sigma: 0.42, margen: 0.22, nombre: 'Dropshot' },
   globo:    { ang0: 46,  vBase: 32, vPot: 0,   spin: 0.3,   sigma: 0.75, margen: 2.0,  nombre: 'Globo' },
   volea:    { ang0: -8,  vBase: 15, vPot: 1.0, spin: -0.25, sigma: 0.50, margen: 0.18, nombre: 'Volea' },
   smash:    { ang0: -32, vBase: 28, vPot: 1.8, spin: 0,     sigma: 0.65, margen: 0.25, nombre: 'Smash' },
@@ -105,7 +105,7 @@ export function ejecutarGolpe(jug, pelota, contacto, op) {
   const g = GOLPES[tipo];
 
   let prof;
-  if (tipo === 'dropshot') prof = 1.5 + (10 - a.toque) * 0.14 + (apZ + 1) * 0.35;
+  if (tipo === 'dropshot') prof = 2.1 + (10 - a.toque) * 0.14 + (apZ + 1) * 0.3;
   else if (tipo === 'globo') prof = MEDIO_LARGO - 2.0 + apZ * 0.6;
   else if (tipo === 'smash') prof = MEDIO_LARGO - 4.5 + apZ * 1.5;
   else if (tipo === 'volea') prof = MEDIO_LARGO - 3.6 + apZ * 1.8;
@@ -133,7 +133,7 @@ export function ejecutarGolpe(jug, pelota, contacto, op) {
   return { tipo, kmh: Math.round(s.v * 3.6) };
 }
 
-// op: { apX: -1|0|1 (hacia donde, en x del mundo), calidad: 0..1, segundo: bool }
+// op: { apX: -1|0|1 (hacia donde, en x del mundo), calidad: 0..1, segundo: bool, fuerza: fraccion de la velocidad (maquina) }
 export function ejecutarSaque(jug, pelota, op) {
   const e = pelota.e, a = jug.datos.attrs;
   const L = lado(jug.indice);
@@ -149,7 +149,7 @@ export function ejecutarSaque(jug, pelota, op) {
   obj.x += gauss() * sigma;
   obj.z += gauss() * sigma * 1.25;
 
-  const vmax = (38 + 2.0 * a.saque) * (segundo ? 0.78 : 1) * (0.72 + 0.28 * calidad);
+  const vmax = (38 + 2.0 * a.saque) * (segundo ? 0.78 : 1) * (0.72 + 0.28 * calidad) * (op.fuerza ?? 1);
   const spin = segundo ? 0.7 : 0.25;
   const s = resolver(e, obj, spin, -16, vmax, segundo ? 0.3 : 0.1);
   const pRed = (segundo ? 0.025 : 0.09) * (op.error ?? 1) * (1 + 2 * (1 - calidad));

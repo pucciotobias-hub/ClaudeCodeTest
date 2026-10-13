@@ -4,11 +4,11 @@ import { trayectoria } from './pelota.js';
 import { puedeGolpear } from './golpes.js';
 
 // reaccion: segundos hasta que empieza a moverse. error: multiplica la dispersion de sus golpes.
-// noForzado: probabilidad de pifiar un golpe comodo. velocidad y potencia: fraccion del maximo del jugador.
+// noForzado: probabilidad de pifiar un golpe comodo. velocidad, potencia y saque: fraccion del maximo del jugador.
 export const DIFICULTADES = {
-  facil:   { nombre: 'Fácil',   reaccion: 0.42, error: 1.7,  noForzado: 0.10, velocidad: 0.84, potencia: 0.50, astucia: 0.3 },
-  media:   { nombre: 'Media',   reaccion: 0.28, error: 1.25, noForzado: 0.05, velocidad: 0.94, potencia: 0.70, astucia: 0.6 },
-  dificil: { nombre: 'Difícil', reaccion: 0.16, error: 1.0,  noForzado: 0.02, velocidad: 1.0,  potencia: 0.88, astucia: 1.0 },
+  facil:   { nombre: 'Fácil',   reaccion: 0.42, error: 1.7,  noForzado: 0.10, velocidad: 0.84, potencia: 0.50, saque: 0.70, astucia: 0.3 },
+  media:   { nombre: 'Media',   reaccion: 0.28, error: 1.25, noForzado: 0.05, velocidad: 0.94, potencia: 0.70, saque: 0.84, astucia: 0.6 },
+  dificil: { nombre: 'Difícil', reaccion: 0.16, error: 1.0,  noForzado: 0.02, velocidad: 1.0,  potencia: 0.88, saque: 0.96, astucia: 1.0 },
 };
 
 const azar = (a, b) => a + Math.random() * (b - a);
@@ -118,6 +118,7 @@ export class IA {
       apX: [-1, 0, 1][Math.floor(Math.random() * 3)] * (0.5 + 0.5 * dif.astucia),
       calidad: Math.min(1, azar(0.55, 0.95) + 0.1 * dif.astucia),
       error: 0.85 + (dif.error - 1) * 0.6,
+      fuerza: dif.saque,
       segundo,
     };
   }

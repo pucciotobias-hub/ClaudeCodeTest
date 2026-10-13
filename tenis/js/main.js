@@ -3,7 +3,7 @@ import * as THREE from 'three';
 import { MEDIO_ANCHO, MEDIO_LARGO, lado } from './cancha.js';
 import { crearEstadio } from './estadio.js';
 import { PLANTEL, ATRIBUTOS, Jugador } from './jugadores.js';
-import { Pelota, PASO } from './pelota.js';
+import { Pelota, PASO, trayectoria } from './pelota.js';
 import { puedeGolpear, ejecutarGolpe, ejecutarSaque, saqueBueno, pelotaBuena, nombreGolpe } from './golpes.js';
 import { Control, TECLAS_GOLPE } from './control.js';
 import { IA, DIFICULTADES } from './ia.js';
@@ -42,6 +42,19 @@ const estadio = crearEstadio(scene);
 const pelota = new Pelota(scene);
 pelota.visible = false;
 const control = new Control();
+
+// Aro en el cesped donde va a picar la pelota que viene: sin esto no se llega a leer la profundidad.
+const marca = new THREE.Mesh(
+  new THREE.RingGeometry(0.22, 0.32, 24),
+  new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.55, depthWrite: false }));
+marca.rotation.x = -Math.PI / 2;
+marca.visible = false;
+scene.add(marca);
+function marcarPique() {
+  const pq = trayectoria(pelota.e).primerPique;
+  marca.visible = !!pq && pq.z > 0 && !DEMO;
+  if (pq) marca.position.set(pq.x, 0.02, pq.z);
+}
 
 // ---------- Estado del partido ----------
 let P = null;          // partido en curso
@@ -124,6 +137,7 @@ function sacar(op) {
   P.golpes = 1; P.esSaque = true; P.cinta = false;
   P.estado = 'peloteo'; P.t = 0;
   P.ias[1 - P.sacador]?.alGolpeRival();
+  if (P.sacador === 1) marcarPique();
   mostrarVelocidad(`Saque <b>${r.kmh}</b> km/h`);
 }
 
@@ -141,6 +155,7 @@ function golpear(j, op) {
   P.ultimo = j.indice; P.ultimoTipo = r.tipo;
   P.golpes++; P.esSaque = false; P.cinta = false;
   P.ias[1 - j.indice]?.alGolpeRival();
+  if (j.indice === 1) marcarPique(); else marca.visible = false;
   if (r.tipo !== 'dropshot' && r.tipo !== 'globo') mostrarVelocidad(`${nombreGolpe(r.tipo)} <b>${r.kmh}</b> km/h`);
   else mostrarVelocidad(nombreGolpe(r.tipo));
   return true;
@@ -148,6 +163,7 @@ function golpear(j, op) {
 
 function alPique() {
   const e = pelota.e;
+  marca.visible = false;
   sonido.pique(clamp(Math.abs(e.vy) / 6, 0.2, 1));
   if (P.estado !== 'peloteo') return;
   if (e.piques === 1) {
@@ -235,7 +251,7 @@ function controlUsuario(dt, flancos) {
     }
   }
   // Mientras prepara el golpe se mueve mas lento: hay que llegar antes y armar.
-  j.mover(control.dirX, -control.dirZ, dt, u.activo ? 0.5 : 1);
+  j.mover(control.dirX, -control.dirZ, dt, u.activo ? 0.65 : 1);
   if (!u.activo) return;
   j.preparar(animacionDe(u.tecla, j));
   const ok = golpear(j, {
@@ -346,7 +362,7 @@ function moverCamara(dt, t) {
     const j = P.jug[0];
     const z = clamp(j.z + 9.5, 21, 27);
     pos = new THREE.Vector3(j.x * 0.45 + pelota.e.x * 0.08, 7.6, z);
-    mira = new THREE.Vector3(j.x * 0.3 + pelota.e.x * 0.12, 0.6, z - 19);
+    mira = new THREE.Vector3(j.x * 0.3 + pelota.e.x * 0.12, 0, z - 17);
   }
   const f = Math.min(1, 3.5 * dt);
   camPos.lerp(pos, f); camMira.lerp(mira, f);
@@ -396,7 +412,7 @@ function alternarPausa() {
 function alMenu() {
   if (P) P.jug.forEach((j) => scene.remove(j.grupo));
   P = null; pausado = false;
-  pelota.visible = false;
+  pelota.visible = marca.visible = false;
   sonido.silenciar(false);
   sonido.murmullo(0.3);
   ['fin', 'pausa', 'hud'].forEach((id) => $(id).classList.add('oculto'));
