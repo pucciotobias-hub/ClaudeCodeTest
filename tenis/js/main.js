@@ -150,7 +150,7 @@ function golpear(j, op) {
   const c = puedeGolpear(j, e);
   if (!c) return false;
   const r = ejecutarGolpe(j, pelota, c, op);
-  j.pegar(r.tipo);
+  j.pegar(r.tipo, c.derecha === !!j.datos.zurdo);
   if (r.tipo === 'dropshot' || r.tipo === 'volea') sonido.toque(); else sonido.golpe(op.potencia ?? 0.6);
   P.ultimo = j.indice; P.ultimoTipo = r.tipo;
   P.golpes++; P.esSaque = false; P.cinta = false;
@@ -246,14 +246,14 @@ function controlUsuario(dt, flancos) {
       if (u.gracia <= 0) {
         // Solto la tecla sin que llegara la pelota: swing al aire.
         u.activo = false; u.carga = 0;
-        if (P.ultimo === 1 && Math.abs(e.z - j.z) < 5) j.pegar(animacionDe(u.tecla, j)); else j.soltar();
+        if (P.ultimo === 1 && Math.abs(e.z - j.z) < 5) j.pegar(...animacionDe(u.tecla, j)); else j.soltar();
       }
     }
   }
   // Mientras prepara el golpe se mueve mas lento: hay que llegar antes y armar.
   j.mover(control.dirX, -control.dirZ, dt, u.activo ? 0.65 : 1);
   if (!u.activo) return;
-  j.preparar(animacionDe(u.tecla, j));
+  j.preparar(...animacionDe(u.tecla, j));
   const ok = golpear(j, {
     tecla: u.tecla,
     apX: control.dirX, apZ: control.dirZ,
@@ -263,10 +263,12 @@ function controlUsuario(dt, flancos) {
   if (ok) { u.activo = false; u.carga = 0; }
 }
 
+// [tipo de animacion, si la pelota viene del lado del reves]
 function animacionDe(tecla, j) {
-  if (tecla !== 'golpe') return tecla;
   const derecha = (pelota.e.x - j.x) * lado(j.indice) > 0;
-  return derecha !== !!j.datos.zurdo ? 'drive' : 'reves';
+  const deReves = derecha === !!j.datos.zurdo;
+  if (tecla !== 'golpe') return [tecla, deReves];
+  return [deReves ? 'reves' : 'drive', deReves];
 }
 
 // ---------- Paso de simulacion ----------
@@ -350,6 +352,7 @@ function pintarMarcador() {
 }
 
 // ---------- Camara ----------
+const depurar = { cam: null };
 const camPos = new THREE.Vector3(0, 30, 46), camMira = new THREE.Vector3(0, 0, 0);
 function moverCamara(dt, t) {
   let pos, mira;
@@ -366,6 +369,7 @@ function moverCamara(dt, t) {
   }
   const f = Math.min(1, 3.5 * dt);
   camPos.lerp(pos, f); camMira.lerp(mira, f);
+  if (depurar.cam) { camPos.fromArray(depurar.cam[0]); camMira.fromArray(depurar.cam[1]); }
   camera.position.copy(camPos);
   camera.lookAt(camMira);
 }
@@ -469,6 +473,7 @@ if (DEMO) {
   eleccion.yo = PLANTEL[Math.floor(Math.random() * PLANTEL.length)].id;
   nuevoPartido();
 }
-window.__juego = { get P() { return P; }, pelota, eleccion };
+// Para mirar poses desde la consola: __juego.depurar.cam = [[x, y, z], [x, y, z]] fija la camara.
+window.__juego = { get P() { return P; }, pelota, eleccion, scene, depurar };
 
 cuadro();

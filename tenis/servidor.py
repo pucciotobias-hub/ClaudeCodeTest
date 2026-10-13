@@ -37,5 +37,11 @@ class Manejador(SimpleHTTPRequestHandler):
         super().do_GET()
 
 
+class Servidor(ThreadingHTTPServer):
+    # El navegador pide todos los modulos juntos: con la cola por defecto (5) Windows
+    # rechaza alguna conexion y el juego queda en blanco.
+    request_queue_size = 128
+
+
 if __name__ == "__main__":
-    ThreadingHTTPServer(("127.0.0.1", PUERTO), partial(Manejador, directory=str(DIR))).serve_forever()
+    Servidor(("127.0.0.1", PUERTO), partial(Manejador, directory=str(DIR))).serve_forever()

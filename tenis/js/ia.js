@@ -48,7 +48,7 @@ export class IA {
     }
     if (!punto) {
       const tras = muestras.filter((m) => m.piques === 1 && adentro(m));
-      punto = tras.find((m) => m.vy < 0 && m.y < 1.15) ?? tras[tras.length - 1];
+      punto = tras.find((m) => m.vy < 0 && m.y < 1.45) ?? tras[tras.length - 1];
     }
     if (!punto) return { dejar: true, x: j.x, z: j.z };
     const costado = j.x < punto.x ? 1 : -1;
