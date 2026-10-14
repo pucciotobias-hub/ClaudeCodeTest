@@ -82,6 +82,13 @@ td.celda-barra { text-align: left; width: 22%; min-width: 110px; }
   <div id="alerta"></div>
   <div class="fichas" id="fichas"></div>
 
+  <section id="programa" style="display:none">
+    <h2>Programa de volumen</h2>
+    <p class="sub" id="s-programa"></p>
+    <div class="tabla"><table id="t-programa"></table></div>
+    <p class="nota" id="n-programa"></p>
+  </section>
+
   <section>
     <h2>GGAL y RFX20</h2>
     <p class="sub">Los futuros de acciones e índice, en vivo.</p>
@@ -302,7 +309,30 @@ function pintarTablas() {
     d.tasasPesos.map(c => `<tr><td>${c.contrato}</td><td>${pct(c.bid)}</td><td>${pct(c.ask)}</td><td>${pct(c.ultimo)}</td><td>${pct(c.ajuste)}</td></tr>`).join('');
 }
 
-function pintar() { pintarEstado(); pintarFichas(); pintarCurva(); pintarTablas(); }
+function pintarPrograma() {
+  const p = datos.programa, s = $('#programa');
+  s.style.display = p ? '' : 'none';
+  if (!p) return;
+  if (p.error) { $('#s-programa').textContent = p.error; $('#t-programa').innerHTML = ''; return; }
+  $('#s-programa').textContent = `Lo que falta del mes y a qué ritmo. Quedan ${p.ruedasPendientes} ruedas de ${p.ruedasMes}` +
+    (p.hoyCuenta ? ', contando la de hoy.' : '; la de hoy ya terminó.');
+  let h = '<tr><th>Canasta</th><th>Volumen</th><th>Exigido</th><th>Tabla de A3</th><th>Diario</th><th>Hoy</th><th>Llevás</th><th>Falta</th><th>Por rueda</th><th>Ritmo hasta acá</th></tr>', act = null;
+  p.filas.forEach(f => {
+    if (f.canasta !== act) { act = f.canasta; h += `<tr class="grupo"><td colspan="10">${act}</td></tr>`; }
+    const ok = f.falta === 0, cls = ok ? 'sube' : f.atrasado ? 'baja' : '';
+    h += `<tr><td></td><td>${f.tipo === 'maker' ? 'Maker' : 'Total'}</td><td>${ent(f.exigido)}</td><td>${ent(f.tabla)}</td>` +
+      `<td>${f.tipo === 'maker' ? '–' : ent(f.diario)}</td><td>${f.hoy == null ? '–' : ent(f.hoy)}</td>` +
+      `<td>${ent(f.tabla + f.diario)} <span class="marca">${pct(f.pct, 0)}</span></td>` +
+      `<td class="${cls}">${ok ? 'Cumplido' : ent(f.falta)}</td><td class="${cls}"><strong>${ok ? '–' : num(f.porRueda, 1)}</strong></td>` +
+      `<td>${f.ritmo == null ? '–' : num(f.ritmo, 1)}</td></tr>`;
+  });
+  $('#t-programa').innerHTML = h;
+  $('#n-programa').textContent = `La tabla de A3 llega hasta el ${fecha(p.corte)}; lo operado después sale del diario de trades, entrada y salida por separado. ` +
+    'El diario no sabe qué órdenes fueron pasivas, así que el maker queda como en la tabla hasta que la actualices (tasas/programa.json). ' +
+    'En rojo: el ritmo que llevás no alcanza para lo que falta.';
+}
+
+function pintar() { pintarEstado(); pintarFichas(); pintarPrograma(); pintarCurva(); pintarTablas(); }
 
 async function sondear() {
   try {

@@ -312,6 +312,7 @@ def calcular():
         "tasasPesos": [{k: v for k, v in x.items() if k != "orden"}
                        for x in sorted(tasas_pesos, key=lambda x: x["orden"])],
         "curva": curva, "pases": pases, "interes": interes, "fechaPrev": fecha_prev,
+        "programa": programa(),
     }
 
 
@@ -331,6 +332,77 @@ def guardar_foto(hoy, foto):
         ultima_foto = time.time()
     except OSError:
         pass
+
+
+# --- Programa de volumen de A3 -------------------------------------------------
+# Los numeros los copia el usuario de la tabla del programa (tasas/programa.json,
+# gitignoreado) y llegan hasta la rueda "corte". Lo operado despues se suma desde
+# el diario de trades: cada ejecucion cuenta, entrada y salida por separado (asi
+# lo cuenta el broker). El diario no sabe si una orden fue pasiva, asi que solo
+# suma al volumen total; el maker queda como en la tabla hasta que se actualice.
+
+PROGRAMA = DIR / "programa.json"
+DIARIO = DIR.parent / "diario" / "trades"
+CANASTA = {"GGAL": "Renta Variable", "RFX20": "Renta Variable", "DLR": "Dólar", "CAUC": "Tasa"}
+FIN_RUEDA = 17  # despues de esta hora la rueda de hoy ya no cuenta como pendiente
+
+
+def ruedas(mes, feriados):
+    """Dias habiles del mes AAAA-MM, sin los feriados."""
+    a, m = map(int, mes.split("-"))
+    d, dias = date(a, m, 1), []
+    while d.month == m:
+        if d.weekday() < 5 and d.isoformat() not in feriados:
+            dias.append(d)
+        d += timedelta(days=1)
+    return dias
+
+
+def programa():
+    try:
+        cfg = json.loads(PROGRAMA.read_text(encoding="utf-8"))
+    except FileNotFoundError:
+        return None
+    except (OSError, ValueError) as e:
+        return {"error": f"programa.json: {e}"}
+    ahora = datetime.now()
+    hoy, corte = ahora.date(), date.fromisoformat(cfg["corte"])
+    dias = ruedas(cfg["mes"], set(cfg.get("feriados", [])))
+    # Pendientes: las que faltan despues de hoy, mas hoy si la rueda no termino.
+    pendientes = [d for d in dias if d > hoy or (d == hoy and ahora.hour < FIN_RUEDA)]
+    hechas = [d for d in dias if d < hoy or (d == hoy and ahora.hour >= FIN_RUEDA)]
+
+    diario, hoy_vol = {}, {}
+    for d in dias:
+        if corte < d <= hoy:
+            try:
+                trades = json.loads((DIARIO / f"{d.isoformat()}.json").read_text(encoding="utf-8"))["trades"]
+            except (OSError, ValueError, KeyError):
+                continue
+            for t in trades:
+                c = CANASTA.get(t["instrumento"])
+                if c:
+                    n = t["cantidad"] * (2 if t.get("salida") is not None else 1)
+                    diario[c] = diario.get(c, 0) + n
+                    if d == hoy:
+                        hoy_vol[c] = hoy_vol.get(c, 0) + n
+
+    filas = []
+    for canasta, req in cfg["canastas"].items():
+        for tipo in ("maker", "total"):
+            tabla, exigido = req[tipo]
+            extra = diario.get(canasta, 0) if tipo == "total" else 0
+            llevas = tabla + extra
+            falta = max(exigido - llevas, 0)
+            por_rueda = falta / len(pendientes) if pendientes else None
+            ritmo = llevas / len(hechas) if hechas else None
+            filas.append({"canasta": canasta, "tipo": tipo, "exigido": exigido, "tabla": tabla, "diario": extra,
+                          "hoy": hoy_vol.get(canasta, 0) if tipo == "total" else None,
+                          "falta": falta, "porRueda": por_rueda, "ritmo": ritmo,
+                          "pct": llevas / exigido * 100 if exigido else None,
+                          "atrasado": falta > 0 and (ritmo is None or por_rueda is None or ritmo < por_rueda)})
+    return {"corte": cfg["corte"], "ruedasMes": len(dias), "ruedasPendientes": len(pendientes),
+            "hoyCuenta": hoy in pendientes, "filas": filas}
 
 
 class Manejador(BaseHTTPRequestHandler):
