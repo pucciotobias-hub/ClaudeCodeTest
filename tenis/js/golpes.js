@@ -8,12 +8,14 @@ import { G, ARRASTRE, MAGNUS } from './pelota.js';
 // ang0: angulo de salida minimo (grados). El calculo lo sube hasta pasar la red sin exceder la velocidad.
 // vBase + vPot * atributo potencia = velocidad maxima (m/s). sigma: dispersion base en metros.
 const GOLPES = {
-  drive:    { ang0: 3,   vBase: 21, vPot: 1.6, spin: 0.45,  sigma: 0.52, margen: 0.22, nombre: 'Drive' },
-  reves:    { ang0: 3,   vBase: 20, vPot: 1.4, spin: 0.35,  sigma: 0.56, margen: 0.22, nombre: 'Revés' },
+  drive:    { ang0: 3,   vBase: 24, vPot: 1.85, spin: 0.45, sigma: 0.52, margen: 0.22, nombre: 'Drive' },
+  reves:    { ang0: 3,   vBase: 23, vPot: 1.6, spin: 0.35,  sigma: 0.56, margen: 0.22, nombre: 'Revés' },
+  // Slice: mas lento y seguro, flota y pica bajo. Estirado casi no pierde precision (es el golpe de defensa).
+  slice:    { ang0: 5,   vBase: 19.5, vPot: 0.9, spin: -0.55, sigma: 0.44, margen: 0.25, estirado: 0.25, nombre: 'Slice' },
   dropshot: { ang0: 14,  vBase: 20, vPot: 0,   spin: -0.85, sigma: 0.42, margen: 0.22, nombre: 'Dropshot' },
   globo:    { ang0: 46,  vBase: 32, vPot: 0,   spin: 0.3,   sigma: 0.75, margen: 2.0,  nombre: 'Globo' },
-  volea:    { ang0: -8,  vBase: 15, vPot: 1.0, spin: -0.25, sigma: 0.50, margen: 0.18, nombre: 'Volea' },
-  smash:    { ang0: -32, vBase: 28, vPot: 1.8, spin: 0,     sigma: 0.65, margen: 0.25, nombre: 'Smash' },
+  volea:    { ang0: -8,  vBase: 17, vPot: 1.15, spin: -0.25, sigma: 0.50, margen: 0.18, nombre: 'Volea' },
+  smash:    { ang0: -32, vBase: 32, vPot: 2.05, spin: 0,    sigma: 0.65, margen: 0.25, nombre: 'Smash' },
 };
 export const nombreGolpe = (tipo) => GOLPES[tipo]?.nombre ?? 'Saque';
 
@@ -94,10 +96,10 @@ export function objetivo(jug, tipo, apX, apZ) {
   else if (tipo === 'smash') prof = MEDIO_LARGO - 4.5 + apZ * 1.5;
   else if (tipo === 'volea') prof = MEDIO_LARGO - 3.6 + apZ * 1.8;
   else prof = MEDIO_LARGO - 2.6 + apZ * 1.5;
-  return { x: apX * (MEDIO_ANCHO - 0.9), z: -lado(jug.indice) * prof };
+  return { x: apX * (MEDIO_ANCHO - 0.8), z: -lado(jug.indice) * prof };
 }
 
-// op: { tecla: 'golpe'|'dropshot'|'globo', apX: -1..1 (x del mundo), apZ: -1 corto..1 profundo,
+// op: { tecla: 'golpe'|'slice'|'dropshot'|'globo', apX: -1..1 (x del mundo), apZ: -1 corto..1 profundo,
 //       potencia: 0..1, calidad: 0..1, error: multiplicador de dispersion (maquina) }
 export function ejecutarGolpe(jug, pelota, contacto, op) {
   const e = pelota.e, d = jug.datos, a = d.attrs;
@@ -110,6 +112,7 @@ export function ejecutarGolpe(jug, pelota, contacto, op) {
   let tipo;
   if (op.tecla === 'dropshot') tipo = 'dropshot';
   else if (op.tecla === 'globo') tipo = 'globo';
+  else if (op.tecla === 'slice') tipo = 'slice';
   else if (contacto.alto) tipo = 'smash';
   else if (e.piques === 0 && enRed) tipo = 'volea';
   else tipo = (contacto.derecha !== !!d.zurdo) ? 'drive' : 'reves';
@@ -120,7 +123,7 @@ export function ejecutarGolpe(jug, pelota, contacto, op) {
   const fino = tipo === 'dropshot' || tipo === 'globo' || tipo === 'volea' ? a.toque : a.precision;
   const velEntrada = Math.hypot(e.vx, e.vz);
   const sigma = g.sigma * (1.75 - 0.11 * fino) * (op.error ?? 1) *
-    (1 + 0.9 * (1 - calidad) + 0.5 * potencia * potencia + 0.7 * contacto.estirado + velEntrada / 80);
+    (1 + 0.9 * (1 - calidad) + 0.5 * potencia * potencia + (g.estirado ?? 0.7) * contacto.estirado + velEntrada / 80);
   obj.x += gauss() * sigma;
   obj.z += gauss() * sigma * 1.3;
 
@@ -148,15 +151,15 @@ export function ejecutarSaque(jug, pelota, op) {
   const borde = segundo ? 0.75 : 0.45;
   const obj = {
     x: -sx * clamp(2.06 - sx * clamp(op.apX ?? 0, -1, 1) * 1.45, borde, MEDIO_ANCHO - borde),
-    z: -L * (SAQUE - (segundo ? 1.5 : 0.85)),
+    z: -L * (SAQUE - (segundo ? 1.5 : 0.7)),
   };
   const sigma = (segundo ? 0.36 : 0.6) * (1.7 - 0.1 * a.saque) * (op.error ?? 1) * (1 + 1.3 * (1 - calidad));
   obj.x += gauss() * sigma;
   obj.z += gauss() * sigma * 1.25;
 
-  const vmax = (38 + 2.0 * a.saque) * (segundo ? 0.78 : 1) * (0.72 + 0.28 * calidad) * (op.fuerza ?? 1);
-  const spin = segundo ? 0.7 : 0.25;
-  const s = resolver(e, obj, spin, -16, vmax, segundo ? 0.3 : 0.1);
+  const vmax = (42 + 2.2 * a.saque) * (segundo ? 0.78 : 1) * (0.72 + 0.28 * calidad) * (op.fuerza ?? 1);
+  const spin = segundo ? 0.7 : 0.6;
+  const s = resolver(e, obj, spin, -16, vmax, segundo ? 0.3 : 0.06);
   const pRed = (segundo ? 0.025 : 0.09) * (op.error ?? 1) * (1 + 2 * (1 - calidad));
   if (Math.random() < pRed) s.vy -= 0.05 * s.v;
 

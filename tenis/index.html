@@ -37,6 +37,10 @@
   #potencia { position: fixed; bottom: 44px; left: 50%; transform: translateX(-50%); width: 260px; height: 12px;
     background: #0009; border: 1px solid #fff5; }
   #potencia i { display: block; height: 100%; width: 0; background: linear-gradient(90deg, #7fd36a, #e8d24a 65%, #e2603a); }
+  #saque { position: fixed; bottom: 44px; left: 50%; transform: translateX(-50%); width: 320px; height: 16px;
+    border: 1px solid #fff8; }
+  #saque i { position: absolute; top: -6px; bottom: -6px; width: 4px; margin-left: -2px; background: #fff;
+    box-shadow: 0 0 4px #000; }
   #ayuda { position: fixed; bottom: 16px; left: 50%; transform: translateX(-50%); font-size: 13px;
     color: #e8efe6; text-shadow: 0 1px 3px #000; white-space: nowrap; }
   kbd { display: inline-block; padding: 1px 7px; margin: 0 2px; border: 1px solid #fff8; border-radius: 4px;
@@ -88,9 +92,10 @@
   <div id="cartel" class="apagado"></div>
   <div id="velocidad" class="apagado"></div>
   <div id="potencia"><i></i></div>
+  <div id="saque" class="oculto"><i></i></div>
   <div id="ayuda">
     <kbd>←</kbd><kbd>↑</kbd><kbd>→</kbd><kbd>↓</kbd> moverse y apuntar ·
-    <kbd>Espacio</kbd> drive / revés · <kbd>Z</kbd> dropshot · <kbd>X</kbd> globo · <kbd>P</kbd> pausa
+    <kbd>Espacio</kbd> drive / revés · <kbd>V</kbd> slice · <kbd>Z</kbd> dropshot · <kbd>X</kbd> globo · <kbd>P</kbd> pausa
   </div>
 </div>
 
@@ -107,9 +112,9 @@
   <button id="jugar" class="jugar">Jugar</button>
   <div class="teclas">
     <kbd>←</kbd><kbd>↑</kbd><kbd>→</kbd><kbd>↓</kbd> moverse y apuntar ·
-    <kbd>Espacio</kbd> drive o revés (según el lado de la pelota) y saque · <kbd>Z</kbd> dropshot · <kbd>X</kbd> globo
+    <kbd>Espacio</kbd> drive o revés (según el lado de la pelota) y saque · <kbd>V</kbd> slice · <kbd>Z</kbd> dropshot · <kbd>X</kbd> globo
   </div>
-  <div class="teclas">Mantené la tecla de golpe antes de que llegue la pelota para cargar potencia. En el saque: <kbd>Espacio</kbd> lanza, <kbd>Espacio</kbd> pega en lo más alto.</div>
+  <div class="teclas">Mantené la tecla de golpe antes de que llegue la pelota para cargar potencia. En el saque: <kbd>Espacio</kbd> lanza la pelota y <kbd>Espacio</kbd> de nuevo le pega: cuanto más cerca del verde de la barra, mejor sale.</div>
 </div>
 
 <div id="pausa" class="pantalla oculto">

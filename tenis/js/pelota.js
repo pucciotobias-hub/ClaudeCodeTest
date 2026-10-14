@@ -62,8 +62,9 @@ export function avanzar(e, dt) {
       e.vy = 0; e.rodando = true;
     } else {
       e.vy = -e.vy * RESTITUCION * (1 + 0.15 * e.spin);
-      // El efecto hacia atras (dropshot) frena la pelota contra el pasto: pica y se queda.
-      const roce = ROCE_PIQUE * (e.spin < 0 ? 1 + 0.3 * e.spin : 1);
+      // Mucho efecto hacia atras (dropshot) frena la pelota contra el pasto: pica y se queda.
+      // Con menos efecto (slice, volea) pasa lo contrario: patina y sale baja.
+      const roce = ROCE_PIQUE * (e.spin < -0.7 ? 1 + 0.3 * e.spin : e.spin < 0 ? 1 - 0.12 * e.spin : 1);
       e.vx *= roce; e.vz *= roce;
       e.spin *= 0.4;
     }

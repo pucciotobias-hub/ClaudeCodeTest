@@ -106,6 +106,30 @@ const GOLPES = {
         pyaw: -0.25, lean: 0.26, crouch: 0.1, fR: [0.06, 0, 0.22], fL: [-0.26, 0, -0.12] }),
     ],
   },
+  slice: { // de arriba hacia abajo y hacia adelante, acompaniando largo con la cara abierta
+    prep: K({ hR: [0.5, 1.52, -0.2], rd: [0.1, 0.95, -0.3], hL: [-0.2, 1.15, 0.3], yaw: 1.1, pyaw: 0.5,
+      lean: 0.14, crouch: 0.12, fR: [0.26, 0, -0.14], fL: [-0.16, 0, 0.2] }),
+    swing: [
+      K({ t: 0, hR: [0.6, 0.98, 0.42], rd: [0.85, 0.3, 0.25], rn: [0, 0.45, 0.9], hL: [-0.3, 1.1, 0.15], yaw: 0.25,
+        pyaw: 0.12, lean: 0.24, crouch: 0.12, fR: [0.26, 0, -0.14], fL: [-0.16, 0, 0.2] }),
+      K({ t: 0.14, hR: [0.3, 0.8, 0.64], rd: [0.5, 0.1, 0.85], rn: [-0.3, 0.9, 0.3], hL: [-0.34, 1.05, 0], yaw: -0.1,
+        lean: 0.28, crouch: 0.14, fR: [0.26, 0, -0.14], fL: [-0.16, 0, 0.24] }),
+      K({ t: 0.32, hR: [-0.05, 0.88, 0.6], rd: [0.1, 0.25, 0.95], rn: [-0.3, 0.9, 0.2], hL: [-0.36, 1.05, -0.05], yaw: -0.3,
+        pyaw: -0.1, lean: 0.24, crouch: 0.1, fR: [0.24, 0.02, -0.06], fL: [-0.16, 0, 0.24] }),
+    ],
+  },
+  slice_r: { // a una mano, con el brazo libre yendo hacia atras
+    prep: K({ hR: [-0.35, 1.52, -0.2], rd: [-0.2, 0.9, -0.4], ag: 0.3, yaw: -1.3, pyaw: -0.6, lean: 0.14,
+      crouch: 0.12, fR: [0.06, 0, 0.24], fL: [-0.26, 0, -0.12] }),
+    swing: [
+      K({ t: 0, hR: [-0.36, 0.98, 0.45], rd: [-0.85, 0.3, 0.3], rn: [0, 0.45, 0.9], hL: [-0.4, 1.05, -0.2], yaw: -0.75,
+        pyaw: -0.4, lean: 0.24, crouch: 0.12, fR: [0.06, 0, 0.24], fL: [-0.26, 0, -0.12] }),
+      K({ t: 0.14, hR: [0.1, 0.82, 0.62], rd: [-0.1, 0.1, 0.95], rn: [0.3, 0.9, 0.2], hL: [-0.5, 1.0, -0.35], yaw: -0.55,
+        pyaw: -0.3, lean: 0.28, crouch: 0.14, fR: [0.06, 0, 0.26], fL: [-0.26, 0, -0.12] }),
+      K({ t: 0.32, hR: [0.5, 0.95, 0.45], rd: [0.6, 0.3, 0.7], rn: [0.3, 0.9, 0.2], hL: [-0.55, 1.0, -0.4], yaw: -0.4,
+        pyaw: -0.25, lean: 0.24, crouch: 0.1, fR: [0.06, 0, 0.26], fL: [-0.26, 0, -0.12] }),
+    ],
+  },
   globo: { // de abajo hacia arriba, terminando alto
     prep: K({ hR: [0.48, 0.72, -0.28], rd: [0.3, -0.45, -0.8], rn: [0, 0.8, 0.5], hL: [0.2, 1.2, 0.3], yaw: 1.0, pyaw: 0.5,
       lean: 0.2, crouch: 0.18, fR: [0.26, 0, -0.14], fL: [-0.16, 0, 0.2] }),
@@ -387,7 +411,7 @@ export class Jugador {
     const vmax = this.velMax * factor * (0.8 + 0.2 * this.energia);
     const ox = n > 0.01 ? dx / n * vmax * Math.min(1, n) : 0;
     const oz = n > 0.01 ? dz / n * vmax * Math.min(1, n) : 0;
-    const a = 30 * dt;
+    const a = 16 * dt; // arrancar y frenar cuesta: una pelota a contrapie o bien abierta puede ser ganadora
     this.vx += Math.max(-a, Math.min(a, ox - this.vx));
     this.vz += Math.max(-a, Math.min(a, oz - this.vz));
     const L = lado(this.indice);
@@ -413,7 +437,7 @@ export class Jugador {
   descansar(cuanto) { this.energia = Math.min(1, this.energia + cuanto); }
 
   // ---------- Animacion ----------
-  // tipo: drive, reves, dropshot, globo, volea, smash, saque. deReves: la pelota viene del lado del reves.
+  // tipo: drive, reves, slice, dropshot, globo, volea, smash, saque. deReves: la pelota viene del lado del reves.
   #clave(tipo, deReves) {
     if (tipo === 'reves') return this.datos.dosManos ? 'reves' : 'reves1';
     if (deReves && GOLPES[tipo + '_r']) return tipo + '_r';

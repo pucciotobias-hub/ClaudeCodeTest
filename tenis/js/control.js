@@ -1,10 +1,10 @@
-// Teclado del usuario: flechas para moverse y apuntar, Espacio / Z / X para pegar.
+// Teclado del usuario: flechas para moverse y apuntar, Espacio / V / Z / X para pegar.
 const MAPA = {
   ArrowLeft: 'izq', ArrowRight: 'der', ArrowUp: 'arriba', ArrowDown: 'abajo',
-  Space: 'golpe', KeyZ: 'dropshot', KeyX: 'globo',
+  Space: 'golpe', KeyV: 'slice', KeyZ: 'dropshot', KeyX: 'globo',
   KeyP: 'pausa', Escape: 'pausa',
 };
-export const TECLAS_GOLPE = ['golpe', 'dropshot', 'globo'];
+export const TECLAS_GOLPE = ['golpe', 'slice', 'dropshot', 'globo'];
 
 export class Control {
   constructor() {

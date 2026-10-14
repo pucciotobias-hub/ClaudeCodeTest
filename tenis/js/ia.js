@@ -12,6 +12,7 @@ export const DIFICULTADES = {
 };
 
 const azar = (a, b) => a + Math.random() * (b - a);
+const ALTURA_IMPACTO = 0.6;
 
 // Donde conviene pararse para pegarle a la pelota que viene. `dejar` avisa que se va afuera.
 // astucia 0..1: cuanto margen necesita para darse cuenta de que es mala.
@@ -30,7 +31,9 @@ export function leerPelota(j, e, astucia = 1) {
   }
   if (!punto) {
     const tras = muestras.filter((m) => m.piques === 1 && adentro(m));
-    punto = tras.find((m) => m.vy < 0 && m.y < 1.45) ?? tras[tras.length - 1];
+    // Le pega subiendo, apenas la pelota llega a la altura de la cadera (o en lo mas alto si pica baja):
+    // esperarla hasta que baje obliga a irse metros atras de la linea de fondo.
+    punto = tras.find((m) => m.y >= ALTURA_IMPACTO || m.vy < 0) ?? tras[tras.length - 1];
   }
   if (!punto) return { dejar: true, x: j.x, z: j.z };
   const costado = j.x < punto.x ? 1 : -1;
@@ -113,7 +116,10 @@ export class IA {
     // Con el rival centrado, cualquier lado; a veces juega a contrapie o al medio.
     if (Math.abs(r.x) < 1.2) op.apX = (Math.random() < 0.5 ? -1 : 1) * azar(0.45, 0.95);
     else if (Math.random() > 0.55 + 0.3 * dif.astucia) op.apX = -op.apX * azar(0.2, 0.8);
-    if (contacto.estirado > 0.6) { op.potencia *= 0.75; op.apX *= 0.5; op.apZ = 0; }
+    if (contacto.estirado > 0.6) {
+      op.potencia *= 0.75; op.apX *= 0.5; op.apZ = 0;
+      if (Math.random() < 0.5) op.tecla = 'slice';
+    }
     return op;
   }
 

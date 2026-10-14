@@ -3,7 +3,7 @@ import * as THREE from 'three';
 import { MEDIO_ANCHO, MEDIO_LARGO, lado } from './cancha.js';
 import { crearEstadio } from './estadio.js';
 import { PLANTEL, ATRIBUTOS, Jugador } from './jugadores.js';
-import { Pelota, PASO, trayectoria } from './pelota.js';
+import { Pelota, PASO, trayectoria, estadoNuevo, avanzar } from './pelota.js';
 import { puedeGolpear, ejecutarGolpe, ejecutarSaque, saqueBueno, pelotaBuena, nombreGolpe, objetivo } from './golpes.js';
 import { Control, TECLAS_GOLPE } from './control.js';
 import { IA, DIFICULTADES, leerPelota } from './ia.js';
@@ -120,7 +120,44 @@ function prepararPunto() {
   pelotaEnMano();
   sonido.murmullo(0.15);
   pintarMarcador();
-  if (!P.ias[P.sacador]) cartel(P.segundo ? 'Segundo saque' : 'Tu saque', 'Espacio para lanzar, Espacio para pegar', 1.6);
+  P.lanzamiento = medirLanzamiento(s);
+  if (!P.ias[P.sacador]) {
+    cartel(P.segundo ? 'Segundo saque' : 'Tu saque', 'Espacio lanza la pelota, Espacio de nuevo en la zona verde', 1.8);
+    pintarBarraSaque();
+  }
+}
+
+// Con que sale la pelota de la mano, y hasta donde hay que dejarla bajar para pegarle con el brazo
+// estirado: ese es el mejor punto de impacto.
+const lanzamiento = (s) => {
+  const k = s.datos.altura / 1.85;
+  return { k, y: 1.45 * k, vy: 5.6 * Math.sqrt(k), yIdeal: 2.88 * k, ySuelta: 1.1 * k };
+};
+
+// Simula el lanzamiento: en que momento pasa por el punto ideal y cuando se cae.
+function medirLanzamiento(s) {
+  const l = lanzamiento(s);
+  const e = { ...estadoNuevo(), y: l.y, vy: l.vy };
+  let t = 0, ideal = 0;
+  while (t < 3 && !(e.vy < 0 && e.y < l.ySuelta)) {
+    avanzar(e, PASO); t += PASO;
+    if (!ideal && e.vy < 0 && e.y <= l.yIdeal) ideal = t;
+  }
+  return { ideal, fin: t };
+}
+
+// Que tan bueno sale el saque segun a cuantos segundos del momento ideal se le pega.
+const SAQUE_PERFECTO = 0.035, SAQUE_NULO = 0.3;
+const calidadSaque = (t) => clamp(1 - (Math.abs(t - P.lanzamiento.ideal) - SAQUE_PERFECTO) / (SAQUE_NULO - SAQUE_PERFECTO), 0, 1);
+const notaSaque = (c) => (c >= 0.95 ? 'perfecto' : c >= 0.6 ? 'bueno' : c >= 0.3 ? 'regular' : 'flojo');
+
+// La barra del saque es el tiempo del lanzamiento: verde donde conviene pegar.
+function pintarBarraSaque() {
+  const { ideal, fin } = P.lanzamiento;
+  const p = (dt) => `${(clamp((ideal + dt) / fin, 0, 1) * 100).toFixed(1)}%`;
+  const rojo = '#b23a2e', amarillo = '#e8d24a', verde = '#5fd35a';
+  $('saque').style.background = `linear-gradient(90deg, ${rojo} ${p(-SAQUE_NULO)}, ${amarillo} ${p(-SAQUE_NULO / 2)}, ` +
+    `${verde} ${p(-SAQUE_PERFECTO)}, ${verde} ${p(SAQUE_PERFECTO)}, ${amarillo} ${p(SAQUE_NULO / 2)}, ${rojo} ${p(SAQUE_NULO)})`;
 }
 
 function pelotaEnMano() {
@@ -129,10 +166,10 @@ function pelotaEnMano() {
 }
 
 function lanzar() {
-  const s = P.jug[P.sacador], k = s.datos.altura / 1.85;
+  const s = P.jug[P.sacador], l = lanzamiento(s);
   pelotaEnMano();
-  pelota.e.y = 1.45 * k;
-  pelota.e.vy = 5.6 * Math.sqrt(k);
+  pelota.e.y = l.y;
+  pelota.e.vy = l.vy;
   s.preparar('saque');
   P.estado = 'lanzada'; P.t = 0;
 }
@@ -148,7 +185,7 @@ function sacar(op) {
   P.estado = 'peloteo'; P.t = 0;
   P.ias[1 - P.sacador]?.alGolpeRival();
   if (P.sacador === 1) marcarPique();
-  mostrarVelocidad(`Saque <b>${r.kmh}</b> km/h`);
+  mostrarVelocidad(`Saque <b>${r.kmh}</b> km/h` + (op.nota ? ` · ${op.nota}` : ''));
 }
 
 // La unica puerta para pegarle a la pelota en el peloteo, la usan el usuario y la maquina.
@@ -161,7 +198,8 @@ function golpear(j, op) {
   if (!c) return false;
   const r = ejecutarGolpe(j, pelota, c, op);
   j.pegar(r.tipo, c.derecha === !!j.datos.zurdo);
-  if (r.tipo === 'dropshot' || r.tipo === 'volea') sonido.toque(); else sonido.golpe(op.potencia ?? 0.6);
+  if (r.tipo === 'dropshot' || r.tipo === 'volea') sonido.toque();
+  else sonido.golpe(r.tipo === 'slice' ? 0.4 : op.potencia ?? 0.6);
   P.ultimo = j.indice; P.ultimoTipo = r.tipo;
   P.golpes++; P.esSaque = false; P.cinta = false;
   P.ias[1 - j.indice]?.alGolpeRival(r.tipo);
@@ -317,7 +355,8 @@ function paso(dt, flancos) {
     const k = P.jug[P.sacador].datos.altura / 1.85;
     if (usuarioSaca) {
       if (flancos.recien.golpe && e.y > 1.6 * k) {
-        sacar({ apX: control.dirX, calidad: clamp((e.y - 1.75 * k) / (1.1 * k), 0, 1) });
+        const calidad = calidadSaque(P.t);
+        sacar({ apX: control.dirX, calidad, nota: notaSaque(calidad) });
       }
     } else if (e.vy < 0 && e.y <= 2.9 * k) {
       sacar(P.ias[P.sacador].saque(P.segundo));
@@ -420,6 +459,10 @@ function cuadro() {
     }
     P.jug.forEach((j) => j.dibujar(dt * Math.min(ACELERAR, 4)));
     $('potencia').firstElementChild.style.width = `${P.usuario.activo ? P.usuario.carga * 100 : 0}%`;
+    const sacando = !P.ias[P.sacador] && (P.estado === 'presaque' || P.estado === 'lanzada');
+    $('saque').classList.toggle('oculto', !sacando);
+    $('potencia').classList.toggle('oculto', sacando);
+    if (sacando) $('saque').firstElementChild.style.left = `${P.estado === 'lanzada' ? clamp(P.t / P.lanzamiento.fin, 0, 1) * 100 : 0}%`;
   }
   pelota.dibujar();
   if (!pausado) {
