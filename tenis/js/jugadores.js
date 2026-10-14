@@ -188,6 +188,16 @@ const GOLPES = {
 };
 GOLPES.smash = GOLPES.saque;
 
+// Giro de unidad: el primer tramo del armado. Los hombros giran con la raqueta todavia adelante y la
+// mano libre en el cuello; recien despues la raqueta va atras. Es la pose de espera girada con el tronco.
+const rotarY = (v, a) => [v[0] * Math.cos(a) + v[2] * Math.sin(a), v[1], -v[0] * Math.sin(a) + v[2] * Math.cos(a)];
+for (const [clave, g] of Object.entries(GOLPES)) {
+  if (clave === 'saque' || clave === 'smash') continue;
+  const a = g.prep.yaw * 0.85;
+  g.giro = { ...g.prep, hR: rotarY(LISTO.hR, a), rd: rotarY(LISTO.rd, a), rn: rotarY(LISTO.rn, a), hL: rotarY(LISTO.hL, a), ag: LISTO.ag };
+}
+const suave = (u) => { const x = Math.max(0, Math.min(1, u)); return x * x * (3 - 2 * x); };
+
 const CAMPOS_V = ['hR', 'rd', 'rn', 'hL', 'fR', 'fL'];
 const CAMPOS_N = ['ag', 'yaw', 'pyaw', 'lean', 'crouch', 'salto'];
 function copiarPose(p) {
@@ -305,6 +315,8 @@ export class Jugador {
     this.pose = copiarPose(LISTO);    // pose actual, suavizada
     this.meta = copiarPose(LISTO);
     this.paso = 0; this.correr = 0; this.reloj = Math.random() * 10;
+    this.rumbo = 0;                   // giro del cuerpo hacia donde corre
+    this.tSplit = 9;                  // tiempo desde el ultimo split-step
     this.s = datos.zurdo ? 1 : -1;    // el modelo mira a +z, asi que su derecha es -x
     this.#armar(scene);
     this.dibujar(0);
@@ -454,6 +466,9 @@ export class Jugador {
 
   soltar() { if (this.anim?.fase === 'prep') this.anim = null; }
 
+  // Saltito con los pies abiertos cuando pega el rival: queda listo para salir para cualquier lado.
+  split() { if (this.anim?.fase !== 'swing') this.tSplit = 0; }
+
   // Deja la figura clavada en un momento de un golpe (para mirar las poses).
   posar(tipo, deReves, fase, t = 0) {
     this.anim = { clave: this.#clave(tipo, deReves), fase, t };
@@ -467,7 +482,10 @@ export class Jugador {
     if (!a) { mezclar(this.meta, LISTO, LISTO, 0); return 7; }
     const g = GOLPES[a.clave];
     a.t += dt;
-    if (a.fase === 'prep') { mezclar(this.meta, g.prep, g.prep, 0); return 11; }
+    if (a.fase === 'prep') {
+      mezclar(this.meta, g.giro ?? g.prep, g.prep, g.giro ? suave((a.t - 0.06) / 0.3) : 1);
+      return 11;
+    }
     const k = g.swing;
     const fin = k[k.length - 1].t;
     if (a.t >= fin + 0.16) { this.anim = null; mezclar(this.meta, LISTO, LISTO, 0); return 7; }
@@ -489,30 +507,46 @@ export class Jugador {
     g.position.set(this.x, 0, this.z);
     this.reloj += dt;
 
-    // Carrera: los pies recorren una zancada en la direccion del movimiento (el cuerpo sigue mirando a la red).
+    // Carrera. En un sprint el cuerpo gira hacia donde va (salvo hacia atras: ahi retrocede de frente);
+    // despacio o con el golpe armado sigue de cara a la red y se desplaza con pasos laterales.
     const giro = this.indice === 0 ? -1 : 1;
     const lvx = this.vx * giro, lvz = this.vz * giro;
     const v = Math.hypot(lvx, lvz);
     this.correr += (Math.min(1, v / 2.5) - this.correr) * Math.min(1, 10 * dt);
-    this.paso += v * dt * 2.7;
+    this.paso += v * dt * 2.5;
     const c = this.correr;
-    const zancada = Math.min(0.36, 0.065 * v) * c, alza = Math.min(0.2, 0.04 * v) * c;
-    const ux = v > 0.01 ? lvx / v : 0, uz = v > 0.01 ? lvz / v : 0;
+    const sprint = suave((v - 2.6) / 2.2);
+    const rumbo = Math.atan2(lvx, lvz);
+    let objetivo = Math.abs(rumbo) > 2.3 ? 0 : Math.max(-1.35, Math.min(1.35, rumbo)) * sprint;
+    if (this.anim) objetivo *= this.anim.fase === 'prep' ? 0.3 : 0;
+    this.rumbo += (objetivo - this.rumbo) * Math.min(1, 7 * dt);
+    g.rotation.y = (this.indice === 0 ? Math.PI : 0) + this.rumbo;
+    // La direccion de la carrera vista desde el cuerpo ya girado.
+    const cr = Math.cos(this.rumbo), sr = Math.sin(this.rumbo);
+    const bx = lvx * cr - lvz * sr, bz = lvx * sr + lvz * cr;
+    const zancada = Math.min(0.42, 0.075 * v) * c, alza = Math.min(0.22, 0.045 * v) * c;
+    const ux = v > 0.01 ? bx / v : 0, uz = v > 0.01 ? bz / v : 0;
     const enEspera = !this.anim && c < 0.2;
     const rebote = enEspera ? Math.abs(Math.sin(this.reloj * 5.5)) * 0.018 : 0;
+    // Split-step: saltito corto y cae con los pies abiertos.
+    this.tSplit += dt;
+    const hop = this.tSplit < 0.32 ? Math.sin(Math.PI * this.tSplit / 0.32) : 0;
+    const abre = this.tSplit < 0.5 ? Math.sin(Math.PI * Math.min(1, this.tSplit / 0.5)) : 0;
 
-    const salto = p.salto;
-    const P = v1.set(0, CADERA_Y - p.crouch + salto + rebote + Math.abs(Math.sin(this.paso)) * 0.03 * c, 0);
+    const salto = p.salto + hop * 0.07;
+    const P = v1.set(0, CADERA_Y - p.crouch - 0.05 * c + salto + rebote + Math.abs(Math.sin(this.paso)) * 0.035 * c, 0);
     this.tronco.position.copy(P);
-    this.tronco.rotation.set(p.lean + 0.1 * c * uz, s * p.yaw, 0.08 * c * ux * -1);
-    this.cabeza.rotation.set(-p.lean * 0.7, -s * p.yaw * 0.62, 0);
+    this.tronco.rotation.set(p.lean + (0.08 + 0.1 * sprint) * c * uz, s * p.yaw, -0.1 * c * ux);
+    this.cabeza.rotation.set(-p.lean * 0.7, -s * p.yaw * 0.62 - this.rumbo * 0.6, 0);
     this.caderaMalla.position.copy(P).y -= 0.01;
     this.caderaMalla.rotation.y = s * p.pyaw;
 
-    // Brazos.
-    const mano = (h) => v2.set(s * h[0], h[1] + salto + rebote, h[2]);
+    // Brazos: sin golpe armado acompanian la carrera, cada uno contra su pierna.
+    const brazada = this.anim ? 0 : c * Math.min(1, v / 4);
+    const vaiven = Math.cos(this.paso);
+    const mano = (h, dz = 0) => v2.set(s * h[0], h[1] + salto + rebote - 0.12 * brazada, h[2] + dz);
     const rd = v3.set(s * p.rd[0], p.rd[1], p.rd[2]).normalize();
-    this.#brazo(this.brazoR, s, mano(p.hR), vManoR);
+    this.#brazo(this.brazoR, s, mano(p.hR, vaiven * 0.16 * brazada), vManoR);
     this.raqueta.position.copy(vManoR).addScaledVector(rd, -0.02);
     // Base de la raqueta: Y a lo largo, Z lo mas parecido posible a hacia donde mira el encordado.
     const n = v4.set(s * p.rn[0], p.rn[1], p.rn[2]);
@@ -523,14 +557,16 @@ export class Jugador {
     m4.makeBasis(lateral, rd, n);
     this.raqueta.quaternion.setFromRotationMatrix(m4);
 
-    const agarre = Math.min(1, p.ag / 0.1);
-    const libre = mano(p.hL);
+    const agarre = Math.min(1, p.ag / 0.1) * (1 - brazada);
+    const libre = mano(p.hL, -vaiven * 0.22 * brazada);
     if (agarre > 0) libre.lerp(v6.copy(vManoR).addScaledVector(rd, Math.max(p.ag, 0.1)), agarre);
     this.#brazo(this.brazoL, -s, libre, vManoL);
 
-    // Piernas.
-    this.#pierna(this.piernaR, s, p.fR, p.pyaw, salto, ux, uz, zancada, alza, this.paso, P);
-    this.#pierna(this.piernaL, -s, p.fL, p.pyaw, salto, ux, uz, zancada, alza, this.paso + Math.PI, P);
+    // Piernas: hacia adelante alternan (fase opuesta); de costado casi juntas, para no cruzarse.
+    const angosto = 0.55 * c * sprint, ancho = 0.07 * abre;
+    const pasoLat = Math.PI * (0.45 + 0.55 * sprint);
+    this.#pierna(this.piernaR, s, p.fR, p.pyaw, salto, ux, uz, zancada, alza, this.paso, this.paso, angosto, ancho, P);
+    this.#pierna(this.piernaL, -s, p.fL, p.pyaw, salto, ux, uz, zancada, alza, this.paso + Math.PI, this.paso + pasoLat, angosto, ancho, P);
   }
 
   #brazo(b, signo, objetivo, manoOut) {
@@ -545,12 +581,12 @@ export class Jugador {
     if (b.banda) tender(b.banda, v9.lerpVectors(vCodo, manoOut, 0.74), v10.lerpVectors(vCodo, manoOut, 0.9));
   }
 
-  #pierna(q, signo, pie, pyaw, salto, ux, uz, zancada, alza, fase, P) {
+  #pierna(q, signo, pie, pyaw, salto, ux, uz, zancada, alza, fase, faseLat, angosto, ancho, P) {
     const s = this.s;
     const cadera = v7.set(signo * 0.105, -0.03, 0).applyAxisAngle(EJE_Y, s * pyaw).add(P);
-    const sube = Math.max(0, Math.sin(fase));
+    const sube = Math.max(0, Math.sin(Math.abs(ux) > Math.abs(uz) ? faseLat : fase));
     const tobillo = v8.set(
-      s * pie[0] - ux * zancada * Math.cos(fase),
+      s * pie[0] * (1 - angosto) + signo * ancho - ux * zancada * Math.cos(faseLat),
       pie[1] + salto + TOBILLO + sube * alza,
       pie[2] - uz * zancada * Math.cos(fase));
     const polo = v9.set(signo * 0.15, 0.1, 1);

@@ -184,6 +184,7 @@ function sacar(op) {
   P.golpes = 1; P.esSaque = true; P.cinta = false;
   P.estado = 'peloteo'; P.t = 0;
   P.ias[1 - P.sacador]?.alGolpeRival();
+  P.jug[1 - P.sacador].split();
   if (P.sacador === 1) marcarPique();
   mostrarVelocidad(`Saque <b>${r.kmh}</b> km/h` + (op.nota ? ` · ${op.nota}` : ''));
 }
@@ -203,6 +204,7 @@ function golpear(j, op) {
   P.ultimo = j.indice; P.ultimoTipo = r.tipo;
   P.golpes++; P.esSaque = false; P.cinta = false;
   P.ias[1 - j.indice]?.alGolpeRival(r.tipo);
+  P.jug[1 - j.indice].split();
   if (j.indice === 1) marcarPique(); else { marca.visible = false; P.usuario.plan = null; }
   if (r.tipo !== 'dropshot' && r.tipo !== 'globo') mostrarVelocidad(`${nombreGolpe(r.tipo)} <b>${r.kmh}</b> km/h`);
   else mostrarVelocidad(nombreGolpe(r.tipo));
@@ -464,7 +466,7 @@ function cuadro() {
     $('potencia').classList.toggle('oculto', sacando);
     if (sacando) $('saque').firstElementChild.style.left = `${P.estado === 'lanzada' ? clamp(P.t / P.lanzamiento.fin, 0, 1) * 100 : 0}%`;
   }
-  pelota.dibujar();
+  pelota.dibujar(pausado ? 0 : dt);
   if (!pausado) {
     estadio.actualizar(dt, tiempo);
     if ((tCartel -= dt) <= 0) $('cartel').classList.add('apagado');

@@ -3,7 +3,7 @@
 import {
   MEDIO_ANCHO, MEDIO_LARGO, SAQUE, POSTE_X, RADIO_PELOTA as R, alturaRed, lado,
 } from './cancha.js';
-import { G, ARRASTRE, MAGNUS } from './pelota.js';
+import { G, ARRASTRE, MAGNUS, trayectoria } from './pelota.js';
 
 // ang0: angulo de salida minimo (grados). El calculo lo sube hasta pasar la red sin exceder la velocidad.
 // vBase + vPot * atributo potencia = velocidad maxima (m/s). sigma: dispersion base en metros.
@@ -137,7 +137,7 @@ export function ejecutarGolpe(jug, pelota, contacto, op) {
   const pRed = 0.012 * (op.error ?? 1) * (1 + 4 * (1 - calidad) + 2 * contacto.estirado + potencia);
   if (tipo !== 'globo' && Math.random() < pRed) s.vy -= 0.09 * s.v;
 
-  Object.assign(e, { vx: s.vx, vy: s.vy, vz: s.vz, spin, piques: 0, rodando: false });
+  Object.assign(e, { vx: s.vx, vy: s.vy, vz: s.vz, spin, curva: 0, piques: 0, rodando: false });
   return { tipo, kmh: Math.round(s.v * 3.6) };
 }
 
@@ -158,12 +158,28 @@ export function ejecutarSaque(jug, pelota, op) {
   obj.z += gauss() * sigma * 1.25;
 
   const vmax = (42 + 2.2 * a.saque) * (segundo ? 0.78 : 1) * (0.72 + 0.28 * calidad) * (op.fuerza ?? 1);
-  const spin = segundo ? 0.7 : 0.6;
-  const s = resolver(e, obj, spin, -16, vmax, segundo ? 0.3 : 0.06);
+  // Primero cortado: dobla hacia la izquierda de quien saca (derecha si es zurdo) y se abre al picar.
+  // Segundo con kick: mucho topspin, pica alto y salta para el otro lado.
+  const mano = jug.datos.zurdo ? -1 : 1;
+  const spin = segundo ? 0.95 : 0.6;
+  const curva = segundo ? 0.35 * mano : -0.55 * mano;
+  const margen = segundo ? 0.3 : 0.06;
+  // La curva no entra en el calculo plano: se apunta, se mide cuanto se desvio y se corrige.
+  const apunte = { ...obj };
+  // Si la correccion obliga a un tiro mucho mas lento (apunte sin linea limpia), se queda con el primero.
+  const plano = resolver(e, apunte, spin, -16, vmax, margen);
+  let s = plano;
+  for (let i = 0; i < 2; i++) {
+    const pq = trayectoria({ ...e, vx: s.vx, vy: s.vy, vz: s.vz, spin, curva, piques: 0, rodando: false }).primerPique;
+    if (!pq) break;
+    apunte.x -= pq.x - obj.x; apunte.z -= pq.z - obj.z;
+    s = resolver(e, apunte, spin, -16, vmax, margen);
+  }
+  if (s.v < 0.88 * plano.v) s = plano;
   const pRed = (segundo ? 0.025 : 0.09) * (op.error ?? 1) * (1 + 2 * (1 - calidad));
   if (Math.random() < pRed) s.vy -= 0.05 * s.v;
 
-  Object.assign(e, { vx: s.vx, vy: s.vy, vz: s.vz, spin, piques: 0, rodando: false });
+  Object.assign(e, { vx: s.vx, vy: s.vy, vz: s.vz, spin, curva, piques: 0, rodando: false });
   return { tipo: 'saque', kmh: Math.round(s.v * 3.6) };
 }
 
