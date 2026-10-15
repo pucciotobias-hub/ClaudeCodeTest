@@ -48,6 +48,7 @@ The unattended GGAL runs commit and push on their own to the same branch, so the
 Windows Scheduled Tasks (`scripts/install_ggal_tasks.ps1`) fire `ggal_estudio.ps1` on weekdays. The wrapper makes sure Chrome is up with CDP on port 9222, then runs `claude -p` headless with a **recipe** (`scripts/ggal_*_prompt.md`) prefixed with date, time, turn and output path. The headless Claude drives a live TradingView chart through the `tradingview` MCP server, writes the report and commits it.
 
 - **The recipe is the product.** To change what a study does, edit its `*_prompt.md`, not the wrapper. Recipes carry dated notes explaining why each rule exists; keep that habit when adding one.
+- **The `apertura` is on demand only** since 2026-10-16: no scheduled task fires it; the user asks for it (`/estudio apertura`). Scheduled: `cierre` (weekdays), `semanal` (Mondays), `auditoria` (Fridays).
 - **Turns and outputs:** `apertura`/`mediodia`/`cierre` → `estudios/ggal/<date>-<turn>.md`; `auditoria` (Fridays) → `estudios/ggal/auditorias/<date>.md`; `semanal` (Mondays) → `estudios/ggal/semanal/<date>.json`.
 - **Audit proposals are never applied automatically.** The audit proposes recipe changes; the user reads and approves them.
 - **One chart, one run.** All turns share the same chart, guarded by the mutex `Local\GgalEstudioChart`. Do not drive the chart from an interactive session while a run is in progress (`logs/ggal_estudio.log` shows `INICIO` without `FIN`).

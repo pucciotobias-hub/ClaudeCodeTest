@@ -23,7 +23,7 @@ dos veces por dia habil, y deja el informe versionado en `estudios/ggal/`.
 
 | Tarea | Cuando | Por que |
 |---|---|---|
-| `EstudioGGAL-Apertura` | L-V 10:20 (reintento 10:50) | 10 min antes de que abra NY (10:30 ART). Llegas con el mapa armado. |
+| Apertura | **A pedido** (`/estudio apertura`) | Desde el 16-oct-2026 no se programa: el usuario la pide cuando la quiere. La tarea `EstudioGGAL-Apertura` (L-V 10:20) quedo en la lista `$Retiradas` del instalador, que la borra si sigue registrada. |
 | `EstudioGGAL-Cierre` | L-V 17:15 (reintentos 17:50 y 18:30) | 15 min despues del cierre (17:00 ART). Vela diaria ya cerrada. |
 | `ReporteSemanalGGAL` | L 09:30 (reintento 12:00) | Semana cerrada, antes de la apertura. El de 12:00 va despues de la apertura para no pisarse en el chart. |
 | `AuditoriaGGAL` | V 19:30 (reintento 20:30) | Despues del ultimo reintento del cierre del viernes. |

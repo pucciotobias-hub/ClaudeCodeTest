@@ -3,16 +3,20 @@
     Registra (o borra) las Tareas Programadas del estudio diario de GGAL.
 
 .DESCRIPTION
-    Crea tres tareas, hora local (ART, UTC-3):
+    Crea estas tareas, hora local (ART, UTC-3):
 
-      EstudioGGAL-Apertura   L-V 10:20, 10:50        -> antes de que abra NY
       EstudioGGAL-Cierre     L-V 17:15, 17:50, 18:30 -> despues del cierre
+      ReporteSemanalGGAL     L   09:30, 12:00
       AuditoriaGGAL          V   19:30, 20:30        -> despues del ultimo
                                                         reintento del cierre
 
     El primer disparo es el bueno; los otros son reintentos. Si el primero murio
     en el despertar de la maquina (0xC000013A, paso el 11 y el 23-sep), el
     siguiente lo cubre. Si el informe ya existe, el wrapper sale sin hacer nada.
+
+    La apertura ya no es automatica desde el 16-oct-2026: el usuario la pide
+    cuando la quiere (/estudio apertura). 'instalar' borra la tarea vieja si
+    sigue registrada (lista $Retiradas).
 
     Todas corren SOLO con el usuario logueado: Chrome necesita una sesion de
     escritorio activa para renderizar el chart.
@@ -38,11 +42,12 @@ $WorkDir = Split-Path -Parent $PSScriptRoot
 
 $LaV = @('Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday')
 $Tareas = @(
-    @{ Nombre = 'EstudioGGAL-Apertura'; Turno = 'apertura';  Horas = @('10:20', '10:50');          Dias = $LaV;       Desc = 'Estudio tecnico GGAL ADR - pre-apertura de NY' }
     @{ Nombre = 'EstudioGGAL-Cierre';   Turno = 'cierre';    Horas = @('17:15', '17:50', '18:30'); Dias = $LaV;       Desc = 'Estudio tecnico GGAL ADR - post-cierre de NY' }
     @{ Nombre = 'ReporteSemanalGGAL';   Turno = 'semanal';   Horas = @('09:30', '12:00');          Dias = @('Monday'); Desc = 'Reporte semanal GGAL: noticias macro y panorama, publicado en claude.ai' }
     @{ Nombre = 'AuditoriaGGAL';        Turno = 'auditoria'; Horas = @('19:30', '20:30');          Dias = @('Friday'); Desc = 'Auditoria semanal de los estudios GGAL contra el precio' }
 )
+# Tareas que existieron y ya no se programan: 'instalar' y 'desinstalar' las borran.
+$Retiradas = @('EstudioGGAL-Apertura')
 
 switch ($Accion) {
 
@@ -67,10 +72,23 @@ switch ($Accion) {
                 Write-Output "No existia: $($t.Nombre)"
             }
         }
+        foreach ($n in $Retiradas) {
+            if (Get-ScheduledTask -TaskName $n -ErrorAction SilentlyContinue) {
+                Unregister-ScheduledTask -TaskName $n -Confirm:$false
+                Write-Output "Borrada (retirada): $n"
+            }
+        }
     }
 
     'instalar' {
         if (-not (Test-Path $Runner)) { throw "No se encontro $Runner" }
+
+        foreach ($n in $Retiradas) {
+            if (Get-ScheduledTask -TaskName $n -ErrorAction SilentlyContinue) {
+                Unregister-ScheduledTask -TaskName $n -Confirm:$false
+                Write-Output "Borrada (retirada): $n"
+            }
+        }
 
         foreach ($t in $Tareas) {
             $action = New-ScheduledTaskAction `
@@ -119,6 +137,6 @@ switch ($Accion) {
 
         Write-Output ""
         Write-Output "Listo. Verificar con: .\install_ggal_tasks.ps1 -Accion estado"
-        Write-Output "Correr a mano:        .\ggal_estudio.ps1 -Turno apertura"
+        Write-Output "Apertura, a pedido:   .\ggal_estudio.ps1 -Turno apertura"
     }
 }
