@@ -37,7 +37,9 @@ function Write-Log([string]$texto) {
 Set-Location $Repo
 while ($true) {
     Write-Log "INICIO remote-control (sesion '$Nombre')"
-    & $Claude remote-control --name $Nombre --permission-mode auto
+    # same-dir y no worktree: el diario (diario/trades), el .env y los logs no estan
+    # en git, asi que una sesion en un worktree no los veria.
+    & $Claude remote-control --name $Nombre --permission-mode auto --spawn=same-dir
     Write-Log "FIN remote-control (codigo $LASTEXITCODE); reintento en 30 s"
     Start-Sleep -Seconds 30
 }
