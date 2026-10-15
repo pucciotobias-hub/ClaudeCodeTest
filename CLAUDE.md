@@ -57,6 +57,7 @@ Windows Scheduled Tasks (`scripts/install_ggal_tasks.ps1`) fire `ggal_estudio.ps
 - **The wrapper is Windows PowerShell 5.1**, saved as UTF-8 with BOM and CRLF. No `&&`, no ternary, and git's stderr becomes a terminating error under `$ErrorActionPreference = 'Stop'`.
 - **Diagnosing a missing or late report:** read `logs/ggal_estudio.log` first. The usual cause is the laptop sleeping at trigger time, not the recipe.
 - **Telegram notice:** when a run ends the wrapper calls `scripts/telegram_aviso.py`, which sends the report's header, "Qué cambió" and "Escenarios" (or a failure line). Credentials are `TELEGRAM_BOT_TOKEN` and `TELEGRAM_CHAT_ID` in the root `.env`; without them it logs one line and the run is unaffected.
+- **From the phone:** the scheduled task `RemoteControlClaude` (`scripts/install_remote_control.ps1`, approved by the user on 2026-10-15) runs `scripts/remote_control.ps1` at logon, which keeps a `claude remote-control` session named `ggal` open in this repo with auto permission mode and restarts it if it dies (`logs/remote_control.log`). The user drives it from the Claude mobile app's Code tab.
 - **Running a study by hand:** the `/estudio [turno]` skill (`.claude/skills/estudio`) checks for a run in progress and for an existing report before launching the wrapper with `-Forzar`.
 
 ### Weekly report page
