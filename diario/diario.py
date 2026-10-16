@@ -27,6 +27,7 @@ import json
 import os
 import pathlib
 import sys
+import time
 import urllib.request
 from datetime import date, datetime
 
@@ -163,14 +164,22 @@ def sincronizar(d):
     if not url:
         return "planilla: sin configurar (falta DIARIO_SHEET_URL en .env); quedó anotado solo acá"
     cuerpo = json.dumps({"fecha": d["fecha"], "encabezado": MOVIMIENTOS, "filas": movimientos(d), "resumen": resumen(d)}).encode("utf-8")
-    try:
-        pedido = urllib.request.Request(url, data=cuerpo, headers={"Content-Type": "application/json"})
-        with urllib.request.urlopen(pedido, timeout=40) as r:   # Apps Script contesta con una redireccion; urllib la sigue
-            texto = r.read().decode("utf-8")
-        r = json.loads(texto)
-        return f"planilla: actualizada ({r.get('url', 'ok')})" if r.get("ok") else f"planilla: rechazó el envío ({r.get('error')})"
-    except Exception as e:
-        return f"planilla: NO se pudo actualizar ({type(e).__name__}: {str(e)[:120]}); quedó anotado acá, se reintenta con el próximo cambio"
+    # 16-oct-2026: de vez en cuando Apps Script no redirige el POST al echo de googleusercontent sino de vuelta
+    # a /exec, urllib lo repite como GET y la respuesta es la pagina HTML "no se encontro la funcion doGet".
+    # El envio reescribe el dia entero, asi que reintentar es inofensivo: hasta 3 veces, y si no, se avisa.
+    for intento in range(3):
+        try:
+            pedido = urllib.request.Request(url, data=cuerpo, headers={"Content-Type": "application/json"})
+            with urllib.request.urlopen(pedido, timeout=40) as r:   # Apps Script contesta con una redireccion; urllib la sigue
+                texto = r.read().decode("utf-8", "replace")
+            if not texto.lstrip().startswith("{"):
+                raise ValueError("Apps Script devolvió HTML en vez de JSON" + (" (cayó en doGet)" if "doGet" in texto else ""))
+            r = json.loads(texto)
+            return f"planilla: actualizada ({r.get('url', 'ok')})" if r.get("ok") else f"planilla: rechazó el envío ({r.get('error')})"
+        except Exception as e:
+            error = e
+            time.sleep(2)
+    return f"planilla: NO se pudo actualizar tras 3 intentos ({type(error).__name__}: {str(error)[:120]}); quedó anotado acá, se reintenta con el próximo cambio"
 
 
 def mostrar(d):
