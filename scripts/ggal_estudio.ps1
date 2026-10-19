@@ -90,7 +90,12 @@ if (-not (Test-Path $LogDir)) { New-Item -ItemType Directory -Path $LogDir | Out
 function Write-Log {
     param([string]$Message, [string]$Level = 'INFO')
     $line = "{0} | {1,-5} | {2}" -f (Get-Date -Format 'yyyy-MM-dd HH:mm:ss'), $Level, $Message
-    Add-Content -Path $LogFile -Value $line -Encoding utf8
+    # Reintenta y nunca tira: el 19-oct a las 11:03 el log estaba tomado por otro
+    # proceso un instante y Add-Content, con ErrorActionPreference Stop, mato la corrida.
+    for ($i = 0; $i -lt 10; $i++) {
+        try { [IO.File]::AppendAllText($LogFile, $line + "`r`n", (New-Object System.Text.UTF8Encoding $false)); break }
+        catch { Start-Sleep -Milliseconds 300 }
+    }
     Write-Output $line
 }
 
@@ -382,7 +387,7 @@ try {
     Set-Oficina 'fin' $false $(if ($code -eq 0) { 'ok' } else { 'error' })
     $candado.ReleaseMutex()
     foreach ($f in @($tmpOut, $tmpErr)) {
-        if (Test-Path $f) { Add-Content -Path $LogFile -Value (Get-Content $f -Raw -Encoding utf8) -Encoding utf8 }
+        if (Test-Path $f) { $txt = Get-Content $f -Raw -Encoding utf8; if ($txt) { Write-Log $txt.TrimEnd() | Out-Null } }
     }
     Remove-Item $tmpIn, $tmpOut, $tmpErr -ErrorAction SilentlyContinue
 }
