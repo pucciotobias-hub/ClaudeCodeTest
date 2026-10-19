@@ -98,6 +98,20 @@ header h1{font-size:clamp(2rem,6vw,3.1rem);font-weight:700}
 .esc .g{font:500 .82rem/1.4 var(--mono);color:var(--muted)}
 .panorama{font-size:1.02rem}
 
+
+/* Grafico de velas al final: dibujado a escala con los niveles del tecnico */
+.chart-head{display:flex;flex-wrap:wrap;justify-content:space-between;gap:4px 16px;align-items:baseline;margin-top:6px}
+.readout{font:500 .86rem/1.4 var(--mono);font-variant-numeric:tabular-nums;color:var(--ink);min-height:1.4em}
+.readout .lbl{color:var(--muted)}
+.chart{position:relative;margin-top:8px;touch-action:pan-y}
+.chart svg{display:block;width:100%;height:auto;overflow:visible}
+.chart text{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.leyenda{display:flex;flex-wrap:wrap;gap:6px 18px;color:var(--muted);font-size:.8rem;margin-top:10px}
+.leyenda span{display:inline-flex;align-items:center;gap:6px}
+.leyenda i{display:inline-block;width:18px;height:0;border-top:2px solid currentColor}
+.leyenda i.dash{border-top-style:dashed}
+.chart-nota{color:var(--muted);font-size:.8rem;margin-top:6px}
+
 footer .fuente{font-style:italic}
 footer{color:var(--muted);font-size:.8rem;border-top:1px solid var(--line);padding-top:14px;display:grid;gap:4px}
 @media (max-width:520px){
@@ -1115,6 +1129,14 @@ function render(D){
     h.push('</section>');
   }
 
+  if (D.velas && D.velas.length > 5) {
+    h.push('<section><h2>Gráfico <small>velas diarias con los niveles del técnico</small></h2>' +
+      '<div class="chart-head"><div class="readout" id="readout"></div></div>' +
+      '<div class="chart" id="chart" role="img" aria-label="Gráfico de velas diarias de GGAL con soportes, resistencias y EMA20"></div>' +
+      '<div class="leyenda"><span style="color:var(--accent)"><i></i>EMA20</span><span style="color:var(--down)"><i class="dash"></i>Resistencia</span><span style="color:var(--amber)"><i class="dash"></i>Pivote</span><span style="color:var(--up)"><i class="dash"></i>Soporte</span><span style="color:var(--muted)"><i style="border-top:8px solid var(--line)"></i>Semana del reporte</span></div>' +
+      '<p class="chart-nota">Pasá el dedo o el mouse por las velas para ver apertura, máximo, mínimo y cierre de cada día.</p></section>');
+  }
+
   h.push('<footer><span>Generado ' + esc(D.generado) + ' · precios del feed de TradingView, noticias de la web con fuente citada.</span>' +
     (D.notas ? '<span>' + esc(D.notas) + '</span>' : '') +
     '<span>Descripción del cuadro técnico y macro. No es asesoramiento financiero.</span></footer>');
@@ -1122,6 +1144,125 @@ function render(D){
   app.innerHTML = h.join('');
 }
 
+var DIAS = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
+var MESES = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
+function fechaCorta(s){ var p = s.split('-'); var d = new Date(+p[0], +p[1]-1, +p[2]); return DIAS[d.getDay()] + ' ' + (+p[2]) + '-' + MESES[+p[1]-1]; }
+
+function drawChart(D){
+  var box = document.getElementById('chart');
+  if (!box || !D.velas) return;
+  var all = D.velas;
+  // EMA20 sobre todas las velas cargadas
+  var k = 2/21, ema = [], e = all[0][4];
+  all.forEach(function(r, i){ e = i ? r[4]*k + e*(1-k) : r[4]; ema.push(e); });
+  var W = Math.max(300, box.clientWidth || 800);
+  var narrow = W < 560;
+  var n = Math.min(all.length - 19, narrow ? 28 : 46);
+  var start = all.length - n;
+  var bars = all.slice(start), emaS = ema.slice(start);
+  var niveles = ((D.tecnico || {}).niveles || []).slice();
+  var H = narrow ? 300 : 360;
+  var padL = 6, padR = narrow ? 74 : 92, padT = 14, padB = 26;
+  var lo = Infinity, hi = -Infinity;
+  bars.forEach(function(r, i){ lo = Math.min(lo, r[3], emaS[i]); hi = Math.max(hi, r[2], emaS[i]); });
+  niveles.forEach(function(nv){ if (nv.nivel > lo - 3 && nv.nivel < hi + 3) { lo = Math.min(lo, nv.nivel); hi = Math.max(hi, nv.nivel); } });
+  var span = hi - lo; lo -= span*0.04; hi += span*0.04;
+  var pw = W - padL - padR, ph = H - padT - padB;
+  var step = pw / n, cw = Math.max(2, Math.min(12, step*0.62));
+  function X(i){ return padL + step*(i + 0.5); }
+  function Y(v){ return padT + (hi - v) / (hi - lo) * ph; }
+  var s = [];
+  // grilla horizontal cada 1 o 2 USD
+  var gstep = (hi - lo) > 14 ? 2 : 1;
+  for (var g = Math.ceil(lo/gstep)*gstep; g <= hi; g += gstep) {
+    s.push('<line x1="'+padL+'" x2="'+(padL+pw)+'" y1="'+Y(g).toFixed(1)+'" y2="'+Y(g).toFixed(1)+'" stroke="var(--line)" stroke-width="1" opacity=".7"/>');
+    if (Y(g) > padT + 10) s.push('<text x="'+(padL+2)+'" y="'+(Y(g)-3).toFixed(1)+'" font-size="10" fill="var(--muted)">'+g+'</text>');
+  }
+  // franja de la semana del reporte (ultimas 5 velas)
+  var wk = Math.min(5, n);
+  s.push('<rect x="'+(padL+step*(n-wk)).toFixed(1)+'" y="'+padT+'" width="'+(step*wk).toFixed(1)+'" height="'+ph+'" fill="var(--flat-bg)"/>');
+  // eje de meses
+  var prevM = null;
+  bars.forEach(function(r, i){
+    var m = r[0].slice(5,7);
+    if (m !== prevM) {
+      if (prevM !== null || i < 3) {
+        s.push('<line x1="'+X(i).toFixed(1)+'" x2="'+X(i).toFixed(1)+'" y1="'+(padT+ph)+'" y2="'+(padT+ph+5)+'" stroke="var(--muted)"/>');
+        s.push('<text x="'+X(i).toFixed(1)+'" y="'+(H-6)+'" font-size="11" fill="var(--muted)" text-anchor="'+(i < 2 ? 'start' : 'middle')+'">'+MESES[+m-1]+'</text>');
+      }
+      prevM = m;
+    }
+  });
+  s.push('<line x1="'+padL+'" x2="'+(padL+pw)+'" y1="'+(padT+ph)+'" y2="'+(padT+ph)+'" stroke="var(--muted)" stroke-width="1"/>');
+  // niveles
+  var labels = [];
+  niveles.forEach(function(nv){
+    if (nv.nivel < lo || nv.nivel > hi) return;
+    var t = /^P/i.test(nv.tipo) ? 'var(--amber)' : /^R/i.test(nv.tipo) ? 'var(--down)' : 'var(--up)';
+    var y = Y(nv.nivel);
+    s.push('<line x1="'+padL+'" x2="'+(padL+pw)+'" y1="'+y.toFixed(1)+'" y2="'+y.toFixed(1)+'" stroke="'+t+'" stroke-width="1.2" stroke-dasharray="5 4"/>');
+    labels.push({y: y, color: t, text: (/^P/i.test(nv.tipo) ? 'PIV' : nv.tipo) + ' ' + nv.nivel.toFixed(2)});
+  });
+  // cierre como etiqueta del eje
+  var last = bars[n-1];
+  labels.push({y: Y(last[4]), color: 'var(--accent)', text: last[4].toFixed(2), pill: true});
+  labels.sort(function(a, b){ return a.y - b.y; });
+  var gap = 15;
+  for (var i = 1; i < labels.length; i++) if (labels[i].y - labels[i-1].y < gap) labels[i].y = labels[i-1].y + gap;
+  for (i = labels.length - 2; i >= 0; i--) if (labels[i+1].y > padT+ph && labels[i].y > labels[i+1].y - gap) labels[i].y = labels[i+1].y - gap;
+  // EMA20
+  s.push('<polyline fill="none" stroke="var(--accent)" stroke-width="1.8" stroke-linejoin="round" points="' + emaS.map(function(v, i){ return X(i).toFixed(1)+','+Y(v).toFixed(1); }).join(' ') + '"/>');
+  // velas
+  bars.forEach(function(r, i){
+    var up = r[4] >= r[1], col = up ? 'var(--up)' : 'var(--down)';
+    var x = X(i), yo = Y(r[1]), yc = Y(r[4]);
+    s.push('<line x1="'+x.toFixed(1)+'" x2="'+x.toFixed(1)+'" y1="'+Y(r[2]).toFixed(1)+'" y2="'+Y(r[3]).toFixed(1)+'" stroke="'+col+'" stroke-width="1.2"/>');
+    s.push('<rect x="'+(x-cw/2).toFixed(1)+'" y="'+Math.min(yo,yc).toFixed(1)+'" width="'+cw.toFixed(1)+'" height="'+Math.max(1, Math.abs(yc-yo)).toFixed(1)+'" fill="'+(up ? 'var(--panel)' : col)+'" stroke="'+col+'" stroke-width="1.2"/>');
+  });
+  // maximo y minimo de swing dentro de la ventana reciente (ultimas 10 velas)
+  var rec = bars.slice(-10), ih = 0, il = 0;
+  rec.forEach(function(r, j){ if (r[2] > rec[ih][2]) ih = j; if (r[3] < rec[il][3]) il = j; });
+  var ihA = n-10+ih, ilA = n-10+il;
+  s.push('<text x="'+X(ihA).toFixed(1)+'" y="'+(Y(bars[ihA][2])-6).toFixed(1)+'" font-size="11" text-anchor="middle" fill="var(--ink)">'+bars[ihA][2].toFixed(2)+'</text>');
+  s.push('<text x="'+X(ilA).toFixed(1)+'" y="'+(Y(bars[ilA][3])+15).toFixed(1)+'" font-size="11" text-anchor="middle" fill="var(--ink)">'+bars[ilA][3].toFixed(2)+'</text>');
+  // etiquetas a la derecha
+  labels.forEach(function(l){
+    var x0 = padL + pw + 6;
+    if (l.pill) {
+      s.push('<rect x="'+x0+'" y="'+(l.y-9).toFixed(1)+'" width="'+(padR-8)+'" height="18" rx="3" fill="var(--accent)"/>');
+      s.push('<text x="'+(x0+6)+'" y="'+(l.y+4).toFixed(1)+'" font-size="11.5" font-weight="600" fill="var(--panel)">'+l.text+'</text>');
+    } else {
+      s.push('<text x="'+(x0+6)+'" y="'+(l.y+4).toFixed(1)+'" font-size="11" fill="'+l.color+'">'+l.text+'</text>');
+    }
+  });
+  // cursor
+  s.push('<line id="cx" x1="0" x2="0" y1="'+padT+'" y2="'+(padT+ph)+'" stroke="var(--muted)" stroke-width="1" stroke-dasharray="2 3" visibility="hidden"/>');
+  box.innerHTML = '<svg viewBox="0 0 '+W+' '+H+'" width="'+W+'" height="'+H+'" xmlns="http://www.w3.org/2000/svg">' + s.join('') + '</svg>';
+
+  var ro = document.getElementById('readout'), cx = box.querySelector('#cx'), svg = box.querySelector('svg');
+  function show(i){
+    var r = bars[i], prev = start + i > 0 ? all[start+i-1][4] : null;
+    var ch = prev ? (r[4]/prev - 1)*100 : null;
+    ro.innerHTML = '<span class="lbl">' + fechaCorta(r[0]) + '</span> · A ' + r[1].toFixed(2) + ' · M ' + r[2].toFixed(2) + ' · m ' + r[3].toFixed(2) + ' · C <b>' + r[4].toFixed(2) + '</b>' +
+      (ch == null ? '' : ' <span class="' + cls(ch) + '">' + pct(ch) + '</span>') + ' <span class="lbl">· EMA20 ' + emaS[i].toFixed(2) + '</span>';
+  }
+  function move(ev){
+    var rect = svg.getBoundingClientRect();
+    var x = (ev.clientX - rect.left) * W / rect.width;
+    var i = Math.max(0, Math.min(n-1, Math.floor((x - padL) / step)));
+    cx.setAttribute('x1', X(i)); cx.setAttribute('x2', X(i)); cx.setAttribute('visibility', 'visible');
+    show(i);
+  }
+  svg.addEventListener('pointermove', move);
+  svg.addEventListener('pointerdown', move);
+  svg.addEventListener('pointerleave', function(){ cx.setAttribute('visibility', 'hidden'); show(n-1); });
+  show(n-1);
+}
+function cls(v){ return v == null ? 'flat' : v > 0.05 ? 'up' : v < -0.05 ? 'down' : 'flat'; }
+function pct(v){ return v == null ? 'N/D' : (v > 0 ? '+' : v < 0 ? '−' : '') + Math.abs(v).toFixed(2).replace('.', ',') + '%'; }
+
 var DATOS = JSON.parse(document.getElementById('datos').textContent);
 render(DATOS);
+drawChart(DATOS);
+var _rw = 0; window.addEventListener('resize', function(){ var b = document.getElementById('chart'); if (b && b.clientWidth !== _rw) { _rw = b.clientWidth; drawChart(DATOS); } });
 </script>
