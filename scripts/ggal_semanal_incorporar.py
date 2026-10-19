@@ -6,7 +6,7 @@ leer un documento de Claude Docs (falla con self_only para cualquier visor),
 asi que cada semana se reemplaza ese bloque y se republica.
 
 Uso:
-    python scripts/ggal_semanal_incorporar.py estudios/ggal/semanal/<FECHA>.json
+    py scripts/ggal_semanal_incorporar.py estudios/ggal/semanal/<FECHA>.json
 """
 import json
 import pathlib
@@ -20,6 +20,12 @@ def main():
     datos = json.loads(pathlib.Path(sys.argv[1]).read_text(encoding="utf-8"))
     if not (datos.get("semana") and datos.get("ggal")):
         raise SystemExit("El JSON no trae 'semana' y 'ggal': no se toca la pagina.")
+    # Una semana sin cierre es una corrida sin feed: la pagina quedaba sin precio
+    # y sin grafico y parecia actualizada (paso el 19-oct).
+    if datos["ggal"].get("cierre") is None:
+        raise SystemExit("El JSON no trae el cierre de GGAL (corrida sin feed?): no se toca la pagina.")
+    if len(datos.get("velas") or []) < 6:
+        print("aviso: el JSON no trae 'velas'; la pagina sale sin grafico.")
     # "</" cerraria el <script> si apareciera en un texto.
     bloque = json.dumps(datos, ensure_ascii=False, indent=1).replace("</", "<\\/")
 

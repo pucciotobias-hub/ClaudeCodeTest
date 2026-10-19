@@ -58,6 +58,14 @@ estudio diario).
 - Para GGAL, ademas: maximo y minimo de la semana, EMA20 y RSI14 al viernes
   (calculalos sobre los cierres diarios o tomalos del ultimo informe de cierre),
   y volumen de la semana contra el promedio de las 4 anteriores.
+- **Velas para el grafico de la pagina:** de `NASDAQ:GGAL` diario,
+  `data_get_ohlcv` count=100 (sin summary) y cargá en `velas` una fila por rueda,
+  de la mas vieja a la mas nueva: `["AAAA-MM-DD", apertura, maximo, minimo,
+  cierre]`, con 2 decimales, hasta el viernes de la semana (si hay vela de hoy,
+  afuera). La pagina dibuja con eso las velas, la EMA20 y los niveles del
+  tecnico; sin `velas` el grafico no aparece. (Desde el 19-oct: el grafico se
+  agrego a mano a la pagina el 13-oct y la receta no lo pedia, asi que el JSON
+  del lunes lo borraba.)
 - **No uses `data_get_study_values`** (hace derivar el simbolo y borra los
   dibujos) y **no toques los dibujos**: no hay `draw_*` en este reporte.
 - Al terminar, **dejá el chart en `NASDAQ:GGAL` diario**. A las 10:20 corre el
@@ -161,7 +169,9 @@ Formato (los numeros son de ejemplo del formato, no datos):
   "agenda": [ { "dia": "Mié 30", "evento": "", "por_que": "" } ],
   "escenarios": [ { "nombre": "Rebote", "sesgo": "alcista", "gatillo": "2 cierres > 39.80", "lectura": "" } ],
   "panorama": "",
-  "notas": "Lo que falto o se corrigio en la corrida. Vacio si nada."
+  "notas": "Lo que falto o se corrigio en la corrida. Vacio si nada.",
+  "velas_fuente": "Velas diarias del ADR (apertura, maximo, minimo, cierre). EMA20 calculada en la pagina sobre todas las velas cargadas.",
+  "velas": [ ["2026-09-25", 40.00, 40.00, 38.74, 38.74] ]
 }
 ```
 
