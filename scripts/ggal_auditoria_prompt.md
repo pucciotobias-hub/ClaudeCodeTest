@@ -58,8 +58,8 @@ cualitativa que no depende de precios, y terminá.
 ## 3. Parte objetiva: el script
 
 ```
-python scripts/ggal_auditoria.py --barras scripts/ggal_bars.json --desde <PRIMER ESTUDIO> --hasta <ULTIMA RUEDA COMPLETA>
-python scripts/ggal_auditoria.py --barras scripts/ggal_bars.json --hasta <ULTIMA RUEDA COMPLETA>
+py scripts/ggal_auditoria.py --barras scripts/ggal_bars.json --desde <PRIMER ESTUDIO> --hasta <ULTIMA RUEDA COMPLETA>
+py scripts/ggal_auditoria.py --barras scripts/ggal_bars.json --hasta <ULTIMA RUEDA COMPLETA>
 ```
 
 La primera es el periodo; la segunda es el acumulado de todos los estudios, para

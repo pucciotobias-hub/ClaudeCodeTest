@@ -101,6 +101,59 @@ function Test-Cdp {
     } catch { return $false }
 }
 
+# Aviso por Telegram (scripts/telegram_aviso.py). Nunca tumba la corrida: si no
+# hay credenciales, red o python, queda una linea en el log y se sigue. El script
+# escribe solo en stdout, porque con ErrorActionPreference Stop el stderr de un
+# ejecutable se vuelve excepcion.
+function Send-Aviso {
+    param([string[]]$Argumentos)
+    try {
+        $py = Get-Command python.exe -All -ErrorAction SilentlyContinue |
+            Sort-Object { $_.Source -like '*WindowsApps*' } | Select-Object -First 1
+        if (-not $py) { Write-Log 'Aviso de Telegram: no se encontro python.exe.' 'WARN'; return }
+        $r = & $py.Source (Join-Path $PSScriptRoot 'telegram_aviso.py') @Argumentos
+        Write-Log "Aviso: $r"
+    } catch {
+        Write-Log "Aviso de Telegram fallo: $($_.Exception.Message)" 'WARN'
+    }
+}
+
+# Levanta el servidor MCP de TradingView a mano, le pide tv_health_check por stdio
+# y lo mata. Devuelve los segundos que tardo, o $null si no contesto a tiempo.
+# Calienta node y sus modulos antes de claude -p y prueba que el server llega al chart.
+function Test-McpTradingview {
+    param([int]$Segundos = 120)
+    $cfg = (Get-Content $McpConfig -Raw | ConvertFrom-Json).mcpServers.tradingview
+    $in  = Join-Path $LogDir 'mcp_prueba.in.txt'
+    $out = Join-Path $LogDir 'mcp_prueba.out.txt'
+    $err = Join-Path $LogDir 'mcp_prueba.err.txt'
+    $msgs = @(
+        '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2025-06-18","capabilities":{},"clientInfo":{"name":"ggal_estudio","version":"1"}}}'
+        '{"jsonrpc":"2.0","method":"notifications/initialized"}'
+        '{"jsonrpc":"2.0","id":2,"method":"tools/call","params":{"name":"tv_health_check","arguments":{}}}'
+    )
+    [IO.File]::WriteAllText($in, (($msgs -join "`n") + "`n"), (New-Object System.Text.UTF8Encoding $false))
+    $argsNode = ($cfg.args | ForEach-Object { "`"$_`"" }) -join ' '
+    $t0 = Get-Date
+    $p = Start-Process -FilePath $cfg.command -ArgumentList $argsNode -NoNewWindow -PassThru `
+        -RedirectStandardInput $in -RedirectStandardOutput $out -RedirectStandardError $err
+    $ok = $false
+    try {
+        while (((Get-Date) - $t0).TotalSeconds -lt $Segundos) {
+            Start-Sleep -Milliseconds 500
+            $txt = if (Test-Path $out) { Get-Content $out -Raw -ErrorAction SilentlyContinue } else { '' }
+            if ($txt -match 'cdp_connected\\?"\s*:\s*true') { $ok = $true; break }
+            if ($p.HasExited) { break }
+        }
+    } finally {
+        # El server no sale solo al cerrarse stdin: queda colgado del CDP.
+        if (-not $p.HasExited) { try { & taskkill.exe /PID $p.Id /T /F | Out-Null } catch {} }
+        Remove-Item $in, $out, $err -ErrorAction SilentlyContinue
+    }
+    if ($ok) { return [math]::Round(((Get-Date) - $t0).TotalSeconds, 1) }
+    return $null
+}
+
 # --- 1. Preflight ----------------------------------------------------------
 Write-Log "=== INICIO estudio GGAL - turno: $Turno ==="
 
@@ -212,6 +265,33 @@ if ($LASTEXITCODE -ne 0) {
     exit 1
 }
 
+# --- 2.b Servidor MCP de TradingView ------------------------------------------
+# claude -p le da 30 s al server para arrancar y, si no llega, sigue sin las
+# herramientas: no hay forma de reconectarlo a mitad. Paso el 12-oct, el 15-oct
+# y el semanal del 19-oct, todas al despertar la maquina (Chrome tardo 52 s): el
+# informe salio vacio y quedo commiteado, asi que el reintento no hizo nada.
+# Ahora se prueba antes con tv_health_check; si falla, se relanza Chrome y se
+# prueba otra vez, y si sigue sin responder la corrida se corta sin commitear
+# nada y el disparo siguiente la cubre. MCP_TIMEOUT sube el tope de arranque.
+Set-Oficina 'mcp'
+$seg = Test-McpTradingview
+if ($null -eq $seg) {
+    Write-Log "El MCP de TradingView no respondio a tv_health_check; se relanza Chrome y se prueba de nuevo." 'WARN'
+    & powershell.exe -NoProfile -ExecutionPolicy Bypass -File $RelanzarScript | ForEach-Object { Write-Log "  chrome: $_" }
+    $seg = Test-McpTradingview
+}
+if ($null -eq $seg) {
+    Write-Log "El MCP de TradingView sigue sin llegar al chart. Abortando sin correr Claude." 'ERROR'
+    [GgalPower]::SetThreadExecutionState($ES_CONTINUOUS) | Out-Null
+    Set-Oficina 'fin' $false 'error'
+    $candado.ReleaseMutex()
+    Send-Aviso @('--texto', "GGAL $Turno ${fecha}: TradingView no respondio, no se corrio el estudio. Lo cubre el disparo siguiente o -Forzar.")
+    Write-Log "=== FIN estudio GGAL - turno: $Turno ==="
+    exit 1
+}
+Write-Log "MCP de TradingView OK (tv_health_check en $seg s)."
+$env:MCP_TIMEOUT = '120000'
+
 # --- 3. Armar el prompt ----------------------------------------------------
 $receta = Get-Content $PromptFile -Raw
 
@@ -245,6 +325,9 @@ $allowed = @(
     'Bash(git log*)'
     'Bash(git diff*)'
     'Bash(python *)'
+    # `python` en el bash de claude -p es el alias vacio de la Microsoft Store
+    # ("no se encontro Python", exit 49): las recetas usan `py`. Desde el 19-oct.
+    'Bash(py *)'
     'Bash(ls *)'
     'Bash(cat *)'
     'Bash(mkdir *)'
@@ -302,23 +385,6 @@ try {
         if (Test-Path $f) { Add-Content -Path $LogFile -Value (Get-Content $f -Raw -Encoding utf8) -Encoding utf8 }
     }
     Remove-Item $tmpIn, $tmpOut, $tmpErr -ErrorAction SilentlyContinue
-}
-
-# Aviso por Telegram (scripts/telegram_aviso.py). Nunca tumba la corrida: si no
-# hay credenciales, red o python, queda una linea en el log y se sigue. El script
-# escribe solo en stdout, porque con ErrorActionPreference Stop el stderr de un
-# ejecutable se vuelve excepcion.
-function Send-Aviso {
-    param([string[]]$Argumentos)
-    try {
-        $py = Get-Command python.exe -All -ErrorAction SilentlyContinue |
-            Sort-Object { $_.Source -like '*WindowsApps*' } | Select-Object -First 1
-        if (-not $py) { Write-Log 'Aviso de Telegram: no se encontro python.exe.' 'WARN'; return }
-        $r = & $py.Source (Join-Path $PSScriptRoot 'telegram_aviso.py') @Argumentos
-        Write-Log "Aviso: $r"
-    } catch {
-        Write-Log "Aviso de Telegram fallo: $($_.Exception.Message)" 'WARN'
-    }
 }
 
 if ($code -ne 0) {

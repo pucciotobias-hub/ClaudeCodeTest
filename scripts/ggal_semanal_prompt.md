@@ -39,8 +39,12 @@ estudio diario).
 
 - `tv_health_check`. Si falla, corré
   `powershell.exe -NoProfile -ExecutionPolicy Bypass -File scripts/relanzar_chrome_cdp.ps1`
-  y reintentá. Si sigue sin responder, usá los cierres de los informes diarios y
-  aclaralo en `notas`.
+  y reintentá. Si sigue sin responder, o si las herramientas `tradingview` no
+  aparecen ni con ToolSearch, **no escribas ni commitees el reporte**: respondé
+  solo `SIN FEED: <motivo>` y terminá. Un reporte sin precios commiteado hace
+  que el reintento de las 12:00 crea que ya esta hecho (paso el 19-oct: salio
+  con cierre, mercados y velas en null y la pagina sin precio). El wrapper ya
+  prueba el MCP antes de llamarte, asi que esto deberia ser raro.
 - Para cada ticker: `chart_set_timeframe` → `D` **y despues** `chart_set_symbol`
   (en ese orden; al reves el feed se queda pegado), verificá con `ui_evaluate`
   que `activeChart().symbol()` sea el pedido, y `data_get_ohlcv` count=12.
@@ -116,7 +120,7 @@ Reglas:
   del INDEC, vencimientos de deuda, resultados de bancos argentinos, feriados en
   Argentina o EE.UU.). Buscalos; no inventes fechas.
 - **Licitaciones del Tesoro: no se buscan en la web.** Corré
-  `python scripts/licitaciones_tesoro.py` (lee el cronograma oficial de
+  `py scripts/licitaciones_tesoro.py` (lee el cronograma oficial de
   Finanzas, un PDF que marca las fechas solo con color y que `WebFetch` no
   puede leer) y cargá en `agenda` el llamado, la licitacion o la liquidacion
   que caigan en la semana. Si no cae ninguna, nombrá la proxima licitacion en
@@ -165,7 +169,7 @@ Formato (los numeros son de ejemplo del formato, no datos):
   pudiste leer, nunca un cero.
 - `semana` y `ggal` son obligatorios: sin ellos la pagina descarta los datos.
 - Validá antes de seguir:
-  `python -c "import json,sys;d=json.load(open(sys.argv[1],encoding='utf-8'));assert d['semana'] and d['ggal'];print('ok')" <ARCHIVO>`
+  `py -c "import json,sys;d=json.load(open(sys.argv[1],encoding='utf-8'));assert d['semana'] and d['ggal'];print('ok')" <ARCHIVO>`
 
 ## 6. Republicar la pagina
 
@@ -173,11 +177,13 @@ La pagina muestra la semana que trae adentro; no puede leer datos de afuera
 (hasta el 5-oct-2026 intentaba leer un documento de Claude Docs y eso falla
 para cualquier visor: mostro la semana vieja sin avisar). Por eso se republica.
 
-1. `python scripts/ggal_semanal_incorporar.py <ARCHIVO DE SALIDA>`: reemplaza el
+1. `py scripts/ggal_semanal_incorporar.py <ARCHIVO DE SALIDA>`: reemplaza el
    bloque de datos de `scripts/ggal_semanal_pagina.html`. No edites ese archivo
    a mano.
-2. Con la herramienta `Artifact` (si no esta en tu lista, cargala con
-   ToolSearch `select:Artifact`): primero `action: "read"` con
+2. En la corrida desatendida (`claude -p`) la herramienta `Artifact` no existe
+   (comprobado en cada lunes desde el 12-oct): si no esta en tu lista ni sale
+   con ToolSearch `select:Artifact`, no la busques mas y pasá al punto 3. Si
+   esta: primero `action: "read"` con
    `url: "https://claude.ai/artifact/7MVXWjsWK6TgPye87j3R67"` (sin esa lectura
    el publish se rechaza), despues `action: "publish"` con
    `file_path: "scripts/ggal_semanal_pagina.html"` y la misma `url`. Sin `icon`,
