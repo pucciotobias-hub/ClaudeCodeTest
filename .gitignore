@@ -25,3 +25,6 @@ tasas/historia/
 diario/trades/
 # Numeros del programa de volumen de A3 (copiados a mano de la tabla del broker)
 tasas/programa.json
+
+# Base local de Form 4 del tablero de insiders (se rearma sola desde la SEC)
+insiders/datos/

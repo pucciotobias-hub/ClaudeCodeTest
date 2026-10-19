@@ -1,0 +1,464 @@
+<!doctype html>
+<html lang="es-AR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Insiders</title>
+<link rel="icon" href="data:,">
+<style>
+:root {
+  color-scheme: light;
+  --plano: #f9f9f7; --superficie: #fcfcfb; --tinta: #0b0b0b; --tinta-2: #52514e; --tenue: #898781;
+  --grilla: #e1e0d9; --eje: #c3c2b7; --borde: rgba(11,11,11,0.10);
+  --serie-1: #2a78d6; --serie-2: #eb6834; --sube: #006300; --baja: #d03b3b; --aviso: #fab219;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    color-scheme: dark;
+    --plano: #0d0d0d; --superficie: #1a1a19; --tinta: #ffffff; --tinta-2: #c3c2b7; --tenue: #898781;
+    --grilla: #2c2c2a; --eje: #383835; --borde: rgba(255,255,255,0.10);
+    --serie-1: #3987e5; --serie-2: #d95926; --sube: #0ca30c; --baja: #e66767; --aviso: #fab219;
+  }
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--plano); color: var(--tinta); font: 14px/1.45 system-ui, -apple-system, "Segoe UI", sans-serif; }
+main { max-width: 1180px; margin: 0 auto; padding: 20px 16px 48px; }
+a { color: var(--serie-1); text-decoration: none; }
+a:hover { text-decoration: underline; }
+header { display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px 16px; margin-bottom: 12px; }
+h1 { font-size: 20px; margin: 0; }
+h2 { font-size: 16px; margin: 0 0 2px; }
+.sub { color: var(--tinta-2); margin: 0 0 8px; }
+#estado { color: var(--tinta-2); display: flex; align-items: center; gap: 6px; margin-left: auto; }
+#estado i { width: 8px; height: 8px; border-radius: 50%; background: var(--tenue); display: inline-block; }
+#estado.vivo i { background: var(--sube); }
+#estado.bajando i { background: var(--aviso); }
+#estado.mal i { background: var(--baja); }
+button.chico { font: inherit; font-size: 12px; color: var(--tinta-2); background: none; border: 1px solid var(--borde); border-radius: 6px; padding: 2px 8px; cursor: pointer; }
+nav { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; margin-bottom: 16px; border-bottom: 1px solid var(--grilla); }
+nav a { color: var(--tinta-2); padding: 8px 2px; border-bottom: 2px solid transparent; margin-bottom: -1px; font-weight: 600; }
+nav a.activo { color: var(--tinta); border-bottom-color: var(--tinta); text-decoration: none; }
+nav form { margin-left: auto; padding: 4px 0; }
+nav input { font: inherit; width: 140px; padding: 4px 10px; border: 1px solid var(--borde); border-radius: 8px; background: var(--superficie); color: var(--tinta); text-transform: uppercase; }
+.controles { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 20px; margin-bottom: 14px; color: var(--tinta-2); font-size: 13px; }
+.controles label { display: inline-flex; align-items: center; gap: 8px; }
+.selector { display: inline-flex; border: 1px solid var(--borde); border-radius: 8px; overflow: hidden; }
+.selector button { font: inherit; color: var(--tinta-2); background: none; border: 0; padding: 4px 12px; cursor: pointer; }
+.selector button[aria-pressed="true"] { background: var(--grilla); color: var(--tinta); font-weight: 600; }
+.fichas { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin-bottom: 16px; }
+.ficha, section { background: var(--superficie); border: 1px solid var(--borde); border-radius: 10px; }
+.ficha { padding: 12px 14px; }
+.ficha .rot { color: var(--tinta-2); font-size: 12px; }
+.ficha .val { font-size: 22px; font-weight: 600; line-height: 1.25; font-variant-numeric: tabular-nums; }
+.ficha .det { color: var(--tinta-2); font-size: 12px; }
+section { padding: 16px; margin-bottom: 16px; }
+.grupo { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 6px 16px; }
+.grupo .nombre { flex: 1 1 280px; }
+.grupo .nombre a { font-size: 18px; font-weight: 700; }
+.grupo .nombre span { color: var(--tinta-2); margin-left: 8px; }
+.grupo .nombre a.chip { font-size: 11px; font-weight: 400; }
+.grupo .cifras { display: flex; flex-wrap: wrap; gap: 4px 20px; font-variant-numeric: tabular-nums; }
+.grupo .cifras div { text-align: right; }
+.grupo .cifras small { display: block; color: var(--tinta-2); font-size: 11px; }
+.grupo .cifras b { font-size: 15px; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
+.chip { font-size: 11px; padding: 1px 8px; border-radius: 10px; border: 1px solid var(--borde); color: var(--tinta-2); white-space: nowrap; }
+.chip.fuerte { border-color: var(--sube); color: var(--sube); }
+.chip.ojo { border-color: var(--aviso); color: var(--tinta); }
+.tabla { overflow-x: auto; margin-top: 8px; }
+table { border-collapse: collapse; width: 100%; font-variant-numeric: tabular-nums; }
+th, td { padding: 6px 10px; text-align: right; white-space: nowrap; border-bottom: 1px solid var(--grilla); }
+th { color: var(--tinta-2); font-weight: 600; font-size: 12px; }
+th.izq, td.izq { text-align: left; }
+td.nom { max-width: 240px; overflow: hidden; text-overflow: ellipsis; }
+.sube { color: var(--sube); } .baja { color: var(--baja); } .tenue { color: var(--tenue); }
+.vacio { color: var(--tinta-2); padding: 24px 0; text-align: center; }
+.aviso { border-left: 3px solid var(--aviso); padding: 6px 10px; margin: 0 0 12px; background: var(--superficie); border-radius: 0 6px 6px 0; }
+.leyenda { display: flex; flex-wrap: wrap; gap: 4px 16px; color: var(--tinta-2); font-size: 12px; margin: 4px 0; }
+.leyenda span { display: inline-flex; align-items: center; gap: 6px; }
+.leyenda b { width: 14px; height: 0; border-top: 2px solid var(--serie-1); display: inline-block; }
+.leyenda b.c { width: 0; height: 0; border: 6px solid transparent; border-bottom: 10px solid var(--sube); border-top: 0; }
+.leyenda b.v { width: 0; height: 0; border: 6px solid transparent; border-top: 10px solid var(--baja); border-bottom: 0; }
+.lienzo { position: relative; }
+.lienzo svg { display: block; width: 100%; }
+svg text { fill: var(--tenue); font-size: 11px; font-family: inherit; }
+.globo { position: absolute; pointer-events: none; background: var(--superficie); border: 1px solid var(--borde);
+  border-radius: 8px; padding: 8px 10px; font-size: 12px; box-shadow: 0 4px 14px rgba(0,0,0,.18); display: none; white-space: nowrap; z-index: 2; }
+.globo strong { display: block; font-size: 13px; }
+.globo span { color: var(--tinta-2); }
+.notas { color: var(--tinta-2); font-size: 13px; }
+.notas li { margin-bottom: 4px; }
+</style>
+</head>
+<body>
+<main>
+<header>
+  <h1>Insiders</h1>
+  <span class="sub">Compras de directivos en EE.UU., de los Form 4 de la SEC</span>
+  <div id="estado"><i></i><span>conectando…</span> <button class="chico" id="actualizar" type="button">Actualizar</button></div>
+</header>
+<nav>
+  <a href="#clusters" data-vista="clusters">Clusters</a>
+  <a href="#compras" data-vista="compras">Compras</a>
+  <a href="#" data-vista="ticker" id="pestana-ticker" hidden></a>
+  <form id="buscar"><input name="t" placeholder="Ticker…" autocomplete="off" spellcheck="false" aria-label="Buscar ticker"></form>
+</nav>
+<div id="vista"></div>
+<section class="notas">
+  <h2>Cómo leerlo</h2>
+  <ul>
+    <li><b>Cluster</b>: 2 o más directivos distintos (directores u officers) comprando la misma acción en mercado abierto dentro de la ventana. Los accionistas del 10% que no son directivos se listan, pero no cuentan para el cluster.</li>
+    <li>Solo cuentan las compras en mercado abierto (código <b>P</b> del Form 4), con plata propia. No entran asignaciones de acciones, ejercicios de opciones ni conversiones.</li>
+    <li><b>Δ tenencia</b>: cuánto agrandó su posición con esa compra respecto de lo que ya tenía. Una compra que suma un 50% pesa más que una que suma un 1%.</li>
+    <li><b>10b5-1</b>: operación hecha bajo un plan programado de antemano. Si es una compra, dice menos sobre lo que piensa hoy el directivo.</li>
+    <li><b>Al mismo precio y día</b>: varios insiders comprando el mismo día al mismo precio exacto casi nunca es una compra en pantalla. Suele ser un plan para empleados, un DRIP o la suscripción de una colocación, y como señal vale mucho menos.</li>
+    <li>La fecha es la de la operación. El Form 4 se presenta hasta 2 días hábiles después.</li>
+    <li>Las ventas informan poco: se vende por impuestos, para diversificar o por planes programados. La señal está en las compras.</li>
+  </ul>
+</section>
+</main>
+
+<script>
+const $ = s => document.querySelector(s);
+const NS = 'http://www.w3.org/2000/svg';
+const MESES = 'ene feb mar abr may jun jul ago sep oct nov dic'.split(' ');
+const vista = $('#vista');
+const prefs = { dias: 14, min: 2, orden: 'valor', diasCompras: 14, monto: 0, soloDirectivos: true, todo: false };
+try { Object.assign(prefs, JSON.parse(localStorage.getItem('insiders') || '{}')); } catch (e) {}
+const guardarPrefs = () => { try { localStorage.setItem('insiders', JSON.stringify(prefs)); } catch (e) {} };
+
+const nf = (v, d = 2) => v == null ? '—' : v.toLocaleString('es-AR', { minimumFractionDigits: d, maximumFractionDigits: d });
+const miles = v => v == null ? '—' : Math.round(v).toLocaleString('es-AR');
+function usd(v) {
+  if (v == null) return '—';
+  const a = Math.abs(v), s = v < 0 ? '−' : '';
+  if (a >= 1e9) return `${s}US$ ${nf(a / 1e9, 2)} B`;
+  if (a >= 1e6) return `${s}US$ ${nf(a / 1e6, 2)} M`;
+  if (a >= 1e3) return `${s}US$ ${nf(a / 1e3, 0)} K`;
+  return `${s}US$ ${nf(a, 0)}`;
+}
+const pct = (v, d = 1) => v == null ? '—' : (v > 0 ? '+' : '') + nf(v, d) + '%';
+const clase = v => v == null ? '' : v > 0 ? 'sube' : v < 0 ? 'baja' : '';
+const fecha = f => f ? `${f.slice(8, 10)}-${MESES[+f.slice(5, 7) - 1]}` : '—';
+const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const linkTicker = t => `<a href="#t/${encodeURIComponent(t)}">${esc(t)}</a>`;
+const sec = (cik, acc) => `https://www.sec.gov/Archives/edgar/data/${cik}/${acc.replace(/-/g, '')}/`;
+
+async function pedir(url) {
+  const r = await fetch(url);
+  if (!r.ok) throw new Error(`${r.status} ${r.statusText}`);
+  return r.json();
+}
+
+function selector(opciones, actual, alElegir) {
+  const s = document.createElement('div');
+  s.className = 'selector';
+  for (const [valor, texto] of opciones) {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.textContent = texto;
+    b.setAttribute('aria-pressed', valor === actual);
+    b.onclick = () => alElegir(valor);
+    s.append(b);
+  }
+  return s;
+}
+
+function controles(items) {
+  const c = document.createElement('div');
+  c.className = 'controles';
+  for (const [rot, nodo] of items) {
+    const l = document.createElement('label');
+    if (rot) l.append(rot);
+    l.append(nodo);
+    c.append(l);
+  }
+  return c;
+}
+
+// ---------------------------------------------------------------- estado de la base
+
+let ultimoEstado = null;
+async function mirarEstado() {
+  let espera = 60000;
+  try {
+    const e = await pedir('/estado');
+    const b = e.base || {};
+    const nodo = $('#estado');
+    let texto;
+    if (e.corriendo) {
+      nodo.className = 'bajando';
+      texto = e.total ? `Bajando ${e.que}: ${e.hechos}/${e.total}` : `Buscando ${e.que || 'presentaciones'}…`;
+      espera = 4000;
+    } else if (e.error) {
+      nodo.className = 'mal';
+      texto = e.error;
+    } else {
+      nodo.className = 'vivo';
+      texto = `Al día${e.ultima ? ' ' + e.ultima.slice(11, 16) : ''}`;
+    }
+    if (b.indices) texto += ` · base: ${b.indices} ruedas (${fecha(b.desde)} a ${fecha(b.hasta)})`;
+    nodo.querySelector('span').textContent = texto;
+    // Al terminar una vuelta, repintar la vista con lo nuevo (la ficha de un ticker no cambia por esto).
+    if (ultimoEstado && ultimoEstado.corriendo && !e.corriendo && !location.hash.startsWith('#t/')) ruta();
+    ultimoEstado = e;
+  } catch (err) {
+    $('#estado').className = 'mal';
+    $('#estado span').textContent = 'Sin servidor: ¿está corriendo insiders/servidor.py?';
+    espera = 10000;
+  }
+  setTimeout(mirarEstado, espera);
+}
+$('#actualizar').onclick = async () => {
+  await fetch('/actualizar', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' });
+  setTimeout(mirarEstado, 800);
+};
+
+// ---------------------------------------------------------------- clusters
+
+async function verClusters() {
+  vista.innerHTML = '<p class="vacio">Cargando clusters…</p>';
+  const d = await pedir(`/clusters?dias=${prefs.dias}&min=${prefs.min}`);
+  if (d.error) throw new Error(d.error);
+  const lista = [...d.clusters].sort({
+    valor: (a, b) => b.valor - a.valor,
+    directivos: (a, b) => b.directivos - a.directivos || b.valor - a.valor,
+    fecha: (a, b) => b.hasta.localeCompare(a.hasta) || b.valor - a.valor,
+  }[prefs.orden]);
+  vista.innerHTML = '';
+  vista.append(controles([
+    ['Ventana', selector([[7, '7 días'], [14, '14 días'], [30, '30 días']], prefs.dias, v => { prefs.dias = v; guardarPrefs(); verClusters(); })],
+    ['Mínimo', selector([[2, '2'], [3, '3'], [4, '4']], prefs.min, v => { prefs.min = v; guardarPrefs(); verClusters(); })],
+    ['Ordenar', selector([['valor', 'Monto'], ['directivos', 'Directivos'], ['fecha', 'Fecha']], prefs.orden, v => { prefs.orden = v; guardarPrefs(); verClusters(); })],
+  ]));
+  if (!lista.length) {
+    vista.insertAdjacentHTML('beforeend', `<p class="vacio">No hay clusters de ${prefs.min} o más directivos en los últimos ${prefs.dias} días.</p>`);
+    return;
+  }
+  const total = lista.reduce((s, c) => s + c.valor, 0);
+  const altos = lista.filter(c => c.alto).length;
+  vista.insertAdjacentHTML('beforeend', `<div class="fichas">
+    <div class="ficha"><div class="rot">Clusters</div><div class="val">${lista.length}</div><div class="det">${prefs.min}+ directivos en ${prefs.dias} días</div></div>
+    <div class="ficha"><div class="rot">Monto comprado</div><div class="val">${usd(total)}</div><div class="det">entre todos</div></div>
+    <div class="ficha"><div class="rot">Con CEO, CFO o presidente</div><div class="val">${altos}</div><div class="det">de ${lista.length}</div></div>
+  </div>`);
+  for (const c of lista) {
+    const chips = [`<span class="chip fuerte">${c.directivos} directivos</span>`];
+    if (c.alto) chips.push('<span class="chip fuerte">CEO/CFO/presidente</span>');
+    if (c.compras > c.directivos) chips.push(`<span class="chip">${c.compras} presentaciones</span>`);
+    if (c.plan) chips.push(`<span class="chip ojo">${c.plan} con plan 10b5-1</span>`);
+    if (c.mismoPrecio >= 2) chips.push(`<span class="chip ojo" title="Varios insiders el mismo día al mismo precio exacto: suele ser un plan de compra para empleados, un DRIP o la suscripción de una colocación, no una compra en pantalla">${c.mismoPrecio} al mismo precio y día</span>`);
+    if (!c.comparable) chips.push('<span class="chip ojo" title="Lo comprado no cotiza a ese precio con este ticker: suele ser la acción local de un ADR u otra clase">precio no comparable</span>');
+    const filas = c.insiders.map(i => `<tr>
+      <td class="izq nom" title="${esc(i.insider)}">${esc(i.insider)}</td><td class="izq nom" title="${esc(i.rol)}">${esc(i.rol)}${i.plan ? ' <span class="chip ojo">10b5-1</span>' : ''}</td>
+      <td>${fecha(i.hasta)}</td><td>${nf(i.precio)}</td><td>${usd(i.valor)}</td>
+      <td>${i.cambioTenencia == null ? '—' : pct(i.cambioTenencia)}</td></tr>`).join('');
+    vista.insertAdjacentHTML('beforeend', `<section>
+      <div class="grupo">
+        <div class="nombre">${linkTicker(c.ticker)}<span>${esc(c.emisor)}</span>
+          <div class="chips">${chips.join('')}</div></div>
+        <div class="cifras">
+          <div><small>Comprado</small><b>${usd(c.valor)}</b></div>
+          <div><small>Precio prom.</small><b>${nf(c.precio)}</b></div>
+          <div><small>Hoy</small><b>${nf(c.precioHoy)}</b></div>
+          <div><small>Desde la compra</small><b class="${clase(c.desdeCompra)}">${pct(c.desdeCompra)}</b></div>
+          <div><small>Fechas</small><b>${fecha(c.desde)}${c.desde !== c.hasta ? ' a ' + fecha(c.hasta) : ''}</b></div>
+        </div>
+      </div>
+      <div class="tabla"><table><thead><tr><th class="izq">Insider</th><th class="izq">Rol</th><th>Fecha</th><th>Precio</th><th>Monto</th><th>Δ tenencia</th></tr></thead>
+      <tbody>${filas}</tbody></table></div>
+    </section>`);
+  }
+}
+
+// ---------------------------------------------------------------- compras sueltas
+
+async function verCompras() {
+  vista.innerHTML = '<p class="vacio">Cargando compras…</p>';
+  const d = await pedir(`/compras?dias=${prefs.diasCompras}`);
+  if (d.error) throw new Error(d.error);
+  const enCluster = {};
+  for (const g of d.compras) if (g.directivo) (enCluster[g.ticker] ??= new Set()).add(g.insiderCik);
+  const lista = d.compras.filter(g => g.valor >= prefs.monto && (!prefs.soloDirectivos || g.directivo));
+  vista.innerHTML = '';
+  const casilla = document.createElement('input');
+  casilla.type = 'checkbox';
+  casilla.checked = prefs.soloDirectivos;
+  casilla.onchange = () => { prefs.soloDirectivos = casilla.checked; guardarPrefs(); verCompras(); };
+  vista.append(controles([
+    ['Ventana', selector([[7, '7 días'], [14, '14 días'], [30, '30 días']], prefs.diasCompras, v => { prefs.diasCompras = v; guardarPrefs(); verCompras(); })],
+    ['Monto', selector([[0, 'Todo'], [100000, '≥ 100 K'], [1000000, '≥ 1 M']], prefs.monto, v => { prefs.monto = v; guardarPrefs(); verCompras(); })],
+    ['', Object.assign(document.createElement('span'), { textContent: 'Solo directivos (sin fondos del 10%)' })],
+  ]));
+  vista.lastChild.lastChild.prepend(casilla);
+  if (!lista.length) {
+    vista.insertAdjacentHTML('beforeend', '<p class="vacio">No hay compras con ese filtro.</p>');
+    return;
+  }
+  const filas = lista.map(g => {
+    const n = enCluster[g.ticker]?.size || 0;
+    return `<tr>
+      <td class="izq">${fecha(g.hasta)}</td><td class="izq">${linkTicker(g.ticker)}${n >= 2 ? ' <span class="chip fuerte" title="Directivos distintos comprando en la ventana">×' + n + '</span>' : ''}</td>
+      <td class="izq nom" title="${esc(g.emisor)}">${esc(g.emisor)}</td>
+      <td class="izq nom" title="${esc(g.insider)}">${esc(g.insider)}</td><td class="izq nom" title="${esc(g.rol)}">${esc(g.rol)}${g.plan ? ' <span class="chip ojo">10b5-1</span>' : ''}</td>
+      <td>${miles(g.acciones)}</td><td>${nf(g.precio)}</td><td>${usd(g.valor)}</td>
+      <td>${g.cambioTenencia == null ? '—' : pct(g.cambioTenencia)}</td><td>${nf(g.precioHoy)}</td>
+      <td class="${clase(g.desdeCompra)}"${g.comparable ? '' : ' title="Lo comprado no cotiza a ese precio con este ticker (acción local de un ADR u otra clase)"'}>${g.comparable ? pct(g.desdeCompra) : 'no comp.'}</td>
+      <td><a href="${sec(g.emisorCik, g.acc)}" target="_blank" rel="noopener">Form 4</a></td></tr>`;
+  }).join('');
+  vista.insertAdjacentHTML('beforeend', `<section>
+    <h2>${lista.length} compras en mercado abierto</h2>
+    <p class="sub">Una fila por Form 4; ×N marca las acciones donde compraron N directivos distintos en la ventana.</p>
+    <div class="tabla"><table><thead><tr><th class="izq">Fecha</th><th class="izq">Ticker</th><th class="izq">Empresa</th><th class="izq">Insider</th><th class="izq">Rol</th>
+      <th>Acciones</th><th>Precio</th><th>Monto</th><th>Δ tenencia</th><th>Hoy</th><th>Desde compra</th><th></th></tr></thead>
+    <tbody>${filas}</tbody></table></div></section>`);
+}
+
+// ---------------------------------------------------------------- un ticker
+
+function el(tag, attrs, padre) {
+  const n = document.createElementNS(NS, tag);
+  for (const k in attrs) n.setAttribute(k, attrs[k]);
+  if (padre) padre.append(n);
+  return n;
+}
+
+function grafico(cont, serie, ops) {
+  const W = 1000, H = 320, m = { i: 56, d: 12, a: 12, b: 24 };
+  const svg = el('svg', { viewBox: `0 0 ${W} ${H}`, height: H }, cont);
+  const n = serie.length;
+  const indice = {};
+  serie.forEach((p, i) => { indice[p.f] = i; });
+  // Cada operacion va a la rueda de su fecha, o a la siguiente si fue en un dia sin rueda.
+  const enRueda = f => { if (f in indice) return indice[f]; const i = serie.findIndex(p => p.f >= f); return i < 0 ? null : i; };
+  const enMercado = ops.filter(o => (o.codigo === 'P' || o.codigo === 'S') && o.precio && enRueda(o.hasta) != null);
+  // La accion local de un ADR u otra clase no cotiza al precio del ticker (GGAL: 5,40 contra 50 del ADR): no se dibuja.
+  const comparable = o => { const k = o.precio / serie[enRueda(o.hasta)].c; return k >= 0.4 && k <= 2.5; };
+  const marcas = enMercado.filter(comparable);
+  const fuera = enMercado.length - marcas.length;
+  if (fuera) cont.insertAdjacentHTML('afterend', `<p class="sub">${fuera} ${fuera === 1 ? 'operación no se dibuja' : 'operaciones no se dibujan'}: su precio no es comparable con el del ticker (suele ser la acción local de un ADR u otra clase).</p>`);
+  const valores = serie.map(p => p.c).concat(marcas.map(o => o.precio));
+  let lo = Math.min(...valores), hi = Math.max(...valores);
+  const pad = (hi - lo) * 0.08 || 1;
+  lo -= pad; hi += pad;
+  const x = i => m.i + (W - m.i - m.d) * i / Math.max(1, n - 1);
+  const y = v => m.a + (H - m.a - m.b) * (hi - v) / (hi - lo);
+  for (let k = 0; k <= 4; k++) {
+    const v = lo + (hi - lo) * k / 4;
+    el('line', { x1: m.i, x2: W - m.d, y1: y(v), y2: y(v), stroke: 'var(--grilla)' }, svg);
+    el('text', { x: m.i - 6, y: y(v) + 4, 'text-anchor': 'end' }, svg).textContent = nf(v);
+  }
+  let mesPrevio = '';
+  serie.forEach((p, i) => {
+    const mes = p.f.slice(0, 7);
+    if (mes !== mesPrevio && i > 0) el('text', { x: x(i), y: H - 6, 'text-anchor': 'middle' }, svg).textContent = MESES[+p.f.slice(5, 7) - 1];
+    mesPrevio = mes;
+  });
+  el('polyline', { points: serie.map((p, i) => `${x(i)},${y(p.c)}`).join(' '), fill: 'none', stroke: 'var(--serie-1)', 'stroke-width': 1.8 }, svg);
+  const mayor = Math.max(1, ...marcas.map(o => Math.abs(o.valor)));
+  const porRueda = {};
+  for (const o of marcas) {
+    const i = enRueda(o.hasta);
+    (porRueda[i] ??= []).push(o);
+    const r = 5 + 9 * Math.sqrt(Math.abs(o.valor) / mayor);
+    const cx = x(i), cy = y(o.precio);
+    const compra = o.codigo === 'P';
+    const puntos = compra ? `${cx},${cy - r} ${cx - r},${cy + r * 0.8} ${cx + r},${cy + r * 0.8}` : `${cx},${cy + r} ${cx - r},${cy - r * 0.8} ${cx + r},${cy - r * 0.8}`;
+    el('polygon', { points: puntos, fill: compra ? 'var(--sube)' : 'var(--baja)', 'fill-opacity': 0.75, stroke: 'var(--superficie)', 'stroke-width': 1 }, svg);
+  }
+  const g = document.createElement('div');
+  g.className = 'globo';
+  cont.append(g);
+  const guia = el('line', { y1: m.a, y2: H - m.b, stroke: 'var(--eje)', visibility: 'hidden' }, svg);
+  svg.addEventListener('mousemove', e => {
+    const r = svg.getBoundingClientRect(), px = (e.clientX - r.left) * W / r.width;
+    let i = Math.round((px - m.i) / ((W - m.i - m.d) / Math.max(1, n - 1)));
+    i = Math.max(0, Math.min(n - 1, i));
+    // Si hay una operacion a 3 ruedas o menos, engancharse a ella.
+    const cerca = Object.keys(porRueda).map(Number).filter(k => Math.abs(k - i) <= 3).sort((a, b) => Math.abs(a - i) - Math.abs(b - i))[0];
+    if (cerca != null) i = cerca;
+    guia.setAttribute('x1', x(i)); guia.setAttribute('x2', x(i)); guia.setAttribute('visibility', 'visible');
+    const lineas = (porRueda[i] || []).map(o => `<br><span class="${o.codigo === 'P' ? 'sube' : 'baja'}">${o.tipo}</span> ${esc(o.insider)} · ${usd(Math.abs(o.valor))} a ${nf(o.precio)}`).join('');
+    g.innerHTML = `<strong>${fecha(serie[i].f)} ${serie[i].f.slice(0, 4)}</strong><span>Cierre</span> ${nf(serie[i].c)}${lineas}`;
+    g.style.display = 'block';
+    const izq = (x(i) / W) * r.width;
+    g.style.left = Math.min(izq + 12, r.width - g.offsetWidth - 4) + 'px';
+    g.style.top = '8px';
+  });
+  svg.addEventListener('mouseleave', () => { g.style.display = 'none'; guia.setAttribute('visibility', 'hidden'); });
+}
+
+async function verTicker(ticker) {
+  const t = $('#pestana-ticker');
+  t.hidden = false;
+  t.textContent = ticker;
+  t.href = '#t/' + ticker;
+  vista.innerHTML = `<p class="vacio">Cargando ${esc(ticker)}: la primera vez baja de la SEC el último año de Form 4 de la empresa y puede tardar unos segundos…</p>`;
+  const d = await pedir('/ticker/' + encodeURIComponent(ticker));
+  if (d.error) { vista.innerHTML = `<p class="vacio">${esc(d.error)}</p>`; return; }
+  const r = d.resumen90;
+  const vsMax = d.precio && d.max52 ? (d.precio / d.max52 - 1) * 100 : null;
+  vista.innerHTML = `
+    ${d.aviso ? `<p class="aviso">${esc(d.aviso)}</p>` : ''}
+    <div class="grupo" style="margin-bottom:14px"><div class="nombre"><a href="#t/${esc(d.ticker)}">${esc(d.ticker)}</a><span>${esc(d.emisor)}</span>
+      <div class="chips">${[d.sector, d.industria, d.bolsa].filter(Boolean).map(s => `<span class="chip">${esc(s)}</span>`).join('')}
+      <a class="chip" href="https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=${d.cik}&type=4&owner=include" target="_blank" rel="noopener">Form 4 en la SEC</a></div></div></div>
+    <div class="fichas">
+      <div class="ficha"><div class="rot">Precio</div><div class="val">${nf(d.precio)}</div><div class="det ${clase(d.var)}">${pct(d.var, 2)} en el día</div></div>
+      <div class="ficha"><div class="rot">Capitalización</div><div class="val">${usd(d.capitalizacion)}</div><div class="det">P/E ${nf(d.pe, 1)} · futuro ${nf(d.peFuturo, 1)}</div></div>
+      <div class="ficha"><div class="rot">Contra el máximo de 52 semanas</div><div class="val ${clase(vsMax)}">${pct(vsMax)}</div><div class="det">rango ${nf(d.min52)} a ${nf(d.max52)}</div></div>
+      <div class="ficha"><div class="rot">Compras de insiders, 90 días</div><div class="val sube">${usd(r.compras)}</div><div class="det">${r.compradores} ${r.compradores === 1 ? 'comprador' : 'compradores'}</div></div>
+      <div class="ficha"><div class="rot">Ventas de insiders, 90 días</div><div class="val baja">${usd(r.ventas)}</div><div class="det">${r.vendedores} ${r.vendedores === 1 ? 'vendedor' : 'vendedores'}</div></div>
+    </div>
+    <section><h2>Precio y operaciones de insiders, último año</h2>
+      <div class="leyenda"><span><b></b>Cierre diario</span><span><b class="c"></b>Compra en mercado</span><span><b class="v"></b>Venta en mercado</span><span>Tamaño: monto</span></div>
+      <div class="lienzo" id="grafico"></div></section>
+    <section id="operaciones"></section>`;
+  if (d.serie.length) grafico($('#grafico'), d.serie, d.operaciones);
+  else $('#grafico').innerHTML = '<p class="vacio">yfinance no devolvió precios para este ticker.</p>';
+  pintarOperaciones(d);
+}
+
+function pintarOperaciones(d) {
+  const s = $('#operaciones');
+  const lista = prefs.todo ? d.operaciones : d.operaciones.filter(o => o.codigo === 'P' || o.codigo === 'S');
+  s.innerHTML = '<h2>Operaciones</h2>';
+  s.append(controles([['Mostrar', selector([[false, 'Compras y ventas en mercado'], [true, 'Todas']], prefs.todo, v => { prefs.todo = v; guardarPrefs(); pintarOperaciones(d); })]]));
+  if (!lista.length) { s.insertAdjacentHTML('beforeend', '<p class="vacio">Sin operaciones en el último año.</p>'); return; }
+  const filas = lista.map(o => `<tr>
+    <td class="izq">${fecha(o.hasta)} ${o.hasta.slice(2, 4)}</td>
+    <td class="izq ${o.codigo === 'P' ? 'sube' : o.codigo === 'S' ? 'baja' : 'tenue'}">${o.tipo}</td>
+    <td class="izq nom" title="${esc(o.insider)}">${esc(o.insider)}</td><td class="izq nom" title="${esc(o.rol)}">${esc(o.rol)}${o.plan ? ' <span class="chip ojo">10b5-1</span>' : ''}</td>
+    <td>${miles(o.acciones)}</td><td>${o.precio ? nf(o.precio) : '—'}</td><td>${o.valor ? usd(o.valor) : '—'}</td>
+    <td>${miles(o.despues)}</td><td>${o.cambioTenencia == null ? '—' : pct(o.cambioTenencia)}</td>
+    <td><a href="${sec(d.cik, o.acc)}" target="_blank" rel="noopener">Form 4</a></td></tr>`).join('');
+  s.insertAdjacentHTML('beforeend', `<div class="tabla"><table><thead><tr><th class="izq">Fecha</th><th class="izq">Tipo</th><th class="izq">Insider</th><th class="izq">Rol</th>
+    <th>Acciones</th><th>Precio</th><th>Monto</th><th>Tenencia después</th><th>Δ tenencia</th><th></th></tr></thead><tbody>${filas}</tbody></table></div>`);
+}
+
+// ---------------------------------------------------------------- navegacion
+
+async function ruta() {
+  const h = decodeURIComponent(location.hash.slice(1)) || 'clusters';
+  const cual = h.startsWith('t/') ? 'ticker' : h === 'compras' ? 'compras' : 'clusters';
+  document.querySelectorAll('nav a').forEach(a => a.classList.toggle('activo', a.dataset.vista === cual));
+  try {
+    if (cual === 'ticker') await verTicker(h.slice(2).toUpperCase());
+    else if (cual === 'compras') await verCompras();
+    else await verClusters();
+  } catch (e) {
+    vista.innerHTML = `<p class="vacio">No pude cargar: ${esc(e.message)}</p>`;
+  }
+}
+$('#buscar').onsubmit = e => {
+  e.preventDefault();
+  const t = e.target.t.value.trim().toUpperCase();
+  if (t) location.hash = 't/' + t;
+  e.target.t.value = '';
+};
+addEventListener('hashchange', ruta);
+ruta();
+mirarEstado();
+</script>
+</body>
+</html>
