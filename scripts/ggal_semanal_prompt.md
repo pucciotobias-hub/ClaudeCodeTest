@@ -175,7 +175,9 @@ Formato (los numeros son de ejemplo del formato, no datos):
   "ggal": { "cierre": 39.59, "var_semana": -3.4, "cierre_previo": 41.00,
             "maximo": 42.01, "minimo": 39.28, "ema20": 42.58, "rsi": 29.7,
             "volumen_rel": "118% del promedio" },
-  "resumen": ["3 a 5 lineas, lo que Tobias tiene que saber si lee solo esto"],
+  "resumen": [ { "tema": "La semana", "dato": "−2,15%", "tono": "negativo", "grafico": "semana",
+                 "titulo": "Una frase corta", "texto": "El detalle, como antes" },
+               { "tema": "Técnico", "dato": "35.21 – 36.56", "tono": "neutro", "titulo": "", "texto": "" } ],
   "mercados": [ { "ticker": "GGAL", "nombre": "Galicia ADR", "cierre": 39.59, "var": -3.4 } ],
   "mercados_nota": "Una linea: GGAL con el bloque o sola, en pp contra ARGT",
   "noticias": [ { "bloque": "Grupo Galicia", "titulo": "", "detalle": "",
@@ -203,6 +205,13 @@ Formato (los numeros son de ejemplo del formato, no datos):
 }
 ```
 
+- **`resumen` son tarjetas** (regla del 2026-10-21, a pedido de Tobias: "mas
+  dinamica"). Cinco, en este orden de temas: `La semana` (con `"grafico":
+  "semana"`, que dibuja los cinco cierres), `Técnico`, `Empresa`, `Argentina` y
+  `Afuera`. `dato` es el numero que resume el tema, corto (`−2,15%`, `648`,
+  `USD 60 → 45`); `tono` es para GGAL (`positivo`, `negativo` o `neutro`);
+  `titulo`, una frase de menos de 100 caracteres; `texto`, el detalle de 2 a 4
+  oraciones que antes iba en la linea.
 - **El tecnico se lee en simple** (regla del 2026-10-21, a pedido de Tobias: el
   parrafo largo y la tabla de cinco niveles "no se entendian"). La pagina muestra
   arriba `tendencia`, `frase`, el `piso` y el `techo` con su `si` y tres

@@ -49,6 +49,26 @@ header h1{font-size:clamp(2rem,6vw,3.1rem);font-weight:700}
 .stats{display:flex;flex-wrap:wrap;gap:8px 20px;color:var(--muted);font-size:.88rem}
 .stats b{color:var(--ink);font-family:var(--mono);font-weight:600}
 
+.tarjetas{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px}
+.tj{background:var(--panel);border:1px solid var(--line);border-top:3px solid var(--flat);border-radius:6px;transition:box-shadow .15s,transform .15s}
+.tj.negativo{border-top-color:var(--down)} .tj.positivo{border-top-color:var(--up)}
+.tj.ancha{grid-column:1 / -1}
+.tj:hover{box-shadow:0 4px 14px rgba(0,0,0,.08);transform:translateY(-1px)}
+.tj summary{list-style:none;cursor:pointer;padding:12px 14px;display:grid;gap:6px}
+.tj summary::-webkit-details-marker{display:none}
+.tj .tema{display:flex;justify-content:space-between;gap:8px;font:600 .72rem/1 var(--body);text-transform:uppercase;letter-spacing:.1em;color:var(--muted)}
+.tj .tema em{font-style:normal;letter-spacing:.06em}
+.tj.negativo .tema em,.tj.negativo .dato{color:var(--down)}
+.tj.positivo .tema em,.tj.positivo .dato{color:var(--up)}
+.tj .dato{font-size:1.7rem;font-weight:600;line-height:1.1}
+.tj .tit{font-weight:500;line-height:1.4}
+.tj .mas{font-size:.8rem;color:var(--accent);font-weight:500}
+.tj[open] .mas{display:none}
+.tj p{padding:0 14px 14px;color:var(--muted);font-size:.92rem;max-width:none}
+.tj .mini{width:100%;max-width:440px;height:auto;overflow:visible}
+.tj.ancha summary{grid-template-columns:minmax(150px,auto) 1fr;column-gap:22px;align-items:center}
+.tj.ancha .tema,.tj.ancha .tit,.tj.ancha .mas{grid-column:1 / -1}
+@media (max-width:520px){ .tj.ancha summary{grid-template-columns:1fr} }
 .resumen{margin:0;padding-left:1.1em;display:grid;gap:6px}
 .resumen li{max-width:70ch}
 
@@ -215,11 +235,42 @@ footer{color:var(--muted);font-size:.8rem;border-top:1px solid var(--line);paddi
   "volumen_rel": "77% del promedio de las 4 semanas anteriores"
  },
  "resumen": [
-  "GGAL cerró la semana en 36.02, −2,15% (viernes anterior 36.81), contra −0,63% de ARGT: 1,5 pp peor que el bloque. Cierres: lunes 36.78, martes 36.79, miércoles 35.55, jueves 36.47 y viernes 36.02, con 77% del volumen de las cuatro semanas anteriores.",
-  "Técnico: el miércoles perdió en cierre el soporte de 36.56 (y su otro borde, 36.10). El jueves perforó 35.21 en la rueda, hizo el mínimo del tramo en 34.70 y se dio vuelta hasta 36.47 (+2,6%). El viernes rechazó 36.68 y cerró en 36.02, otra vez debajo de 36.10. No hubo cierre debajo de 35.21 ni dos cierres arriba de 36.56: está entre los dos, con el RSI en 33.9 y la EMA20 en 37.90.",
-  "Empresa: el martes 13 UBS bajó el precio objetivo de GGAL de USD 60 a 45 y mantuvo Neutral. Es el más bajo de los analistas que la siguen. No apareció nada fechado en la semana sobre mora, dividendo de octubre ni declaraciones de Kon.",
-  "Argentina: los datos salieron bien y los bonos no. La inflación de septiembre fue 1,9% (núcleo 1,7%), la licitación renovó 136% y el BCRA compró USD 291 M el martes, su mayor compra en casi tres meses. Igual, el riesgo país pasó de 597 el martes a 611 el miércoles y a 648 el viernes, el máximo de 2026.",
-  "Afuera: el CPI de septiembre dio 3,7% (se esperaba 3,6%) y la tasa a 10 años tocó 5,33% el miércoles, pero en el feed cerró la semana en 5,08%, 16 pb abajo. El dólar bajó 0,4% y aun así el S&P 500 perdió 2,0% y Brasil 3,9%: una semana de aversión al riesgo en la que GGAL quedó en el medio."
+  {
+   "tema": "La semana",
+   "dato": "−2,15%",
+   "tono": "negativo",
+   "grafico": "semana",
+   "titulo": "Cerró en 36.02 y quedó 1,5 puntos peor que el ETF de Argentina",
+   "texto": "GGAL cerró la semana en 36.02, −2,15% (viernes anterior 36.81), contra −0,63% de ARGT: 1,5 pp peor que el bloque. Cierres: lunes 36.78, martes 36.79, miércoles 35.55, jueves 36.47 y viernes 36.02, con 77% del volumen de las cuatro semanas anteriores."
+  },
+  {
+   "tema": "Técnico",
+   "dato": "35.21 – 36.56",
+   "tono": "neutro",
+   "titulo": "Perdió 36.56, pero ningún cierre quedó debajo de 35.21: está encerrada entre los dos",
+   "texto": "Técnico: el miércoles perdió en cierre el soporte de 36.56 (y su otro borde, 36.10). El jueves perforó 35.21 en la rueda, hizo el mínimo del tramo en 34.70 y se dio vuelta hasta 36.47 (+2,6%). El viernes rechazó 36.68 y cerró en 36.02, otra vez debajo de 36.10. No hubo cierre debajo de 35.21 ni dos cierres arriba de 36.56: está entre los dos, con el RSI en 33.9 y la EMA20 en 37.90."
+  },
+  {
+   "tema": "Empresa",
+   "dato": "USD 60 → 45",
+   "tono": "negativo",
+   "titulo": "UBS bajó el precio objetivo de Galicia",
+   "texto": "Empresa: el martes 13 UBS bajó el precio objetivo de GGAL de USD 60 a 45 y mantuvo Neutral. Es el más bajo de los analistas que la siguen. No apareció nada fechado en la semana sobre mora, dividendo de octubre ni declaraciones de Kon."
+  },
+  {
+   "tema": "Argentina",
+   "dato": "648",
+   "tono": "negativo",
+   "titulo": "Riesgo país en el máximo del año, aunque los datos locales salieron bien",
+   "texto": "Argentina: los datos salieron bien y los bonos no. La inflación de septiembre fue 1,9% (núcleo 1,7%), la licitación renovó 136% y el BCRA compró USD 291 M el martes, su mayor compra en casi tres meses. Igual, el riesgo país pasó de 597 el martes a 611 el miércoles y a 648 el viernes, el máximo de 2026."
+  },
+  {
+   "tema": "Afuera",
+   "dato": "S&P −2,0%",
+   "tono": "negativo",
+   "titulo": "Semana de aversión al riesgo: cayeron EE.UU. y Brasil",
+   "texto": "Afuera: el CPI de septiembre dio 3,7% (se esperaba 3,6%) y la tasa a 10 años tocó 5,33% el miércoles, pero en el feed cerró la semana en 5,08%, 16 pb abajo. El dólar bajó 0,4% y aun así el S&P 500 perdió 2,0% y Brasil 3,9%: una semana de aversión al riesgo en la que GGAL quedó en el medio."
+  }
  ],
  "mercados": [
   {
@@ -1454,8 +1505,22 @@ function render(D){
   h.push('<span class="meta">cierre previo ' + px(g.cierre_previo) + '</span></div>');
   h.push('<div class="stats"><span>Rango <b>' + px(g.minimo) + ' – ' + px(g.maximo) + '</b></span><span>EMA20 <b>' + px(g.ema20) + '</b></span><span>RSI14 <b>' + px(g.rsi, 1) + '</b></span>' + (g.volumen_rel ? '<span>Volumen <b>' + esc(g.volumen_rel) + '</b></span>' : '') + '</div></header>');
 
+  // Lo importante en tarjetas (2026-10-21, a pedido de Tobias: "mas dinamica"). Un resumen en texto
+  // (semanas viejas) se sigue mostrando como lista.
   if (D.resumen && D.resumen.length) {
-    h.push('<section><h2>Lo importante</h2><ul class="resumen">' + D.resumen.map(function(r){ return '<li>' + esc(r) + '</li>'; }).join('') + '</ul></section>');
+    if (typeof D.resumen[0] === 'object') {
+      h.push('<section><h2>Lo importante <small>tocá una tarjeta para ver más</small></h2><div class="tarjetas">' + D.resumen.map(function(r){
+        var tono = ['positivo','negativo','neutro'].indexOf(r.tono) >= 0 ? r.tono : 'neutro';
+        return '<details class="tj ' + tono + (r.grafico ? ' ancha' : '') + '"><summary>' +
+          '<span class="tema">' + esc(r.tema) + '<em>' + (tono === 'positivo' ? 'a favor' : tono === 'negativo' ? 'en contra' : 'neutro') + '</em></span>' +
+          '<span class="dato num">' + esc(r.dato) + '</span>' +
+          (r.grafico === 'semana' ? miniSemana(D) : '') +
+          '<span class="tit">' + esc(r.titulo) + '</span><span class="mas">Ver más</span></summary>' +
+          '<p>' + esc(r.texto) + '</p></details>';
+      }).join('') + '</div></section>');
+    } else {
+      h.push('<section><h2>Lo importante</h2><ul class="resumen">' + D.resumen.map(function(r){ return '<li>' + esc(r) + '</li>'; }).join('') + '</ul></section>');
+    }
   }
 
   // Seguimiento: los cierres de los dias que pasaron desde el reporte, sin tocar lo que dice el reporte.
@@ -1592,6 +1657,30 @@ function render(D){
 var DIAS = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
 var MESES = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
 function fechaCorta(s){ var p = s.split('-'); var d = new Date(+p[0], +p[1]-1, +p[2]); return DIAS[d.getDay()] + ' ' + (+p[2]) + '-' + MESES[+p[1]-1]; }
+
+// Mini grafico de la tarjeta "La semana": los cinco cierres del reporte contra el viernes anterior.
+function miniSemana(D){
+  var v = (D.velas || []).slice(-5), base = (D.ggal || {}).cierre_previo;
+  if (v.length < 2) return '';
+  var W = 320, H = 92, pl = 8, pr = 8, pt = 18, pb = 18;
+  var vals = v.map(function(r){ return r[4]; }).concat(base != null ? [base] : []);
+  var lo = Math.min.apply(null, vals), hi = Math.max.apply(null, vals), sp = (hi - lo) || 1;
+  function X(i){ return pl + (W - pl - pr) * i / (v.length - 1); }
+  function Y(c){ return pt + (hi - c) / sp * (H - pt - pb); }
+  var col = base != null && v[v.length-1][4] < base ? 'var(--down)' : 'var(--up)';
+  var s = [];
+  if (base != null) {
+    s.push('<line x1="'+pl+'" x2="'+(W-pr)+'" y1="'+Y(base).toFixed(1)+'" y2="'+Y(base).toFixed(1)+'" stroke="var(--muted)" stroke-dasharray="3 3" stroke-width="1"/>');
+    s.push('<text x="'+(W-pr)+'" y="'+(Y(base)-4).toFixed(1)+'" font-size="9.5" fill="var(--muted)" text-anchor="end">viernes anterior '+base.toFixed(2)+'</text>');
+  }
+  s.push('<polyline fill="none" stroke="'+col+'" stroke-width="2.2" stroke-linejoin="round" points="'+v.map(function(r, i){ return X(i).toFixed(1)+','+Y(r[4]).toFixed(1); }).join(' ')+'"/>');
+  v.forEach(function(r, i){
+    var d = DIAS[new Date(+r[0].slice(0,4), +r[0].slice(5,7)-1, +r[0].slice(8,10)).getDay()];
+    s.push('<circle cx="'+X(i).toFixed(1)+'" cy="'+Y(r[4]).toFixed(1)+'" r="3.2" fill="var(--panel)" stroke="'+col+'" stroke-width="1.8"><title>'+d+' '+r[4].toFixed(2)+'</title></circle>');
+    s.push('<text x="'+X(i).toFixed(1)+'" y="'+(H-3)+'" font-size="10" fill="var(--muted)" text-anchor="'+(i === 0 ? 'start' : i === v.length-1 ? 'end' : 'middle')+'">'+d+' '+r[4].toFixed(2)+'</text>');
+  });
+  return '<svg class="mini" viewBox="0 0 '+W+' '+H+'" aria-hidden="true">'+s.join('')+'</svg>';
+}
 
 // Velas de la semana del reporte mas las del seguimiento (las que ya estan, no se repiten).
 // Cada fila: [fecha, apertura, maximo, minimo, cierre, volumen]; el volumen puede faltar en semanas viejas.
