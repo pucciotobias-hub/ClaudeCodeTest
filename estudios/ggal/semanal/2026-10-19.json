@@ -160,7 +160,23 @@
     "nivel": 33.01,
     "que": "Soporte: base del rango de octubre de 2025 (mínimos del 23-oct-25 y del 13-oct-25 en 33.24). Debajo, 31.14, mínimo de swing del 22-oct-25. −8,4%"
    }
-  ]
+  ],
+  "tendencia": "bajista",
+  "tendencia_texto": "desde junio: de 58.14 (17-jun) a 34.70 (15-oct)",
+  "frase": "Perdió el soporte de 36.56 el miércoles y quedó encerrada entre 35.21 y 36.56.",
+  "techo": {
+   "nivel": 36.56,
+   "si": "Dos cierres seguidos arriba cortan la baja; el próximo techo es 37.20."
+  },
+  "piso": {
+   "nivel": 35.21,
+   "si": "Un cierre debajo sigue la baja y abre 33.01."
+  },
+  "divergencia": {
+   "tipo": "alcista",
+   "desde": "2026-10-01",
+   "hasta": "2026-10-15"
+  }
  },
  "agenda": [
   {
@@ -211,713 +227,813 @@
  ],
  "panorama": "GGAL cerró la semana en 36.02, −2,15%, 1,5 pp peor que ARGT, después de perder el miércoles el soporte de 36.56 que había sostenido seis ruedas. El jueves perforó 35.21 en la rueda hasta 34.70 y lo recompraron, así que el soporte sigue sin perderse en cierre y el precio quedó encerrado entre 35.21 y 36.56. La debilidad no fue solo de GGAL: con datos locales buenos (inflación 1,9%, licitación con 136% de renovación, BCRA comprando), el riesgo país subió a 648, el máximo del año, en una semana en la que el S&P perdió 2,0% y Brasil 3,9%; la tasa a 10 años tocó 5,33% y bajó a 5,08%. Esta semana hay que mirar de qué lado de 35.21 (un cierre debajo abre 33.01) y de 36.56 (dos cierres arriba para hablar de recuperación) cierra, junto con el riesgo país y la tasa larga, con el balotaje de Brasil del domingo 25 y la Fed y la licitación del Tesoro del miércoles 28 adelante.",
  "notas": "Este reporte reemplaza al de las 10:45, que salió sin feed (cierre, mercados y técnico en null). En esta corrida el MCP de TradingView respondió: todos los precios son del feed (velas diarias; NASDAQ:GGAL resuelve a BATS:GGAL y AMEX:EWZ a BATS:EWZ, como siempre). La EMA20, el RSI14 y la SMA200 se calcularon sobre 300 cierres diarios del feed (al 14-oct dan 38.27, 28.62 y 46.71, lo mismo que el informe de ese día). Volumen de la semana: 3,46 M contra un promedio de 4,49 M de las cuatro anteriores. US10Y: el lunes 12 no hubo rueda de bonos (Columbus Day). Informes de la semana: cierres del 12 (sin datos), 13 y 14; cierre del 15 sin datos y no hay cierre del 16 (la máquina no estaba); aperturas del 12, 13 y 15. Sin auditoría del 16-oct. El mapa de niveles es el del cierre del 14-oct. Noticias: las de la corrida de las 10:45 (Grupo Galicia: búsquedas por Kon, mora de Galicia, Naranja X y sistema, dividendo de octubre en español y en inglés, precio objetivo, resultados del 3T y normas del BCRA, con y sin filtro de medios locales; de la semana solo apareció lo de UBS, vista primero en Benzinga, que dio 403). En esta corrida busqué además el rebote del jueves 15 (Merval, ADRs, riesgo país, con filtro de Ámbito, Cronista, Infobae, iProfesional, Bloomberg Línea y Perfil), el dividendo de octubre, Kon y noticias de GGAL en inglés: nada fechado en la semana. El anuncio del dividendo de octubre no está publicado (el último es el de USD 0,0479, cortado el 28-sep y pagado el 5-oct). La fecha de resultados del 3T aparece como 24-nov (Earnings Whispers) y 25-nov (GuruFocus), sin confirmar por la empresa: no se cargó. Brasil no va como noticia: no encontré una nota fechada en la semana que explique el −3,9% de EWZ. La subida de la tasa a 10 años se corrigió con el feed (la nota de Trading Economics daba 5,12% el viernes; el feed, 5,08%). Licitaciones (`licitaciones_tesoro.py`): ninguna en la semana; la próxima tiene llamado el lunes 26, licitación el miércoles 28 y liquidación el viernes 30. Agenda de EE.UU.: el calendario consultado (Thrive in Markets) no detalla datos de EE.UU. para la semana salvo los PMI preliminares del viernes y el período de silencio de la Fed desde el sábado 17.",
- "velas_fuente": "Velas diarias del ADR (apertura, máximo, mínimo, cierre) del feed de TradingView, 27-may al 16-oct-2026. EMA20 calculada en la página sobre todas las velas cargadas.",
+ "velas_fuente": "Velas diarias del ADR (apertura, máximo, mínimo, cierre, volumen) del feed de TradingView, 27-may al 16-oct-2026. El promedio de 20 días, el RSI14 y el volumen relativo se calculan en la página.",
  "velas": [
   [
    "2026-05-27",
    46.05,
    48.96,
    46,
-   48.18
+   48.18,
+   3899389
   ],
   [
    "2026-05-28",
    48.18,
    50.07,
    48,
-   48.83
+   48.83,
+   2496949
   ],
   [
    "2026-05-29",
    49.09,
    50.87,
    48.71,
-   50.69
+   50.69,
+   2104620
   ],
   [
    "2026-06-01",
    50.84,
    51.98,
    49.71,
-   51.16
+   51.16,
+   1523070
   ],
   [
    "2026-06-02",
    50.6,
    50.87,
    49.5,
-   50.33
+   50.33,
+   1096962
   ],
   [
    "2026-06-03",
    49.62,
    49.99,
    48.28,
-   48.33
+   48.33,
+   956379
   ],
   [
    "2026-06-04",
    48.25,
    49.62,
    48.25,
-   48.62
+   48.62,
+   729353
   ],
   [
    "2026-06-05",
    48.35,
    48.56,
    47.24,
-   47.81
+   47.81,
+   659510
   ],
   [
    "2026-06-08",
    48.22,
    49.06,
    47.01,
-   48.04
+   48.04,
+   962023
   ],
   [
    "2026-06-09",
    48.46,
    50.58,
    47.32,
-   49.99
+   49.99,
+   1791555
   ],
   [
    "2026-06-10",
    49.6,
    50.65,
    48.93,
-   49.62
+   49.62,
+   961675
   ],
   [
    "2026-06-11",
    51.1,
    55.7,
    51.08,
-   55.41
+   55.41,
+   4237614
   ],
   [
    "2026-06-12",
    55.49,
    56.25,
    54.56,
-   55.16
+   55.16,
+   1264690
   ],
   [
    "2026-06-15",
    55.8,
    56.6,
    55.52,
-   55.96
+   55.96,
+   1230513
   ],
   [
    "2026-06-16",
    55.96,
    56.2,
    54.12,
-   54.44
+   54.44,
+   991594
   ],
   [
    "2026-06-17",
    54.44,
    58.14,
    54.4,
-   55.55
+   55.55,
+   1684432
   ],
   [
    "2026-06-18",
    56.82,
    57.94,
    56.09,
-   56.37
+   56.37,
+   1334564
   ],
   [
    "2026-06-22",
    55.56,
    56.3,
    52.8,
-   53.33
+   53.33,
+   1698323
   ],
   [
    "2026-06-23",
    52,
    52.28,
    51.03,
-   51.35
+   51.35,
+   913668
   ],
   [
    "2026-06-24",
    50.74,
    50.8,
    48.89,
-   49.1
+   49.1,
+   1145024
   ],
   [
    "2026-06-25",
    49.86,
    50.23,
    48.75,
-   49.42
+   49.42,
+   511265
   ],
   [
    "2026-06-26",
    48.78,
    50.8,
    48.78,
-   49.97
+   49.97,
+   648105
   ],
   [
    "2026-06-29",
    50.87,
    51.87,
    49.94,
-   50.9
+   50.9,
+   1096369
   ],
   [
    "2026-06-30",
    50.62,
    51.88,
    49.52,
-   50.03
+   50.03,
+   688538
   ],
   [
    "2026-07-01",
    49.85,
    50.81,
    47.84,
-   49.05
+   49.05,
+   910729
   ],
   [
    "2026-07-02",
    49.92,
    50.72,
    49.23,
-   50.37
+   50.37,
+   810422
   ],
   [
    "2026-07-06",
    50.81,
    53.5,
    50.41,
-   53.02
+   53.02,
+   1365405
   ],
   [
    "2026-07-07",
    52.53,
    53.64,
    50.92,
-   51.1
+   51.1,
+   572775
   ],
   [
    "2026-07-08",
    50.13,
    51.46,
    49.99,
-   50.25
+   50.25,
+   1485647
   ],
   [
    "2026-07-09",
    50.38,
    50.48,
    48.67,
-   49.39
+   49.39,
+   617481
   ],
   [
    "2026-07-10",
    50.36,
    53.86,
    49.96,
-   53.73
+   53.73,
+   1808483
   ],
   [
    "2026-07-13",
    53.82,
    54.04,
    51.41,
-   51.41
+   51.41,
+   747095
   ],
   [
    "2026-07-14",
    52.66,
    53.1,
    50.65,
-   50.8
+   50.8,
+   1164074
   ],
   [
    "2026-07-15",
    50.83,
    53.19,
    50.79,
-   52.67
+   52.67,
+   1614688
   ],
   [
    "2026-07-16",
    52.23,
    52.27,
    49.76,
-   50.18
+   50.18,
+   1234816
   ],
   [
    "2026-07-17",
    49.42,
    50.01,
    48.45,
-   49.94
+   49.94,
+   1119567
   ],
   [
    "2026-07-20",
    49.58,
    50.46,
    48.97,
-   49.95
+   49.95,
+   667537
   ],
   [
    "2026-07-21",
    50.5,
    51.63,
    50.18,
-   50.94
+   50.94,
+   774507
   ],
   [
    "2026-07-22",
    51.92,
    53.34,
    51.67,
-   53.24
+   53.24,
+   1688772
   ],
   [
    "2026-07-23",
    52.66,
    52.8,
    50.11,
-   50.15
+   50.15,
+   756127
   ],
   [
    "2026-07-24",
    50.17,
    51.48,
    49.04,
-   49.3
+   49.3,
+   774887
   ],
   [
    "2026-07-27",
    49.72,
    50.48,
    49.43,
-   50
+   50,
+   328996
   ],
   [
    "2026-07-28",
    49.33,
    49.66,
    47.9,
-   49.19
+   49.19,
+   953983
   ],
   [
    "2026-07-29",
    48.59,
    50.25,
    48.19,
-   49.15
+   49.15,
+   665409
   ],
   [
    "2026-07-30",
    49.04,
    51.69,
    48.64,
-   51.61
+   51.61,
+   750311
   ],
   [
    "2026-07-31",
    52,
    52.24,
    49.72,
-   49.77
+   49.77,
+   642211
   ],
   [
    "2026-08-03",
    50.23,
    50.79,
    49.85,
-   50.51
+   50.51,
+   510500
   ],
   [
    "2026-08-04",
    51.02,
    51.02,
    48.7,
-   48.92
+   48.92,
+   757473
   ],
   [
    "2026-08-05",
    48.72,
    49.75,
    48.18,
-   48.36
+   48.36,
+   660357
   ],
   [
    "2026-08-06",
    48.08,
    48.54,
    46.6,
-   46.73
+   46.73,
+   695934
   ],
   [
    "2026-08-07",
    47.26,
    47.52,
    45.58,
-   46.18
+   46.18,
+   714738
   ],
   [
    "2026-08-10",
    46.18,
    46.59,
    45.53,
-   46.42
+   46.42,
+   573602
   ],
   [
    "2026-08-11",
    46.9,
    47.75,
    43.87,
-   44.53
+   44.53,
+   1263445
   ],
   [
    "2026-08-12",
    44.41,
    44.83,
    43.6,
-   44.22
+   44.22,
+   765889
   ],
   [
    "2026-08-13",
    44.18,
    45.31,
    43.53,
-   44.99
+   44.99,
+   800023
   ],
   [
    "2026-08-14",
    45.15,
    45.21,
    43.37,
-   43.37
+   43.37,
+   596551
   ],
   [
    "2026-08-17",
    43.72,
    43.99,
    43,
-   43.42
+   43.42,
+   505215
   ],
   [
    "2026-08-18",
    43,
    43.32,
    41.8,
-   42.12
+   42.12,
+   920226
   ],
   [
    "2026-08-19",
    42,
    42.82,
    40.89,
-   41.47
+   41.47,
+   885805
   ],
   [
    "2026-08-20",
    42.59,
    42.59,
    40.6,
-   41
+   41,
+   1895423
   ],
   [
    "2026-08-21",
    41.18,
    42.44,
    41.13,
-   41.45
+   41.45,
+   1758005
   ],
   [
    "2026-08-24",
    41.12,
    44,
    41.12,
-   43.45
+   43.45,
+   1215477
   ],
   [
    "2026-08-25",
    43.66,
    44.28,
    42.5,
-   44.2
+   44.2,
+   796405
   ],
   [
    "2026-08-26",
    44.36,
    45.2,
    43.42,
-   43.91
+   43.91,
+   1005410
   ],
   [
    "2026-08-27",
    43.99,
    44.41,
    42.63,
-   42.91
+   42.91,
+   690253
   ],
   [
    "2026-08-28",
    43.04,
    43.34,
    41.69,
-   42.24
+   42.24,
+   787490
   ],
   [
    "2026-08-31",
    42.5,
    44.57,
    42.5,
-   43.75
+   43.75,
+   1095737
   ],
   [
    "2026-09-01",
    43.35,
    45.08,
    42.92,
-   44.29
+   44.29,
+   752689
   ],
   [
    "2026-09-02",
    44.28,
    45.14,
    43.98,
-   45.01
+   45.01,
+   793526
   ],
   [
    "2026-09-03",
    44.72,
    46.09,
    44.02,
-   44.63
+   44.63,
+   615791
   ],
   [
    "2026-09-04",
    44.56,
    44.95,
    43.82,
-   44.36
+   44.36,
+   481940
   ],
   [
    "2026-09-08",
    44.6,
    44.67,
    43.5,
-   44.12
+   44.12,
+   761880
   ],
   [
    "2026-09-09",
    43.99,
    44.79,
    43.08,
-   44.49
+   44.49,
+   425550
   ],
   [
    "2026-09-10",
    43.63,
    45.72,
    43.63,
-   44.72
+   44.72,
+   1017818
   ],
   [
    "2026-09-11",
    45,
    45.42,
    43.17,
-   43.86
+   43.86,
+   739390
   ],
   [
    "2026-09-14",
    43.48,
    43.87,
    42.65,
-   42.96
+   42.96,
+   773802
   ],
   [
    "2026-09-15",
    42.7,
    43.08,
    41.94,
-   42.14
+   42.14,
+   689556
   ],
   [
    "2026-09-16",
    42.19,
    42.86,
    41.58,
-   42.27
+   42.27,
+   364905
   ],
   [
    "2026-09-17",
    43,
    43.09,
    42.37,
-   42.62
+   42.62,
+   379014
   ],
   [
    "2026-09-18",
    42.2,
    42.43,
    41.5,
-   41.76
+   41.76,
+   524697
   ],
   [
    "2026-09-21",
    42.05,
    42.2,
    41.33,
-   41.76
+   41.76,
+   456205
   ],
   [
    "2026-09-22",
    41.54,
    41.92,
    40.28,
-   41.25
+   41.25,
+   929594
   ],
   [
    "2026-09-23",
    41.11,
    42.01,
    39.93,
-   39.99
+   39.99,
+   1022555
   ],
   [
    "2026-09-24",
    39.83,
    40.44,
    39.28,
-   39.59
+   39.59,
+   940052
   ],
   [
    "2026-09-25",
    40,
    40,
    38.74,
-   38.74
+   38.74,
+   605698
   ],
   [
    "2026-09-28",
    38.09,
    38.53,
    36.73,
-   36.98
+   36.98,
+   1079477
   ],
   [
    "2026-09-29",
    37.02,
    37.83,
    36.56,
-   37.02
+   37.02,
+   729993
   ],
   [
    "2026-09-30",
    37.15,
    38.04,
    36.69,
-   37.24
+   37.24,
+   850192
   ],
   [
    "2026-10-01",
    37,
    37.23,
    35.21,
-   36.07
+   36.07,
+   1697295
   ],
   [
    "2026-10-02",
    36.17,
    36.68,
    35.66,
-   35.89
+   35.89,
+   848794
   ],
   [
    "2026-10-05",
    37.2,
    38.62,
    37.2,
-   38.25
+   38.25,
+   1823913
   ],
   [
    "2026-10-06",
    38.5,
    38.84,
    38.05,
-   38.18
+   38.18,
+   1398868
   ],
   [
    "2026-10-07",
    37.62,
    37.65,
    36.77,
-   37.05
+   37.05,
+   941879
   ],
   [
    "2026-10-08",
    36.51,
    38.04,
    36.51,
-   36.76
+   36.76,
+   1111671
   ],
   [
    "2026-10-09",
    37.07,
    37.6,
    36.45,
-   36.81
+   36.81,
+   805732
   ],
   [
    "2026-10-12",
    36.82,
    37.15,
    36.57,
-   36.78
+   36.78,
+   376283
   ],
   [
    "2026-10-13",
    36.95,
    37.63,
    36.57,
-   36.79
+   36.79,
+   859347
   ],
   [
    "2026-10-14",
    36.24,
    36.63,
    35.46,
-   35.55
+   35.55,
+   701547
   ],
   [
    "2026-10-15",
    35.3,
    36.58,
    34.7,
-   36.47
+   36.47,
+   941303
   ],
   [
    "2026-10-16",
    36.61,
    36.68,
    35.55,
-   36.02
+   36.02,
+   584411
   ]
  ],
  "seguimiento": {
   "actualizado": "2026-10-21",
   "precio": 35.46,
-  "precio_nota": "cierre del martes (provisorio)",
+  "precio_nota": "cierre del martes",
   "texto": "El lunes se activó el escenario bajista del reporte: GGAL cerró en 35.09, por primera vez debajo de 35.21, e hizo un nuevo mínimo del tramo en 34.57. Fue una caída argentina, porque afuera subían el S&P y Brasil y ARGT perdió 1,2%. El martes abrió más abajo (34.92), subió hasta 36.45 a la par de Brasil y lo vendieron toda la tarde. Cerró en 35.46, el primer cierre otra vez arriba de 35.21, que contra la tendencia pide un segundo para contar. 36.56 frenó el rebote por cuarta rueda seguida. El RSI está en 33.4, con la divergencia alcista vigente, y la EMA20 en 37.42.",
   "dias": [
    {
@@ -929,7 +1045,8 @@
     "var": -2.58,
     "provisorio": false,
     "nota": "Primer cierre debajo de 35.21 y nuevo mínimo del tramo en 34.57: se activa «Nuevo mínimo del tramo». Volumen 95% de la media de 20 ruedas.",
-    "macro": "SPY +0,42% · EWZ +0,24% · ARGT −1,24%"
+    "macro": "SPY +0,42% · EWZ +0,24% · ARGT −1,24%",
+    "volumen": 906898
    },
    {
     "fecha": "2026-10-20",
@@ -938,9 +1055,10 @@
     "minimo": 34.92,
     "cierre": 35.46,
     "var": 1.05,
-    "provisorio": true,
+    "provisorio": false,
     "nota": "Abrió en el mínimo, subió 4,4% hasta 36.45 y cerró 0.99 abajo: primer cierre arriba de 35.21, sin confirmar. Volumen 127% de la media, el más alto desde el 15-oct.",
-    "macro": "SPY +0,34% · EWZ +2,41% · ARGT +0,29%"
+    "macro": "SPY +0,34% · EWZ +2,41% · ARGT +0,29%",
+    "volumen": 1217194
    }
   ],
   "niveles": [
@@ -993,6 +1111,24 @@
     "lectura": "Pide dos cierres porque va contra la tendencia. 36.68, el máximo del 16-oct, es el nivel más probable de trampa. Arriba, 37.20 y 38.40."
    }
   ],
-  "fuente": "Estudios de cierre del 19 y del 20-oct. El cierre del lunes es el oficial (35.09; el estudio leyó 35.07 a las 17:16). El del martes es la lectura de las 17:15 y puede cambiar en el cierre oficial."
+  "fuente": "Estudios de cierre del 19 y del 20-oct, con los cierres oficiales del feed (35.09 y 35.46) leídos el 21-oct antes de la apertura.",
+  "tecnico": {
+   "tendencia": "bajista",
+   "tendencia_texto": "desde junio: de 58.14 (17-jun) a 34.57 (19-oct)",
+   "frase": "El martes volvió arriba de 35.21, pero sigue lejos de 36.56 y debajo del promedio de 20 días.",
+   "techo": {
+    "nivel": 36.56,
+    "si": "Dos cierres seguidos arriba cortan la baja; el próximo techo es 37.20."
+   },
+   "piso": {
+    "nivel": 35.21,
+    "si": "Un cierre debajo vuelve a la baja; debajo de 34.57 se abre 33.01."
+   },
+   "divergencia": {
+    "tipo": "alcista",
+    "desde": "2026-10-01",
+    "hasta": "2026-10-19"
+   }
+  }
  }
 }

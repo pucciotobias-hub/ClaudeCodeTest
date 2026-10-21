@@ -61,11 +61,12 @@ estudio diario).
 - **Velas para el grafico de la pagina:** de `NASDAQ:GGAL` diario,
   `data_get_ohlcv` count=100 (sin summary) y cargá en `velas` una fila por rueda,
   de la mas vieja a la mas nueva: `["AAAA-MM-DD", apertura, maximo, minimo,
-  cierre]`, con 2 decimales, hasta el viernes de la semana (si hay vela de hoy,
-  afuera). La pagina dibuja con eso las velas, la EMA20 y los niveles del
-  tecnico; sin `velas` el grafico no aparece. (Desde el 19-oct: el grafico se
-  agrego a mano a la pagina el 13-oct y la receta no lo pedia, asi que el JSON
-  del lunes lo borraba.)
+  cierre, volumen]`, precios con 2 decimales y volumen entero, hasta el viernes
+  de la semana (si hay vela de hoy, afuera). La pagina dibuja con eso las velas,
+  el volumen, el promedio de 20 dias y el RSI, y calcula el volumen relativo;
+  sin `velas` el grafico no aparece. (Desde el 19-oct: el grafico se agrego a
+  mano a la pagina el 13-oct y la receta no lo pedia, asi que el JSON del lunes
+  lo borraba. Desde el 21-oct va el volumen: Tobias pidio verlo en el grafico.)
 - **No uses `data_get_study_values`** (hace derivar el simbolo y borra los
   dibujos) y **no toques los dibujos**: no hay `draw_*` en este reporte.
 - Al terminar, **dejá el chart en `NASDAQ:GGAL` diario**. A las 10:20 corre el
@@ -162,7 +163,13 @@ Formato (los numeros son de ejemplo del formato, no datos):
   "mercados_nota": "Una linea: GGAL con el bloque o sola, en pp contra ARGT",
   "noticias": [ { "bloque": "Grupo Galicia", "titulo": "", "detalle": "",
                   "impacto": "negativo", "fuente": "Ambito", "url": "https://...", "fecha": "23-sep" } ],
-  "tecnico": { "texto": "Estructura y que se rompio o se respeto en la semana",
+  "tecnico": { "tendencia": "bajista",
+               "tendencia_texto": "desde junio: de 58.14 (17-jun) a 34.70 (15-oct)",
+               "frase": "Una oracion simple: donde esta y contra que se esta apoyando o frenando",
+               "techo": { "nivel": 40.60, "si": "Que pasa si cierra arriba, en una oracion" },
+               "piso": { "nivel": 39.40, "si": "Que pasa si cierra debajo, en una oracion" },
+               "divergencia": { "tipo": "alcista", "desde": "2026-09-01", "hasta": "2026-09-24" },
+               "texto": "Estructura y que se rompio o se respeto en la semana",
                "niveles": [ { "tipo": "R1", "nivel": 40.60, "que": "fundamento con fecha" },
                             { "tipo": "PIVOTE", "nivel": 39.40, "que": "" },
                             { "tipo": "S1", "nivel": 38.87, "que": "" } ] },
@@ -170,10 +177,22 @@ Formato (los numeros son de ejemplo del formato, no datos):
   "escenarios": [ { "nombre": "Rebote", "sesgo": "alcista", "gatillo": "2 cierres > 39.80", "lectura": "" } ],
   "panorama": "",
   "notas": "Lo que falto o se corrigio en la corrida. Vacio si nada.",
-  "velas_fuente": "Velas diarias del ADR (apertura, maximo, minimo, cierre). EMA20 calculada en la pagina sobre todas las velas cargadas.",
-  "velas": [ ["2026-09-25", 40.00, 40.00, 38.74, 38.74] ]
+  "velas_fuente": "Velas diarias del ADR (apertura, maximo, minimo, cierre, volumen). Promedio de 20 dias, RSI14 y volumen relativo calculados en la pagina.",
+  "velas": [ ["2026-09-25", 40.00, 40.00, 38.74, 38.74, 605698] ]
 }
 ```
+
+- **El tecnico se lee en simple** (regla del 2026-10-21, a pedido de Tobias: el
+  parrafo largo y la tabla de cinco niveles "no se entendian"). La pagina muestra
+  arriba `tendencia`, `frase`, el `piso` y el `techo` con su `si` y tres
+  indicadores; `texto` y `niveles` quedan plegados en "Ver el detalle".
+  - `piso` y `techo`: el soporte y la resistencia mas cercanos al cierre, del
+    mapa del ultimo estudio. El grafico dibuja **solo esas dos lineas**.
+  - `frase` y cada `si`: una oracion corta, sin jerga (nada de "pivote",
+    "gatillo", "criterio"). Los numeros, con su precio.
+  - `divergencia`: solo si el ultimo estudio de cierre la da vigente. `desde` y
+    `hasta` son las fechas de los dos minimos que compara; la pagina une esos
+    minimos en el precio y en el RSI. Si no hay, no pongas el campo.
 
 - JSON valido: comillas dobles, sin comas colgando. `null` para un numero que no
   pudiste leer, nunca un cero.

@@ -7,6 +7,7 @@
   --bg:#f3f5f7; --panel:#ffffff; --ink:#15202b; --muted:#5b6875; --line:#d9dfe5;
   --accent:#0b5c8f; --up:#0f8a5f; --down:#c23b32; --flat:#7a8691; --amber:#b77800;
   --up-bg:rgba(15,138,95,.10); --down-bg:rgba(194,59,50,.10); --flat-bg:rgba(122,134,145,.12);
+  --violet:#7a4fc2;
   --display:"Barlow Condensed","Arial Narrow",Arial,sans-serif;
   --body:"Public Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
   --mono:"JetBrains Mono",ui-monospace,Consolas,monospace;
@@ -17,6 +18,7 @@
     --bg:#0e141a; --panel:#151d25; --ink:#e4e9ee; --muted:#95a2af; --line:#26313c;
     --accent:#5fb0e6; --up:#3ccf95; --down:#f0736a; --flat:#8d99a5; --amber:#f2b33d;
     --up-bg:rgba(60,207,149,.12); --down-bg:rgba(240,115,106,.12); --flat-bg:rgba(141,153,165,.14);
+    --violet:#b79bf0;
   }
 }
 :root[data-theme="dark"]{
@@ -24,6 +26,7 @@
   --bg:#0e141a; --panel:#151d25; --ink:#e4e9ee; --muted:#95a2af; --line:#26313c;
   --accent:#5fb0e6; --up:#3ccf95; --down:#f0736a; --flat:#8d99a5; --amber:#f2b33d;
   --up-bg:rgba(60,207,149,.12); --down-bg:rgba(240,115,106,.12); --flat-bg:rgba(141,153,165,.14);
+  --violet:#b79bf0;
 }
 *{box-sizing:border-box}
 body{background:var(--bg);color:var(--ink);font:15px/1.6 var(--body);padding-inline:16px;padding-block:28px 56px}
@@ -85,6 +88,40 @@ header h1{font-size:clamp(2rem,6vw,3.1rem);font-weight:700}
 .niveles tr.P td{background:rgba(183,120,0,.08)} .niveles tr.P td:first-child{color:var(--amber)}
 .niveles tr.precio td{color:var(--accent);font-weight:600;border-top:2px solid var(--accent)}
 .table-x{overflow-x:auto}
+
+/* Tecnico en simple: tendencia, regla soporte-precio-resistencia, tres indicadores y el detalle plegado */
+.tec{display:grid;gap:16px}
+.tend{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 12px}
+.tend .lbl{font:600 .72rem/1 var(--body);text-transform:uppercase;letter-spacing:.1em;color:var(--muted)}
+.tend b{font:700 1.6rem/1 var(--display);letter-spacing:.02em}
+.tend.bajista b{color:var(--down)} .tend.alcista b{color:var(--up)}
+.tend span:last-child{color:var(--muted)}
+.frase{font-size:1.08rem;font-weight:500}
+.regla{background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:16px 18px;display:grid;gap:12px}
+.regla-ends{display:flex;justify-content:space-between;gap:12px;font-size:.88rem}
+.regla-ends .s{color:var(--up)} .regla-ends .r{color:var(--down);text-align:right}
+.regla-ends b{font-size:1.05rem} .regla-ends em{font-style:normal;color:var(--muted);font-size:.8rem}
+.regla-bar{position:relative;height:10px;border-radius:5px;background:linear-gradient(90deg,var(--up-bg),var(--flat-bg),var(--down-bg));margin:18px 6px 4px}
+.regla-bar i{font-style:normal;position:absolute;top:50%;width:16px;height:16px;margin:-8px 0 0 -8px;border-radius:50%;background:var(--accent);border:3px solid var(--panel);box-shadow:0 0 0 1px var(--accent)}
+.regla-bar i span{position:absolute;bottom:18px;left:50%;transform:translateX(-50%);font-size:.85rem;font-weight:600;color:var(--accent);white-space:nowrap}
+.regla-si{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px 18px;font-size:.9rem;color:var(--muted)}
+.regla-si b{display:block;color:var(--ink)}
+.regla-si .baja{border-left:3px solid var(--down);padding-left:10px}
+.regla-si .sube{border-left:3px solid var(--up);padding-left:10px}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:12px 14px;display:grid;gap:4px;align-content:start}
+.card .k{font:600 .72rem/1.2 var(--body);text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+.card b{font-size:1.5rem;line-height:1.1}
+.card .x{font-size:.86rem;color:var(--muted)}
+.gauge{position:relative;height:6px;border-radius:3px;background:var(--line);margin:4px 0}
+.gauge s{position:absolute;top:0;bottom:0;background:var(--violet);opacity:.18}
+.gauge i{position:absolute;top:-4px;width:3px;height:14px;margin-left:-1.5px;background:var(--violet);border-radius:1px}
+.det summary{cursor:pointer;color:var(--accent);font-weight:600;font-size:.92rem}
+.det[open] summary{margin-bottom:6px}
+.rangos{display:inline-flex;border:1px solid var(--line);border-radius:5px;overflow:hidden}
+.rangos button{font:500 .8rem/1 var(--body);color:var(--muted);background:transparent;border:0;padding:6px 10px;cursor:pointer}
+.rangos button + button{border-left:1px solid var(--line)}
+.rangos button.on{background:var(--accent);color:var(--panel)}
 
 /* Semana que viene */
 .agenda{display:grid;gap:0}
@@ -301,7 +338,23 @@ footer{color:var(--muted);font-size:.8rem;border-top:1px solid var(--line);paddi
     "nivel": 33.01,
     "que": "Soporte: base del rango de octubre de 2025 (mínimos del 23-oct-25 y del 13-oct-25 en 33.24). Debajo, 31.14, mínimo de swing del 22-oct-25. −8,4%"
    }
-  ]
+  ],
+  "tendencia": "bajista",
+  "tendencia_texto": "desde junio: de 58.14 (17-jun) a 34.70 (15-oct)",
+  "frase": "Perdió el soporte de 36.56 el miércoles y quedó encerrada entre 35.21 y 36.56.",
+  "techo": {
+   "nivel": 36.56,
+   "si": "Dos cierres seguidos arriba cortan la baja; el próximo techo es 37.20."
+  },
+  "piso": {
+   "nivel": 35.21,
+   "si": "Un cierre debajo sigue la baja y abre 33.01."
+  },
+  "divergencia": {
+   "tipo": "alcista",
+   "desde": "2026-10-01",
+   "hasta": "2026-10-15"
+  }
  },
  "agenda": [
   {
@@ -352,713 +405,813 @@ footer{color:var(--muted);font-size:.8rem;border-top:1px solid var(--line);paddi
  ],
  "panorama": "GGAL cerró la semana en 36.02, −2,15%, 1,5 pp peor que ARGT, después de perder el miércoles el soporte de 36.56 que había sostenido seis ruedas. El jueves perforó 35.21 en la rueda hasta 34.70 y lo recompraron, así que el soporte sigue sin perderse en cierre y el precio quedó encerrado entre 35.21 y 36.56. La debilidad no fue solo de GGAL: con datos locales buenos (inflación 1,9%, licitación con 136% de renovación, BCRA comprando), el riesgo país subió a 648, el máximo del año, en una semana en la que el S&P perdió 2,0% y Brasil 3,9%; la tasa a 10 años tocó 5,33% y bajó a 5,08%. Esta semana hay que mirar de qué lado de 35.21 (un cierre debajo abre 33.01) y de 36.56 (dos cierres arriba para hablar de recuperación) cierra, junto con el riesgo país y la tasa larga, con el balotaje de Brasil del domingo 25 y la Fed y la licitación del Tesoro del miércoles 28 adelante.",
  "notas": "Este reporte reemplaza al de las 10:45, que salió sin feed (cierre, mercados y técnico en null). En esta corrida el MCP de TradingView respondió: todos los precios son del feed (velas diarias; NASDAQ:GGAL resuelve a BATS:GGAL y AMEX:EWZ a BATS:EWZ, como siempre). La EMA20, el RSI14 y la SMA200 se calcularon sobre 300 cierres diarios del feed (al 14-oct dan 38.27, 28.62 y 46.71, lo mismo que el informe de ese día). Volumen de la semana: 3,46 M contra un promedio de 4,49 M de las cuatro anteriores. US10Y: el lunes 12 no hubo rueda de bonos (Columbus Day). Informes de la semana: cierres del 12 (sin datos), 13 y 14; cierre del 15 sin datos y no hay cierre del 16 (la máquina no estaba); aperturas del 12, 13 y 15. Sin auditoría del 16-oct. El mapa de niveles es el del cierre del 14-oct. Noticias: las de la corrida de las 10:45 (Grupo Galicia: búsquedas por Kon, mora de Galicia, Naranja X y sistema, dividendo de octubre en español y en inglés, precio objetivo, resultados del 3T y normas del BCRA, con y sin filtro de medios locales; de la semana solo apareció lo de UBS, vista primero en Benzinga, que dio 403). En esta corrida busqué además el rebote del jueves 15 (Merval, ADRs, riesgo país, con filtro de Ámbito, Cronista, Infobae, iProfesional, Bloomberg Línea y Perfil), el dividendo de octubre, Kon y noticias de GGAL en inglés: nada fechado en la semana. El anuncio del dividendo de octubre no está publicado (el último es el de USD 0,0479, cortado el 28-sep y pagado el 5-oct). La fecha de resultados del 3T aparece como 24-nov (Earnings Whispers) y 25-nov (GuruFocus), sin confirmar por la empresa: no se cargó. Brasil no va como noticia: no encontré una nota fechada en la semana que explique el −3,9% de EWZ. La subida de la tasa a 10 años se corrigió con el feed (la nota de Trading Economics daba 5,12% el viernes; el feed, 5,08%). Licitaciones (`licitaciones_tesoro.py`): ninguna en la semana; la próxima tiene llamado el lunes 26, licitación el miércoles 28 y liquidación el viernes 30. Agenda de EE.UU.: el calendario consultado (Thrive in Markets) no detalla datos de EE.UU. para la semana salvo los PMI preliminares del viernes y el período de silencio de la Fed desde el sábado 17.",
- "velas_fuente": "Velas diarias del ADR (apertura, máximo, mínimo, cierre) del feed de TradingView, 27-may al 16-oct-2026. EMA20 calculada en la página sobre todas las velas cargadas.",
+ "velas_fuente": "Velas diarias del ADR (apertura, máximo, mínimo, cierre, volumen) del feed de TradingView, 27-may al 16-oct-2026. El promedio de 20 días, el RSI14 y el volumen relativo se calculan en la página.",
  "velas": [
   [
    "2026-05-27",
    46.05,
    48.96,
    46,
-   48.18
+   48.18,
+   3899389
   ],
   [
    "2026-05-28",
    48.18,
    50.07,
    48,
-   48.83
+   48.83,
+   2496949
   ],
   [
    "2026-05-29",
    49.09,
    50.87,
    48.71,
-   50.69
+   50.69,
+   2104620
   ],
   [
    "2026-06-01",
    50.84,
    51.98,
    49.71,
-   51.16
+   51.16,
+   1523070
   ],
   [
    "2026-06-02",
    50.6,
    50.87,
    49.5,
-   50.33
+   50.33,
+   1096962
   ],
   [
    "2026-06-03",
    49.62,
    49.99,
    48.28,
-   48.33
+   48.33,
+   956379
   ],
   [
    "2026-06-04",
    48.25,
    49.62,
    48.25,
-   48.62
+   48.62,
+   729353
   ],
   [
    "2026-06-05",
    48.35,
    48.56,
    47.24,
-   47.81
+   47.81,
+   659510
   ],
   [
    "2026-06-08",
    48.22,
    49.06,
    47.01,
-   48.04
+   48.04,
+   962023
   ],
   [
    "2026-06-09",
    48.46,
    50.58,
    47.32,
-   49.99
+   49.99,
+   1791555
   ],
   [
    "2026-06-10",
    49.6,
    50.65,
    48.93,
-   49.62
+   49.62,
+   961675
   ],
   [
    "2026-06-11",
    51.1,
    55.7,
    51.08,
-   55.41
+   55.41,
+   4237614
   ],
   [
    "2026-06-12",
    55.49,
    56.25,
    54.56,
-   55.16
+   55.16,
+   1264690
   ],
   [
    "2026-06-15",
    55.8,
    56.6,
    55.52,
-   55.96
+   55.96,
+   1230513
   ],
   [
    "2026-06-16",
    55.96,
    56.2,
    54.12,
-   54.44
+   54.44,
+   991594
   ],
   [
    "2026-06-17",
    54.44,
    58.14,
    54.4,
-   55.55
+   55.55,
+   1684432
   ],
   [
    "2026-06-18",
    56.82,
    57.94,
    56.09,
-   56.37
+   56.37,
+   1334564
   ],
   [
    "2026-06-22",
    55.56,
    56.3,
    52.8,
-   53.33
+   53.33,
+   1698323
   ],
   [
    "2026-06-23",
    52,
    52.28,
    51.03,
-   51.35
+   51.35,
+   913668
   ],
   [
    "2026-06-24",
    50.74,
    50.8,
    48.89,
-   49.1
+   49.1,
+   1145024
   ],
   [
    "2026-06-25",
    49.86,
    50.23,
    48.75,
-   49.42
+   49.42,
+   511265
   ],
   [
    "2026-06-26",
    48.78,
    50.8,
    48.78,
-   49.97
+   49.97,
+   648105
   ],
   [
    "2026-06-29",
    50.87,
    51.87,
    49.94,
-   50.9
+   50.9,
+   1096369
   ],
   [
    "2026-06-30",
    50.62,
    51.88,
    49.52,
-   50.03
+   50.03,
+   688538
   ],
   [
    "2026-07-01",
    49.85,
    50.81,
    47.84,
-   49.05
+   49.05,
+   910729
   ],
   [
    "2026-07-02",
    49.92,
    50.72,
    49.23,
-   50.37
+   50.37,
+   810422
   ],
   [
    "2026-07-06",
    50.81,
    53.5,
    50.41,
-   53.02
+   53.02,
+   1365405
   ],
   [
    "2026-07-07",
    52.53,
    53.64,
    50.92,
-   51.1
+   51.1,
+   572775
   ],
   [
    "2026-07-08",
    50.13,
    51.46,
    49.99,
-   50.25
+   50.25,
+   1485647
   ],
   [
    "2026-07-09",
    50.38,
    50.48,
    48.67,
-   49.39
+   49.39,
+   617481
   ],
   [
    "2026-07-10",
    50.36,
    53.86,
    49.96,
-   53.73
+   53.73,
+   1808483
   ],
   [
    "2026-07-13",
    53.82,
    54.04,
    51.41,
-   51.41
+   51.41,
+   747095
   ],
   [
    "2026-07-14",
    52.66,
    53.1,
    50.65,
-   50.8
+   50.8,
+   1164074
   ],
   [
    "2026-07-15",
    50.83,
    53.19,
    50.79,
-   52.67
+   52.67,
+   1614688
   ],
   [
    "2026-07-16",
    52.23,
    52.27,
    49.76,
-   50.18
+   50.18,
+   1234816
   ],
   [
    "2026-07-17",
    49.42,
    50.01,
    48.45,
-   49.94
+   49.94,
+   1119567
   ],
   [
    "2026-07-20",
    49.58,
    50.46,
    48.97,
-   49.95
+   49.95,
+   667537
   ],
   [
    "2026-07-21",
    50.5,
    51.63,
    50.18,
-   50.94
+   50.94,
+   774507
   ],
   [
    "2026-07-22",
    51.92,
    53.34,
    51.67,
-   53.24
+   53.24,
+   1688772
   ],
   [
    "2026-07-23",
    52.66,
    52.8,
    50.11,
-   50.15
+   50.15,
+   756127
   ],
   [
    "2026-07-24",
    50.17,
    51.48,
    49.04,
-   49.3
+   49.3,
+   774887
   ],
   [
    "2026-07-27",
    49.72,
    50.48,
    49.43,
-   50
+   50,
+   328996
   ],
   [
    "2026-07-28",
    49.33,
    49.66,
    47.9,
-   49.19
+   49.19,
+   953983
   ],
   [
    "2026-07-29",
    48.59,
    50.25,
    48.19,
-   49.15
+   49.15,
+   665409
   ],
   [
    "2026-07-30",
    49.04,
    51.69,
    48.64,
-   51.61
+   51.61,
+   750311
   ],
   [
    "2026-07-31",
    52,
    52.24,
    49.72,
-   49.77
+   49.77,
+   642211
   ],
   [
    "2026-08-03",
    50.23,
    50.79,
    49.85,
-   50.51
+   50.51,
+   510500
   ],
   [
    "2026-08-04",
    51.02,
    51.02,
    48.7,
-   48.92
+   48.92,
+   757473
   ],
   [
    "2026-08-05",
    48.72,
    49.75,
    48.18,
-   48.36
+   48.36,
+   660357
   ],
   [
    "2026-08-06",
    48.08,
    48.54,
    46.6,
-   46.73
+   46.73,
+   695934
   ],
   [
    "2026-08-07",
    47.26,
    47.52,
    45.58,
-   46.18
+   46.18,
+   714738
   ],
   [
    "2026-08-10",
    46.18,
    46.59,
    45.53,
-   46.42
+   46.42,
+   573602
   ],
   [
    "2026-08-11",
    46.9,
    47.75,
    43.87,
-   44.53
+   44.53,
+   1263445
   ],
   [
    "2026-08-12",
    44.41,
    44.83,
    43.6,
-   44.22
+   44.22,
+   765889
   ],
   [
    "2026-08-13",
    44.18,
    45.31,
    43.53,
-   44.99
+   44.99,
+   800023
   ],
   [
    "2026-08-14",
    45.15,
    45.21,
    43.37,
-   43.37
+   43.37,
+   596551
   ],
   [
    "2026-08-17",
    43.72,
    43.99,
    43,
-   43.42
+   43.42,
+   505215
   ],
   [
    "2026-08-18",
    43,
    43.32,
    41.8,
-   42.12
+   42.12,
+   920226
   ],
   [
    "2026-08-19",
    42,
    42.82,
    40.89,
-   41.47
+   41.47,
+   885805
   ],
   [
    "2026-08-20",
    42.59,
    42.59,
    40.6,
-   41
+   41,
+   1895423
   ],
   [
    "2026-08-21",
    41.18,
    42.44,
    41.13,
-   41.45
+   41.45,
+   1758005
   ],
   [
    "2026-08-24",
    41.12,
    44,
    41.12,
-   43.45
+   43.45,
+   1215477
   ],
   [
    "2026-08-25",
    43.66,
    44.28,
    42.5,
-   44.2
+   44.2,
+   796405
   ],
   [
    "2026-08-26",
    44.36,
    45.2,
    43.42,
-   43.91
+   43.91,
+   1005410
   ],
   [
    "2026-08-27",
    43.99,
    44.41,
    42.63,
-   42.91
+   42.91,
+   690253
   ],
   [
    "2026-08-28",
    43.04,
    43.34,
    41.69,
-   42.24
+   42.24,
+   787490
   ],
   [
    "2026-08-31",
    42.5,
    44.57,
    42.5,
-   43.75
+   43.75,
+   1095737
   ],
   [
    "2026-09-01",
    43.35,
    45.08,
    42.92,
-   44.29
+   44.29,
+   752689
   ],
   [
    "2026-09-02",
    44.28,
    45.14,
    43.98,
-   45.01
+   45.01,
+   793526
   ],
   [
    "2026-09-03",
    44.72,
    46.09,
    44.02,
-   44.63
+   44.63,
+   615791
   ],
   [
    "2026-09-04",
    44.56,
    44.95,
    43.82,
-   44.36
+   44.36,
+   481940
   ],
   [
    "2026-09-08",
    44.6,
    44.67,
    43.5,
-   44.12
+   44.12,
+   761880
   ],
   [
    "2026-09-09",
    43.99,
    44.79,
    43.08,
-   44.49
+   44.49,
+   425550
   ],
   [
    "2026-09-10",
    43.63,
    45.72,
    43.63,
-   44.72
+   44.72,
+   1017818
   ],
   [
    "2026-09-11",
    45,
    45.42,
    43.17,
-   43.86
+   43.86,
+   739390
   ],
   [
    "2026-09-14",
    43.48,
    43.87,
    42.65,
-   42.96
+   42.96,
+   773802
   ],
   [
    "2026-09-15",
    42.7,
    43.08,
    41.94,
-   42.14
+   42.14,
+   689556
   ],
   [
    "2026-09-16",
    42.19,
    42.86,
    41.58,
-   42.27
+   42.27,
+   364905
   ],
   [
    "2026-09-17",
    43,
    43.09,
    42.37,
-   42.62
+   42.62,
+   379014
   ],
   [
    "2026-09-18",
    42.2,
    42.43,
    41.5,
-   41.76
+   41.76,
+   524697
   ],
   [
    "2026-09-21",
    42.05,
    42.2,
    41.33,
-   41.76
+   41.76,
+   456205
   ],
   [
    "2026-09-22",
    41.54,
    41.92,
    40.28,
-   41.25
+   41.25,
+   929594
   ],
   [
    "2026-09-23",
    41.11,
    42.01,
    39.93,
-   39.99
+   39.99,
+   1022555
   ],
   [
    "2026-09-24",
    39.83,
    40.44,
    39.28,
-   39.59
+   39.59,
+   940052
   ],
   [
    "2026-09-25",
    40,
    40,
    38.74,
-   38.74
+   38.74,
+   605698
   ],
   [
    "2026-09-28",
    38.09,
    38.53,
    36.73,
-   36.98
+   36.98,
+   1079477
   ],
   [
    "2026-09-29",
    37.02,
    37.83,
    36.56,
-   37.02
+   37.02,
+   729993
   ],
   [
    "2026-09-30",
    37.15,
    38.04,
    36.69,
-   37.24
+   37.24,
+   850192
   ],
   [
    "2026-10-01",
    37,
    37.23,
    35.21,
-   36.07
+   36.07,
+   1697295
   ],
   [
    "2026-10-02",
    36.17,
    36.68,
    35.66,
-   35.89
+   35.89,
+   848794
   ],
   [
    "2026-10-05",
    37.2,
    38.62,
    37.2,
-   38.25
+   38.25,
+   1823913
   ],
   [
    "2026-10-06",
    38.5,
    38.84,
    38.05,
-   38.18
+   38.18,
+   1398868
   ],
   [
    "2026-10-07",
    37.62,
    37.65,
    36.77,
-   37.05
+   37.05,
+   941879
   ],
   [
    "2026-10-08",
    36.51,
    38.04,
    36.51,
-   36.76
+   36.76,
+   1111671
   ],
   [
    "2026-10-09",
    37.07,
    37.6,
    36.45,
-   36.81
+   36.81,
+   805732
   ],
   [
    "2026-10-12",
    36.82,
    37.15,
    36.57,
-   36.78
+   36.78,
+   376283
   ],
   [
    "2026-10-13",
    36.95,
    37.63,
    36.57,
-   36.79
+   36.79,
+   859347
   ],
   [
    "2026-10-14",
    36.24,
    36.63,
    35.46,
-   35.55
+   35.55,
+   701547
   ],
   [
    "2026-10-15",
    35.3,
    36.58,
    34.7,
-   36.47
+   36.47,
+   941303
   ],
   [
    "2026-10-16",
    36.61,
    36.68,
    35.55,
-   36.02
+   36.02,
+   584411
   ]
  ],
  "seguimiento": {
   "actualizado": "2026-10-21",
   "precio": 35.46,
-  "precio_nota": "cierre del martes (provisorio)",
+  "precio_nota": "cierre del martes",
   "texto": "El lunes se activó el escenario bajista del reporte: GGAL cerró en 35.09, por primera vez debajo de 35.21, e hizo un nuevo mínimo del tramo en 34.57. Fue una caída argentina, porque afuera subían el S&P y Brasil y ARGT perdió 1,2%. El martes abrió más abajo (34.92), subió hasta 36.45 a la par de Brasil y lo vendieron toda la tarde. Cerró en 35.46, el primer cierre otra vez arriba de 35.21, que contra la tendencia pide un segundo para contar. 36.56 frenó el rebote por cuarta rueda seguida. El RSI está en 33.4, con la divergencia alcista vigente, y la EMA20 en 37.42.",
   "dias": [
    {
@@ -1070,7 +1223,8 @@ footer{color:var(--muted);font-size:.8rem;border-top:1px solid var(--line);paddi
     "var": -2.58,
     "provisorio": false,
     "nota": "Primer cierre debajo de 35.21 y nuevo mínimo del tramo en 34.57: se activa «Nuevo mínimo del tramo». Volumen 95% de la media de 20 ruedas.",
-    "macro": "SPY +0,42% · EWZ +0,24% · ARGT −1,24%"
+    "macro": "SPY +0,42% · EWZ +0,24% · ARGT −1,24%",
+    "volumen": 906898
    },
    {
     "fecha": "2026-10-20",
@@ -1079,9 +1233,10 @@ footer{color:var(--muted);font-size:.8rem;border-top:1px solid var(--line);paddi
     "minimo": 34.92,
     "cierre": 35.46,
     "var": 1.05,
-    "provisorio": true,
+    "provisorio": false,
     "nota": "Abrió en el mínimo, subió 4,4% hasta 36.45 y cerró 0.99 abajo: primer cierre arriba de 35.21, sin confirmar. Volumen 127% de la media, el más alto desde el 15-oct.",
-    "macro": "SPY +0,34% · EWZ +2,41% · ARGT +0,29%"
+    "macro": "SPY +0,34% · EWZ +2,41% · ARGT +0,29%",
+    "volumen": 1217194
    }
   ],
   "niveles": [
@@ -1134,7 +1289,25 @@ footer{color:var(--muted);font-size:.8rem;border-top:1px solid var(--line);paddi
     "lectura": "Pide dos cierres porque va contra la tendencia. 36.68, el máximo del 16-oct, es el nivel más probable de trampa. Arriba, 37.20 y 38.40."
    }
   ],
-  "fuente": "Estudios de cierre del 19 y del 20-oct. El cierre del lunes es el oficial (35.09; el estudio leyó 35.07 a las 17:16). El del martes es la lectura de las 17:15 y puede cambiar en el cierre oficial."
+  "fuente": "Estudios de cierre del 19 y del 20-oct, con los cierres oficiales del feed (35.09 y 35.46) leídos el 21-oct antes de la apertura.",
+  "tecnico": {
+   "tendencia": "bajista",
+   "tendencia_texto": "desde junio: de 58.14 (17-jun) a 34.57 (19-oct)",
+   "frase": "El martes volvió arriba de 35.21, pero sigue lejos de 36.56 y debajo del promedio de 20 días.",
+   "techo": {
+    "nivel": 36.56,
+    "si": "Dos cierres seguidos arriba cortan la baja; el próximo techo es 37.20."
+   },
+   "piso": {
+    "nivel": 35.21,
+    "si": "Un cierre debajo vuelve a la baja; debajo de 34.57 se abre 33.01."
+   },
+   "divergencia": {
+    "tipo": "alcista",
+    "desde": "2026-10-01",
+    "hasta": "2026-10-19"
+   }
+  }
  }
 }
 </script>
@@ -1194,7 +1367,6 @@ function render(D){
         (d.macro ? '<div class="mc">' + esc(d.macro) + '</div>' : '') + '</div>';
     }).join('') + '</div>');
     if (S.escenarios && S.escenarios.length) h.push(escenarios(S.escenarios));
-    if (S.niveles && S.niveles.length) h.push('<div class="panel"><h3 style="font-size:1.15rem;font-weight:600">Mapa vigente</h3>' + tablaNiveles(S.niveles, S.precio, S.precio_nota || 'último cierre') + '</div>');
     if (S.fuente) h.push('<p class="seg-fuente">' + esc(S.fuente) + '</p>');
     h.push('</section>');
   }
@@ -1230,11 +1402,41 @@ function render(D){
     h.push('</div></section>');
   }
 
+  // Tecnico en simple (2026-10-21, a pedido de Tobias: el parrafo largo y la tabla no se entendian).
+  // Arriba lo que hay que saber; el texto y la tabla completa quedan en "Ver el detalle".
   var t = D.tecnico || {};
-  if (t.texto || (t.niveles && t.niveles.length)) {
-    h.push('<section><h2>Técnico <small>' + (S ? 'mapa al cierre de la semana del reporte' : 'mapa del último estudio de cierre') + '</small></h2><div class="panel"><p>' + esc(t.texto) + '</p>');
-    if (t.niveles && t.niveles.length) h.push(tablaNiveles(t.niveles, g.cierre, 'cierre de la semana'));
+  var K = claves(D);
+  if (K.precio != null && (K.techo || K.piso)) {
+    var all = serie(D), I = calc(all), u = all.length - 1;
+    var T = K.T, tend = (T.tendencia || '').toLowerCase();
+    h.push('<section><h2>Técnico <small>dónde está y qué mirar</small></h2><div class="tec">');
+    if (tend) h.push('<div class="tend ' + (/baj/.test(tend) ? 'bajista' : /alc/.test(tend) ? 'alcista' : '') + '"><span class="lbl">Tendencia</span><b>' + esc(tend.charAt(0).toUpperCase() + tend.slice(1)) + '</b>' + (T.tendencia_texto ? '<span>' + esc(T.tendencia_texto) + '</span>' : '') + '</div>');
+    if (T.frase) h.push('<p class="frase">' + esc(T.frase) + '</p>');
+    if (K.techo && K.piso) {
+      var pos = Math.max(0, Math.min(1, (K.precio - K.piso.nivel) / (K.techo.nivel - K.piso.nivel)));
+      function dist(n){ return pct((n / K.precio - 1) * 100); }
+      h.push('<div class="regla"><div class="regla-ends"><span class="s">Soporte <b class="num">' + px(K.piso.nivel) + '</b> <em>' + dist(K.piso.nivel) + '</em></span><span class="r">Resistencia <b class="num">' + px(K.techo.nivel) + '</b> <em>' + dist(K.techo.nivel) + '</em></span></div>' +
+        '<div class="regla-bar"><i style="left:' + (pos * 100).toFixed(1) + '%"><span class="num">' + px(K.precio) + '</span></i></div>' +
+        '<div class="regla-si"><div class="baja"><b>Si cierra debajo de ' + px(K.piso.nivel) + '</b>' + esc(K.piso.si || '') + '</div><div class="sube"><b>Si cierra arriba de ' + px(K.techo.nivel) + '</b>' + esc(K.techo.si || '') + '</div></div></div>');
+    }
+    var rsi = I.rsi[u], ema = I.ema[u], va = I.volAvg[u], vol = all[u][5];
+    var cards = [];
+    if (rsi != null) cards.push('<div class="card"><span class="k">Fuerza · RSI 14</span><b class="num">' + rsi.toFixed(0) + '</b>' +
+      '<div class="gauge"><s style="left:30%;width:40%"></s><i style="left:' + rsi.toFixed(1) + '%"></i></div><span class="x">' + leerRSI(rsi) + '</span></div>');
+    if (ema != null) { var de = (all[u][4] / ema - 1) * 100;
+      cards.push('<div class="card"><span class="k">Promedio de 20 días</span><b class="num">' + ema.toFixed(2) + '</b><span class="x">El precio está ' + pct(de).replace(/^[+−]/, '') + (de < 0 ? ' debajo: la tendencia de corto plazo sigue para abajo.' : ' arriba: la tendencia de corto plazo es para arriba.') + '</span></div>'); }
+    if (vol && va) { var vr = vol / va * 100;
+      cards.push('<div class="card"><span class="k">Volumen del último día</span><b class="num">' + fmtVol(vol) + '</b><span class="x">' + vr.toFixed(0) + '% del promedio de 20 días: ' + (vr >= 120 ? 'más movimiento que lo normal.' : vr <= 80 ? 'poco movimiento.' : 'normal.') + '</span></div>'); }
+    if (cards.length) h.push('<div class="cards">' + cards.join('') + '</div>');
+    if (t.texto || K.lista.length) {
+      h.push('<details class="det"><summary>Ver el detalle técnico</summary>');
+      if (K.lista.length) h.push(tablaNiveles(K.lista, K.precio, S ? (S.precio_nota || 'último cierre') : 'cierre de la semana'));
+      if (t.texto) h.push('<p style="margin-top:12px"><b>La semana del reporte.</b> ' + esc(t.texto) + '</p>');
+      h.push('</details>');
+    }
     h.push('</div></section>');
+  } else if (t.texto || (t.niveles && t.niveles.length)) {
+    h.push('<section><h2>Técnico</h2><div class="panel"><p>' + esc(t.texto) + '</p>' + (t.niveles && t.niveles.length ? tablaNiveles(t.niveles, g.cierre, 'cierre de la semana') : '') + '</div></section>');
   }
 
   if ((D.agenda && D.agenda.length) || (D.escenarios && D.escenarios.length) || D.panorama) {
@@ -1248,11 +1450,12 @@ function render(D){
   }
 
   if (D.velas && D.velas.length > 5) {
-    h.push('<section><h2>Gráfico <small>velas diarias con los niveles del técnico</small></h2>' +
-      '<div class="chart-head"><div class="readout" id="readout"></div></div>' +
-      '<div class="chart" id="chart" role="img" aria-label="Gráfico de velas diarias de GGAL con soportes, resistencias y EMA20"></div>' +
-      '<div class="leyenda"><span style="color:var(--accent)"><i></i>EMA20</span><span style="color:var(--down)"><i class="dash"></i>Resistencia</span><span style="color:var(--amber)"><i class="dash"></i>Pivote</span><span style="color:var(--up)"><i class="dash"></i>Soporte</span><span style="color:var(--muted)"><i style="border-top:8px solid var(--line)"></i>Semana del reporte</span>' + (S ? '<span style="color:var(--muted)"><i style="border-top:8px solid var(--accent);opacity:.25"></i>Esta semana</span>' : '') + '</div>' +
-      '<p class="chart-nota">Pasá el dedo o el mouse por las velas para ver apertura, máximo, mínimo y cierre de cada día.</p></section>');
+    h.push('<section><h2>Gráfico <small>precio, volumen y RSI · diario</small></h2>' +
+      '<div class="chart-head"><div class="readout" id="readout"></div>' +
+      '<div class="rangos" id="rangos"><button data-r="22">1 mes</button><button data-r="66">3 meses</button><button data-r="999">Todo</button></div></div>' +
+      '<div class="chart" id="chart" role="img" aria-label="Gráfico diario de GGAL: velas, volumen y RSI, con el soporte y la resistencia del técnico"></div>' +
+      '<div class="leyenda"><span style="color:var(--accent)"><i></i>Promedio de 20 días</span><span style="color:var(--up)"><i class="dash"></i>Soporte</span><span style="color:var(--down)"><i class="dash"></i>Resistencia</span><span style="color:var(--violet)"><i></i>Divergencia</span></div>' +
+      '<p class="chart-nota">Barras del pie: volumen (las más marcadas superaron el promedio de 20 días). Panel de abajo: RSI, debajo de 30 es sobreventa. Pasá el dedo o el mouse por las velas para ver cada día.</p></section>');
   }
 
   h.push('<footer><span>Generado ' + esc(D.generado) + ' · precios del feed de TradingView, noticias de la web con fuente citada.</span>' +
@@ -1266,110 +1469,208 @@ var DIAS = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
 var MESES = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
 function fechaCorta(s){ var p = s.split('-'); var d = new Date(+p[0], +p[1]-1, +p[2]); return DIAS[d.getDay()] + ' ' + (+p[2]) + '-' + MESES[+p[1]-1]; }
 
+// Velas de la semana del reporte mas las del seguimiento (las que ya estan, no se repiten).
+// Cada fila: [fecha, apertura, maximo, minimo, cierre, volumen]; el volumen puede faltar en semanas viejas.
+function serie(D){
+  var v = (D.velas || []).slice();
+  if (!v.length) return v;
+  var seg = D.seguimiento && D.seguimiento.dias ? D.seguimiento.dias : [];
+  var ultima = v[v.length - 1][0];
+  seg.forEach(function(d){
+    if (d.fecha > ultima && d.cierre != null) v.push([d.fecha, d.apertura, d.maximo, d.minimo, d.cierre, d.volumen == null ? null : d.volumen]);
+  });
+  return v;
+}
+
+// Promedio de 20 dias (EMA), RSI14 de Wilder y promedio de volumen de las 20 ruedas anteriores.
+function calc(all){
+  var k = 2/21, ema = [], e = null, rsi = [], g = 0, l = 0, volAvg = [];
+  all.forEach(function(r, i){
+    e = i ? r[4]*k + e*(1-k) : r[4]; ema.push(e);
+    if (i === 0) { rsi.push(null); }
+    else {
+      var d = r[4] - all[i-1][4], up = Math.max(d, 0), dn = Math.max(-d, 0);
+      if (i <= 14) { g += up / 14; l += dn / 14; rsi.push(i === 14 ? (l ? 100 - 100/(1 + g/l) : 100) : null); }
+      else { g = (g*13 + up)/14; l = (l*13 + dn)/14; rsi.push(l ? 100 - 100/(1 + g/l) : 100); }
+    }
+    if (i >= 20 && r[5] != null) {
+      var s = 0, ok = true;
+      for (var j = i - 20; j < i; j++) { if (all[j][5] == null) { ok = false; break; } s += all[j][5]; }
+      volAvg.push(ok ? s / 20 : null);
+    } else volAvg.push(null);
+  });
+  return {ema: ema, rsi: rsi, volAvg: volAvg};
+}
+
+// El cuadro de ahora: con seguimiento manda el ultimo cierre y su mapa; sin el, el de la semana.
+// Soporte y resistencia son los niveles mas cercanos al precio, salvo que el JSON los nombre.
+function claves(D){
+  var t = D.tecnico || {}, S = D.seguimiento && D.seguimiento.dias && D.seguimiento.dias.length ? D.seguimiento : null;
+  var T = {}, a;
+  for (a in t) T[a] = t[a];
+  if (S && S.tecnico) for (a in S.tecnico) T[a] = S.tecnico[a];
+  var lista = ((S && S.niveles && S.niveles.length) ? S.niveles : (t.niveles || [])).slice();
+  var precio = S ? (S.precio != null ? S.precio : S.dias[S.dias.length - 1].cierre) : (D.ggal || {}).cierre;
+  var techo = T.techo, piso = T.piso;
+  if (precio != null) {
+    if (!techo) lista.forEach(function(n){ if (n.nivel > precio && (!techo || n.nivel < techo.nivel)) techo = {nivel: n.nivel}; });
+    if (!piso) lista.forEach(function(n){ if (n.nivel < precio && (!piso || n.nivel > piso.nivel)) piso = {nivel: n.nivel}; });
+  }
+  return {T: T, lista: lista, precio: precio, techo: techo, piso: piso};
+}
+
+function leerRSI(v){
+  return v < 30 ? 'Sobreventa: cayó mucho y rápido, suele haber rebotes.' :
+    v < 45 ? 'Débil, cerca de la sobreventa (30).' :
+    v <= 55 ? 'Neutral.' : v <= 70 ? 'Firme.' : 'Sobrecompra: subió mucho y rápido.';
+}
+function fmtVol(v){ return v == null ? 'N/D' : v >= 1e6 ? (v/1e6).toFixed(2).replace('.', ',') + ' M' : Math.round(v/1000) + ' mil'; }
+function cls(v){ return v == null ? 'flat' : v > 0.05 ? 'up' : v < -0.05 ? 'down' : 'flat'; }
+function pct(v){ return v == null ? 'N/D' : (v > 0 ? '+' : v < 0 ? '−' : '') + Math.abs(v).toFixed(2).replace('.', ',') + '%'; }
+
+// Grafico (rediseño del 2026-10-21, a pedido de Tobias: "no se entiende nada, menos resistencias, mas volumen").
+// Tres cosas y nada mas: velas con el volumen al pie, una linea de soporte y una de resistencia con su
+// nombre, y el RSI abajo con la divergencia del estudio dibujada si la hay.
+var RANGO = null;
 function drawChart(D){
   var box = document.getElementById('chart');
   if (!box || !D.velas) return;
-  // Las velas del seguimiento van despues de las de la semana del reporte (las que ya estan, no se repiten).
-  var seg = D.seguimiento && D.seguimiento.dias ? D.seguimiento.dias : [];
-  var ultima = D.velas[D.velas.length - 1][0];
-  var extra = seg.filter(function(d){ return d.fecha > ultima && d.cierre != null; })
-    .map(function(d){ return [d.fecha, d.apertura, d.maximo, d.minimo, d.cierre]; });
-  var all = D.velas.concat(extra);
-  // EMA20 sobre todas las velas cargadas
-  var k = 2/21, ema = [], e = all[0][4];
-  all.forEach(function(r, i){ e = i ? r[4]*k + e*(1-k) : r[4]; ema.push(e); });
-  var W = Math.max(300, box.clientWidth || 800);
+  var all = serie(D), I = calc(all), K = claves(D);
+  var W = Math.max(260, box.clientWidth || 800);
   var narrow = W < 560;
-  var n = Math.min(all.length - 19, narrow ? 28 : 46);
+  var rango = RANGO || (narrow ? 22 : 66);   // hasta que se elige un boton, depende del ancho
+  var botones = document.querySelectorAll('#rangos button');
+  for (var b = 0; b < botones.length; b++) botones[b].className = +botones[b].getAttribute('data-r') === rango ? 'on' : '';
+  var n = Math.min(all.length - 20, rango);
   var start = all.length - n;
-  var bars = all.slice(start), emaS = ema.slice(start);
-  // Con seguimiento, el grafico muestra el mapa vigente (el de la tabla "Mapa vigente"), no el de la semana.
-  var niveles = ((extra.length && D.seguimiento.niveles) || (D.tecnico || {}).niveles || []).slice();
-  var H = narrow ? 300 : 360;
-  var padL = 6, padR = narrow ? 74 : 92, padT = 14, padB = 26;
+  var bars = all.slice(start), emaS = I.ema.slice(start), rsiS = I.rsi.slice(start), vaS = I.volAvg.slice(start);
+  var padL = 4, padR = narrow ? 58 : 66, padT = 10;
+  var Hp = narrow ? 230 : 300, gap = 16, Hr = narrow ? 70 : 84, axis = 22;
+  var H = padT + Hp + gap + Hr + axis;
+  var pw = W - padL - padR;
+  var step = pw / n, cw = Math.max(2, Math.min(10, step*0.6));
+  function X(i){ return padL + step*(i + 0.5); }
+
+  // escala del precio: velas y promedio; las dos lineas solo si quedan cerca
   var lo = Infinity, hi = -Infinity;
   bars.forEach(function(r, i){ lo = Math.min(lo, r[3], emaS[i]); hi = Math.max(hi, r[2], emaS[i]); });
-  niveles.forEach(function(nv){ if (nv.nivel > lo - 3 && nv.nivel < hi + 3) { lo = Math.min(lo, nv.nivel); hi = Math.max(hi, nv.nivel); } });
-  var span = hi - lo; lo -= span*0.04; hi += span*0.04;
-  var pw = W - padL - padR, ph = H - padT - padB;
-  var step = pw / n, cw = Math.max(2, Math.min(12, step*0.62));
-  function X(i){ return padL + step*(i + 0.5); }
-  function Y(v){ return padT + (hi - v) / (hi - lo) * ph; }
+  var lineas = [];
+  if (K.techo) lineas.push({nivel: K.techo.nivel, txt: 'Resistencia', col: 'var(--down)', arriba: true});
+  if (K.piso) lineas.push({nivel: K.piso.nivel, txt: 'Soporte', col: 'var(--up)', arriba: false});
+  var span0 = hi - lo;
+  lineas = lineas.filter(function(l){ return l.nivel > lo - span0*0.3 && l.nivel < hi + span0*0.3; });
+  lineas.forEach(function(l){ lo = Math.min(lo, l.nivel); hi = Math.max(hi, l.nivel); });
+  var span = hi - lo;
+  // el volumen ocupa el 22% de abajo del panel de precio: se deja ese lugar libre debajo de las velas
+  lo -= span*0.30; hi += span*0.05;
+  function Y(v){ return padT + (hi - v) / (hi - lo) * Hp; }
+  var yR0 = padT + Hp + gap;
+  function YR(v){ return yR0 + (100 - v) / 100 * Hr; }
   var s = [];
-  // grilla horizontal cada 1 o 2 USD
-  var gstep = (hi - lo) > 14 ? 2 : 1;
-  for (var g = Math.ceil(lo/gstep)*gstep; g <= hi; g += gstep) {
-    s.push('<line x1="'+padL+'" x2="'+(padL+pw)+'" y1="'+Y(g).toFixed(1)+'" y2="'+Y(g).toFixed(1)+'" stroke="var(--line)" stroke-width="1" opacity=".7"/>');
-    if (Y(g) > padT + 10) s.push('<text x="'+(padL+2)+'" y="'+(Y(g)-3).toFixed(1)+'" font-size="10" fill="var(--muted)">'+g+'</text>');
+
+  // grilla con precios a la derecha
+  var pasos = [0.5, 1, 2, 5, 10], gs = pasos[0];
+  for (var p = 0; p < pasos.length; p++) { gs = pasos[p]; if ((hi - lo) / gs <= (narrow ? 6 : 8)) break; }
+  for (var gv = Math.ceil(lo/gs)*gs; gv <= hi; gv += gs) {
+    var yg = Y(gv);
+    if (yg > padT + Hp*0.78) continue;
+    s.push('<line x1="'+padL+'" x2="'+(padL+pw)+'" y1="'+yg.toFixed(1)+'" y2="'+yg.toFixed(1)+'" stroke="var(--line)" stroke-width="1" opacity=".6"/>');
+    s.push('<text x="'+(padL+pw+6)+'" y="'+(yg+4).toFixed(1)+'" font-size="10.5" fill="var(--muted)">'+gv.toFixed(gs < 1 ? 1 : 0)+'</text>');
   }
-  // franja de la semana del reporte (las 5 velas antes del seguimiento) y la de esta semana
-  var ne = Math.min(extra.length, n), wk = Math.min(5, n - ne);
-  s.push('<rect x="'+(padL+step*(n-ne-wk)).toFixed(1)+'" y="'+padT+'" width="'+(step*wk).toFixed(1)+'" height="'+ph+'" fill="var(--flat-bg)"/>');
-  if (ne) s.push('<rect x="'+(padL+step*(n-ne)).toFixed(1)+'" y="'+padT+'" width="'+(step*ne).toFixed(1)+'" height="'+ph+'" fill="var(--accent)" opacity=".09"/>');
-  // eje de meses
-  var prevM = null;
-  bars.forEach(function(r, i){
-    var m = r[0].slice(5,7);
-    if (m !== prevM) {
-      if (prevM !== null || i < 3) {
-        s.push('<line x1="'+X(i).toFixed(1)+'" x2="'+X(i).toFixed(1)+'" y1="'+(padT+ph)+'" y2="'+(padT+ph+5)+'" stroke="var(--muted)"/>');
-        s.push('<text x="'+X(i).toFixed(1)+'" y="'+(H-6)+'" font-size="11" fill="var(--muted)" text-anchor="'+(i < 2 ? 'start' : 'middle')+'">'+MESES[+m-1]+'</text>');
-      }
-      prevM = m;
-    }
+
+  // volumen al pie del panel de precio
+  var vmax = 0;
+  bars.forEach(function(r){ if (r[5] != null) vmax = Math.max(vmax, r[5]); });
+  if (vmax) {
+    var vb = padT + Hp, vh = Hp*0.2;
+    bars.forEach(function(r, i){
+      if (r[5] == null) return;
+      var h = r[5] / vmax * vh, fuerte = vaS[i] != null && r[5] > vaS[i];
+      s.push('<rect x="'+(X(i)-cw/2).toFixed(1)+'" y="'+(vb-h).toFixed(1)+'" width="'+cw.toFixed(1)+'" height="'+h.toFixed(1)+'" fill="'+(r[4] >= r[1] ? 'var(--up)' : 'var(--down)')+'" opacity="'+(fuerte ? '.55' : '.2')+'"/>');
+    });
+    var pts = [];
+    bars.forEach(function(r, i){ if (vaS[i] != null) pts.push(X(i).toFixed(1)+','+(vb - vaS[i]/vmax*vh).toFixed(1)); });
+    if (pts.length > 1) s.push('<polyline fill="none" stroke="var(--muted)" stroke-width="1" stroke-dasharray="3 3" points="'+pts.join(' ')+'"/>');
+    s.push('<text x="'+(padL+pw+6)+'" y="'+(vb-vh+8).toFixed(1)+'" font-size="10" fill="var(--muted)">Vol</text>');
+  }
+
+  // promedio de 20 dias
+  s.push('<polyline fill="none" stroke="var(--accent)" stroke-width="1.6" stroke-linejoin="round" opacity=".85" points="' + emaS.map(function(v, i){ return X(i).toFixed(1)+','+Y(v).toFixed(1); }).join(' ') + '"/>');
+
+  // soporte y resistencia, con su nombre en palabras
+  lineas.forEach(function(l){
+    var y = Y(l.nivel);
+    s.push('<line x1="'+padL+'" x2="'+(padL+pw)+'" y1="'+y.toFixed(1)+'" y2="'+y.toFixed(1)+'" stroke="'+l.col+'" stroke-width="1.4" stroke-dasharray="6 4"/>');
+    s.push('<text x="'+(padL+4)+'" y="'+(l.arriba ? y-5 : y+13).toFixed(1)+'" font-size="11" font-weight="600" fill="'+l.col+'" letter-spacing=".04em" stroke="var(--bg)" stroke-width="4" paint-order="stroke" stroke-linejoin="round">'+l.txt.toUpperCase()+' '+l.nivel.toFixed(2)+'</text>');
   });
-  s.push('<line x1="'+padL+'" x2="'+(padL+pw)+'" y1="'+(padT+ph)+'" y2="'+(padT+ph)+'" stroke="var(--muted)" stroke-width="1"/>');
-  // niveles
-  var labels = [];
-  niveles.forEach(function(nv){
-    if (nv.nivel < lo || nv.nivel > hi) return;
-    var t = /^P/i.test(nv.tipo) ? 'var(--amber)' : /^R/i.test(nv.tipo) ? 'var(--down)' : 'var(--up)';
-    var y = Y(nv.nivel);
-    s.push('<line x1="'+padL+'" x2="'+(padL+pw)+'" y1="'+y.toFixed(1)+'" y2="'+y.toFixed(1)+'" stroke="'+t+'" stroke-width="1.2" stroke-dasharray="5 4"/>');
-    labels.push({y: y, color: t, text: (/^P/i.test(nv.tipo) ? 'PIV' : nv.tipo) + ' ' + nv.nivel.toFixed(2)});
-  });
-  // cierre como etiqueta del eje
-  var last = bars[n-1];
-  labels.push({y: Y(last[4]), color: 'var(--accent)', text: last[4].toFixed(2), pill: true});
-  labels.sort(function(a, b){ return a.y - b.y; });
-  var gap = 15;
-  for (var i = 1; i < labels.length; i++) if (labels[i].y - labels[i-1].y < gap) labels[i].y = labels[i-1].y + gap;
-  for (i = labels.length - 2; i >= 0; i--) if (labels[i+1].y > padT+ph && labels[i].y > labels[i+1].y - gap) labels[i].y = labels[i+1].y - gap;
-  // EMA20
-  s.push('<polyline fill="none" stroke="var(--accent)" stroke-width="1.8" stroke-linejoin="round" points="' + emaS.map(function(v, i){ return X(i).toFixed(1)+','+Y(v).toFixed(1); }).join(' ') + '"/>');
+
   // velas
   bars.forEach(function(r, i){
     var up = r[4] >= r[1], col = up ? 'var(--up)' : 'var(--down)';
     var x = X(i), yo = Y(r[1]), yc = Y(r[4]);
-    s.push('<line x1="'+x.toFixed(1)+'" x2="'+x.toFixed(1)+'" y1="'+Y(r[2]).toFixed(1)+'" y2="'+Y(r[3]).toFixed(1)+'" stroke="'+col+'" stroke-width="1.2"/>');
-    s.push('<rect x="'+(x-cw/2).toFixed(1)+'" y="'+Math.min(yo,yc).toFixed(1)+'" width="'+cw.toFixed(1)+'" height="'+Math.max(1, Math.abs(yc-yo)).toFixed(1)+'" fill="'+(up ? 'var(--panel)' : col)+'" stroke="'+col+'" stroke-width="1.2"/>');
+    s.push('<line x1="'+x.toFixed(1)+'" x2="'+x.toFixed(1)+'" y1="'+Y(r[2]).toFixed(1)+'" y2="'+Y(r[3]).toFixed(1)+'" stroke="'+col+'" stroke-width="1.1"/>');
+    s.push('<rect x="'+(x-cw/2).toFixed(1)+'" y="'+Math.min(yo,yc).toFixed(1)+'" width="'+cw.toFixed(1)+'" height="'+Math.max(1, Math.abs(yc-yo)).toFixed(1)+'" fill="'+col+'"/>');
   });
-  // maximo y minimo de swing dentro de la ventana reciente (ultimas 10 velas)
-  var rec = bars.slice(-10), ih = 0, il = 0;
-  rec.forEach(function(r, j){ if (r[2] > rec[ih][2]) ih = j; if (r[3] < rec[il][3]) il = j; });
-  var ihA = n-10+ih, ilA = n-10+il;
-  s.push('<text x="'+X(ihA).toFixed(1)+'" y="'+(Y(bars[ihA][2])-6).toFixed(1)+'" font-size="11" text-anchor="middle" fill="var(--ink)">'+bars[ihA][2].toFixed(2)+'</text>');
-  s.push('<text x="'+X(ilA).toFixed(1)+'" y="'+(Y(bars[ilA][3])+15).toFixed(1)+'" font-size="11" text-anchor="middle" fill="var(--ink)">'+bars[ilA][3].toFixed(2)+'</text>');
-  // etiquetas a la derecha
-  labels.forEach(function(l){
-    var x0 = padL + pw + 6;
-    if (l.pill) {
-      s.push('<rect x="'+x0+'" y="'+(l.y-9).toFixed(1)+'" width="'+(padR-8)+'" height="18" rx="3" fill="var(--accent)"/>');
-      s.push('<text x="'+(x0+6)+'" y="'+(l.y+4).toFixed(1)+'" font-size="11.5" font-weight="600" fill="var(--panel)">'+l.text+'</text>');
-    } else {
-      s.push('<text x="'+(x0+6)+'" y="'+(l.y+4).toFixed(1)+'" font-size="11" fill="'+l.color+'">'+l.text+'</text>');
+
+  // precio actual a la derecha
+  var last = bars[n-1], yl = Y(last[4]);
+  s.push('<line x1="'+padL+'" x2="'+(padL+pw)+'" y1="'+yl.toFixed(1)+'" y2="'+yl.toFixed(1)+'" stroke="var(--accent)" stroke-width="1" stroke-dasharray="1 3"/>');
+  s.push('<rect x="'+(padL+pw+2)+'" y="'+(yl-9).toFixed(1)+'" width="'+(padR-4)+'" height="18" rx="3" fill="var(--accent)"/>');
+  s.push('<text x="'+(padL+pw+7)+'" y="'+(yl+4).toFixed(1)+'" font-size="11.5" font-weight="600" fill="var(--panel)">'+last[4].toFixed(2)+'</text>');
+
+  // panel del RSI: franja 30-70, linea y valor actual
+  s.push('<rect x="'+padL+'" y="'+YR(70).toFixed(1)+'" width="'+pw+'" height="'+(YR(30)-YR(70)).toFixed(1)+'" fill="var(--violet)" opacity=".07"/>');
+  [30, 70].forEach(function(v){
+    s.push('<line x1="'+padL+'" x2="'+(padL+pw)+'" y1="'+YR(v).toFixed(1)+'" y2="'+YR(v).toFixed(1)+'" stroke="var(--muted)" stroke-width="1" stroke-dasharray="2 3" opacity=".7"/>');
+    s.push('<text x="'+(padL+pw+6)+'" y="'+(YR(v)+4).toFixed(1)+'" font-size="10" fill="var(--muted)">'+v+'</text>');
+  });
+  s.push('<line x1="'+padL+'" x2="'+(padL+pw)+'" y1="'+(yR0+Hr).toFixed(1)+'" y2="'+(yR0+Hr).toFixed(1)+'" stroke="var(--line)"/>');
+  s.push('<text x="'+(padL+4)+'" y="'+(yR0+10)+'" font-size="10.5" fill="var(--muted)">RSI 14</text>');
+  var rp = [];
+  rsiS.forEach(function(v, i){ if (v != null) rp.push(X(i).toFixed(1)+','+YR(v).toFixed(1)); });
+  s.push('<polyline fill="none" stroke="var(--ink)" stroke-width="1.3" opacity=".75" points="'+rp.join(' ')+'"/>');
+  var rl = rsiS[n-1];
+  if (rl != null) {
+    s.push('<rect x="'+(padL+pw+2)+'" y="'+(YR(rl)-8).toFixed(1)+'" width="'+(padR-4)+'" height="16" rx="3" fill="var(--violet)"/>');
+    s.push('<text x="'+(padL+pw+7)+'" y="'+(YR(rl)+4).toFixed(1)+'" font-size="11" font-weight="600" fill="var(--panel)">'+rl.toFixed(1)+'</text>');
+  }
+
+  // divergencia del estudio: minimos del precio y RSI en las mismas dos fechas
+  var dv = K.T.divergencia;
+  if (dv && dv.desde && dv.hasta) {
+    var ia = -1, ib = -1;
+    bars.forEach(function(r, i){ if (r[0] === dv.desde) ia = i; if (r[0] === dv.hasta) ib = i; });
+    if (ia >= 0 && ib > ia && rsiS[ia] != null && rsiS[ib] != null) {
+      s.push('<line x1="'+X(ia).toFixed(1)+'" x2="'+X(ib).toFixed(1)+'" y1="'+(Y(bars[ia][3])+5).toFixed(1)+'" y2="'+(Y(bars[ib][3])+5).toFixed(1)+'" stroke="var(--violet)" stroke-width="2.2" stroke-linecap="round"/>');
+      s.push('<line x1="'+X(ia).toFixed(1)+'" x2="'+X(ib).toFixed(1)+'" y1="'+YR(rsiS[ia]).toFixed(1)+'" y2="'+YR(rsiS[ib]).toFixed(1)+'" stroke="var(--violet)" stroke-width="2.2" stroke-linecap="round"/>');
+      var tx = Math.min(X(ib), padL + pw - (narrow ? 70 : 80));
+      s.push('<text x="'+tx.toFixed(1)+'" y="'+(Math.max(YR(rsiS[ia]), YR(rsiS[ib])) + 14).toFixed(1)+'" font-size="10.5" font-weight="600" fill="var(--violet)" text-anchor="end" stroke="var(--bg)" stroke-width="4" paint-order="stroke">DIVERGENCIA '+(dv.tipo ? dv.tipo.toUpperCase() : '')+'</text>');
     }
+  }
+
+  // eje de fechas: el primer dia de cada mes
+  var prevM = null;
+  bars.forEach(function(r, i){
+    var m = r[0].slice(5,7);
+    if (m !== prevM && prevM !== null) {
+      s.push('<line x1="'+X(i).toFixed(1)+'" x2="'+X(i).toFixed(1)+'" y1="'+(yR0+Hr)+'" y2="'+(yR0+Hr+4)+'" stroke="var(--muted)"/>');
+      s.push('<text x="'+X(i).toFixed(1)+'" y="'+(H-5)+'" font-size="11" fill="var(--muted)" text-anchor="middle">'+MESES[+m-1]+'</text>');
+    }
+    prevM = m;
   });
+
   // cursor
-  s.push('<line id="cx" x1="0" x2="0" y1="'+padT+'" y2="'+(padT+ph)+'" stroke="var(--muted)" stroke-width="1" stroke-dasharray="2 3" visibility="hidden"/>');
+  s.push('<line id="cx" x1="0" x2="0" y1="'+padT+'" y2="'+(yR0+Hr)+'" stroke="var(--muted)" stroke-width="1" stroke-dasharray="2 3" visibility="hidden"/>');
   box.innerHTML = '<svg viewBox="0 0 '+W+' '+H+'" width="'+W+'" height="'+H+'" xmlns="http://www.w3.org/2000/svg">' + s.join('') + '</svg>';
 
   var ro = document.getElementById('readout'), cx = box.querySelector('#cx'), svg = box.querySelector('svg');
   function show(i){
     var r = bars[i], prev = start + i > 0 ? all[start+i-1][4] : null;
     var ch = prev ? (r[4]/prev - 1)*100 : null;
-    ro.innerHTML = '<span class="lbl">' + fechaCorta(r[0]) + '</span> · A ' + r[1].toFixed(2) + ' · M ' + r[2].toFixed(2) + ' · m ' + r[3].toFixed(2) + ' · C <b>' + r[4].toFixed(2) + '</b>' +
-      (ch == null ? '' : ' <span class="' + cls(ch) + '">' + pct(ch) + '</span>') + ' <span class="lbl">· EMA20 ' + emaS[i].toFixed(2) + '</span>';
+    ro.innerHTML = '<span class="lbl">' + fechaCorta(r[0]) + '</span> · Cierre <b>' + r[4].toFixed(2) + '</b>' +
+      (ch == null ? '' : ' <span class="' + cls(ch) + '">' + pct(ch) + '</span>') +
+      (r[5] != null ? ' <span class="lbl">· Vol</span> ' + fmtVol(r[5]) + (vaS[i] ? ' <span class="lbl">(' + (r[5]/vaS[i]*100).toFixed(0) + '% del prom.)</span>' : '') : '') +
+      (rsiS[i] != null ? ' <span class="lbl">· RSI</span> ' + rsiS[i].toFixed(1) : '');
   }
   function move(ev){
     var rect = svg.getBoundingClientRect();
@@ -1383,11 +1684,16 @@ function drawChart(D){
   svg.addEventListener('pointerleave', function(){ cx.setAttribute('visibility', 'hidden'); show(n-1); });
   show(n-1);
 }
-function cls(v){ return v == null ? 'flat' : v > 0.05 ? 'up' : v < -0.05 ? 'down' : 'flat'; }
-function pct(v){ return v == null ? 'N/D' : (v > 0 ? '+' : v < 0 ? '−' : '') + Math.abs(v).toFixed(2).replace('.', ',') + '%'; }
 
 var DATOS = JSON.parse(document.getElementById('datos').textContent);
 render(DATOS);
 drawChart(DATOS);
-var _rw = 0; window.addEventListener('resize', function(){ var b = document.getElementById('chart'); if (b && b.clientWidth !== _rw) { _rw = b.clientWidth; drawChart(DATOS); } });
+var rg = document.getElementById('rangos');
+if (rg) rg.addEventListener('click', function(ev){ var r = ev.target.getAttribute && ev.target.getAttribute('data-r'); if (r) { RANGO = +r; drawChart(DATOS); } });
+// Se redibuja cuando cambia el ancho del grafico (no solo de la ventana): si se dibujo con el panel angosto,
+// el SVG quedaba estirado con las letras enormes.
+var _rw = 0;
+function redibujar(){ var b = document.getElementById('chart'); if (b && b.clientWidth && b.clientWidth !== _rw) { _rw = b.clientWidth; drawChart(DATOS); } }
+if (window.ResizeObserver && document.getElementById('chart')) new ResizeObserver(redibujar).observe(document.getElementById('chart'));
+window.addEventListener('resize', redibujar);
 </script>
