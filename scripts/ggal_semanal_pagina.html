@@ -76,6 +76,14 @@ header h1{font-size:clamp(2rem,6vw,3.1rem);font-weight:700}
 .nota .d{grid-column:2;color:var(--muted);font-size:.92rem}
 .nota .src{grid-column:2;font-size:.78rem;color:var(--muted)}
 .nota a{color:var(--accent)}
+.nota .mag{grid-column:2;display:flex;align-items:center;gap:8px;font-size:.8rem;color:var(--muted)}
+.nota .mag b{color:var(--ink);font-weight:600}
+.mag .pts{display:inline-flex;gap:3px}
+.mag .pts i{width:14px;height:6px;border-radius:2px;background:var(--line)}
+.mag.bajo .pts i:nth-child(-n+1),.mag.medio .pts i:nth-child(-n+2),.mag.alto .pts i{background:var(--amber)}
+.nota .porque{grid-column:2;font-size:.88rem}
+.nota .porque summary{cursor:pointer;color:var(--accent);font-weight:500;width:max-content}
+.nota .porque p{margin-top:4px;padding:8px 10px;background:var(--panel);border:1px solid var(--line);border-radius:5px;max-width:none}
 
 /* Tecnico */
 .panel{background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:18px}
@@ -134,6 +142,22 @@ header h1{font-size:clamp(2rem,6vw,3.1rem);font-weight:700}
 .esc b{font-family:var(--display);font-size:1.15rem;font-weight:600}
 .esc .g{font:500 .82rem/1.4 var(--mono);color:var(--muted)}
 .panorama{font-size:1.02rem}
+.pano{display:grid;gap:18px;margin-top:4px}
+.paso{display:grid;grid-template-columns:30px 1fr;gap:12px;align-items:start}
+.paso .nro{width:28px;height:28px;border-radius:50%;background:var(--accent);color:var(--panel);font:700 1rem/28px var(--display);text-align:center}
+.paso h3{font-size:1.2rem;font-weight:600;margin:2px 0 6px}
+.facts{display:grid}
+.fact{display:grid;grid-template-columns:5.6em 1fr;gap:10px;padding:9px 0;border-top:1px solid var(--line)}
+.fact .chip{text-align:center}
+.fact .dato{color:var(--muted);font-size:.85rem}
+.fact .ex{display:block;color:var(--muted);font-size:.92rem;margin-top:2px}
+.mirar{margin:0;padding-left:1.1em;display:grid;gap:8px}
+.mirar b{color:var(--ink)}
+h3.sub{font-size:1.2rem;font-weight:600;margin:22px 0 4px;display:flex;align-items:baseline;gap:10px}
+h3.sub small{font:500 .72rem/1 var(--body);color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
+.glos{margin-top:18px}
+.glos dl{display:grid;grid-template-columns:max-content 1fr;gap:6px 14px;margin:6px 0 0;font-size:.92rem}
+.glos dt{font-weight:600} .glos dd{margin:0;color:var(--muted)}
 
 /* Esta semana: los cierres diarios que salieron despues del reporte */
 .seg{border-left:3px solid var(--accent);padding-left:16px;display:grid;gap:14px}
@@ -244,7 +268,9 @@ footer{color:var(--muted);font-size:.8rem;border-top:1px solid var(--line);paddi
    "impacto": "negativo",
    "fuente": "StockAnalysis",
    "url": "https://stockanalysis.com/stocks/ggal/forecast/",
-   "fecha": "13-oct"
+   "fecha": "13-oct",
+   "magnitud": "medio",
+   "explicacion": "El precio objetivo es lo que un banco de inversión cree que va a valer la acción en un año. Cuando uno grande lo baja, los fondos que lo siguen compran menos o venden. 45 sigue arriba del precio actual (36), así que no es una señal de venta, pero sí de menos entusiasmo con Galicia."
   },
   {
    "bloque": "Argentina",
@@ -253,7 +279,9 @@ footer{color:var(--muted);font-size:.8rem;border-top:1px solid var(--line);paddi
    "impacto": "negativo",
    "fuente": "Diario Panorama",
    "url": "https://diariopanorama.com/noticia/569900/golpe-mercados-cayeron-acciones-argentinas-riesgo-pais-alcanzo-nivel-mas-alto-2026",
-   "fecha": "16-oct"
+   "fecha": "16-oct",
+   "magnitud": "alto",
+   "explicacion": "Es el termómetro de la confianza en Argentina: sube cuando los inversores venden bonos argentinos. Encarece el crédito del país y de las empresas, y a los bancos les pega doble porque tienen muchos bonos del Tesoro en su cartera."
   },
   {
    "bloque": "Argentina",
@@ -262,7 +290,9 @@ footer{color:var(--muted);font-size:.8rem;border-top:1px solid var(--line);paddi
    "impacto": "neutro",
    "fuente": "iProUP",
    "url": "https://www.iproup.com/finanzas/72300-indec-confirma-inflacion-de-19-en-septiembre-categorias-con-mayor-aumento.amp",
-   "fecha": "13-oct"
+   "fecha": "13-oct",
+   "magnitud": "medio",
+   "explicacion": "La inflación del mes define las tasas en pesos. Si baja, los bancos pueden prestar más y la mora suele bajar; si sube, el BCRA sube las tasas. Salió igual a lo esperado, por eso casi no movió el mercado."
   },
   {
    "bloque": "Argentina",
@@ -271,7 +301,9 @@ footer{color:var(--muted);font-size:.8rem;border-top:1px solid var(--line);paddi
    "impacto": "positivo",
    "fuente": "Economis",
    "url": "https://economis.com.ar/?p=498040",
-   "fecha": "14-oct"
+   "fecha": "14-oct",
+   "magnitud": "medio",
+   "explicacion": "El Tesoro paga deuda en pesos cada dos semanas y emite deuda nueva para cubrirla. Renovar más del 100% quiere decir que consiguió más plata de la que vencía, sin tener que emitir pesos. Los bancos son los que más compran en estas licitaciones."
   },
   {
    "bloque": "Argentina",
@@ -280,7 +312,9 @@ footer{color:var(--muted);font-size:.8rem;border-top:1px solid var(--line);paddi
    "impacto": "positivo",
    "fuente": "GBM (Reuters)",
    "url": "https://gbm.com/media/noticia/mercados-argentinos-operan-en-baja-atencion-a-mayor-liquidez-y-licitacion-de-deuda/",
-   "fecha": "14-oct"
+   "fecha": "14-oct",
+   "magnitud": "medio",
+   "explicacion": "Cuando el BCRA compra dólares suben las reservas, que son la garantía para pagar la deuda en dólares. Más reservas quiere decir menos riesgo de devaluación y, con el tiempo, un riesgo país más bajo."
   },
   {
    "bloque": "EE.UU. y global",
@@ -289,7 +323,9 @@ footer{color:var(--muted);font-size:.8rem;border-top:1px solid var(--line);paddi
    "impacto": "negativo",
    "fuente": "InvestingLive",
    "url": "https://investinglive.com/news/us-september-cpi-vs-3-6-expected-0/",
-   "fecha": "14-oct"
+   "fecha": "14-oct",
+   "magnitud": "alto",
+   "explicacion": "El CPI es la inflación de EE.UU. Si sale alta, la Fed puede subir su tasa, y con tasas más altas allá la plata sale de los países emergentes como Argentina. Por eso un dato de afuera mueve a GGAL."
   },
   {
    "bloque": "EE.UU. y global",
@@ -298,7 +334,9 @@ footer{color:var(--muted);font-size:.8rem;border-top:1px solid var(--line);paddi
    "impacto": "negativo",
    "fuente": "Trading Economics",
    "url": "https://tradingeconomics.com/united-states/government-bond-yield/news/591950",
-   "fecha": "14-oct"
+   "fecha": "14-oct",
+   "magnitud": "alto",
+   "explicacion": "El CPI es la inflación de EE.UU. Si sale alta, la Fed puede subir su tasa, y con tasas más altas allá la plata sale de los países emergentes como Argentina. Por eso un dato de afuera mueve a GGAL."
   },
   {
    "bloque": "EE.UU. y global",
@@ -307,7 +345,9 @@ footer{color:var(--muted);font-size:.8rem;border-top:1px solid var(--line);paddi
    "impacto": "neutro",
    "fuente": "Trading Economics",
    "url": "https://tradingeconomics.com/united-states/interest-rate/news/592678",
-   "fecha": "16-oct"
+   "fecha": "16-oct",
+   "magnitud": "bajo",
+   "explicacion": "Warsh preside la Fed, el banco central de EE.UU. No confirmó otra suba de tasas, y eso alivió un poco a la tasa larga. Como no se comprometió a nada, el efecto fue chico."
   }
  ],
  "tecnico": {
@@ -403,7 +443,71 @@ footer{color:var(--muted);font-size:.8rem;border-top:1px solid var(--line);paddi
    "lectura": "Contra la tendencia, pide dos cierres. Con dos, la ruptura del 14-oct queda como trampa y la mecha del 15-oct a 34.70 como el mínimo; arriba espera 37.20. 36.68, el máximo del viernes, es el nivel más probable de trampa."
   }
  ],
- "panorama": "GGAL cerró la semana en 36.02, −2,15%, 1,5 pp peor que ARGT, después de perder el miércoles el soporte de 36.56 que había sostenido seis ruedas. El jueves perforó 35.21 en la rueda hasta 34.70 y lo recompraron, así que el soporte sigue sin perderse en cierre y el precio quedó encerrado entre 35.21 y 36.56. La debilidad no fue solo de GGAL: con datos locales buenos (inflación 1,9%, licitación con 136% de renovación, BCRA comprando), el riesgo país subió a 648, el máximo del año, en una semana en la que el S&P perdió 2,0% y Brasil 3,9%; la tasa a 10 años tocó 5,33% y bajó a 5,08%. Esta semana hay que mirar de qué lado de 35.21 (un cierre debajo abre 33.01) y de 36.56 (dos cierres arriba para hablar de recuperación) cierra, junto con el riesgo país y la tasa larga, con el balotaje de Brasil del domingo 25 y la Fed y la licitación del Tesoro del miércoles 28 adelante.",
+ "panorama": {
+  "donde": "GGAL cerró la semana en 36.02, −2,15%. Quedó atrapada entre dos precios: el soporte de 35.21 abajo y la resistencia de 36.56 arriba. El miércoles perdió 36.56, el jueves bajó hasta 34.70 y rebotó, y ningún día cerró debajo de 35.21.",
+  "factores": [
+   {
+    "factor": "Riesgo país",
+    "dato": "648, el máximo de 2026",
+    "efecto": "negativo",
+    "explica": "Es la tasa extra que el mercado le pide a Argentina para prestarle. Cuando sube, bajan los bonos, y los bancos como Galicia tienen muchos bonos del Tesoro: les pega directo."
+   },
+   {
+    "factor": "Mercados de afuera",
+    "dato": "S&P −2,0% · Brasil −3,9%",
+    "efecto": "negativo",
+    "explica": "Cuando los inversores le escapan al riesgo, lo primero que venden es lo emergente. GGAL cayó más que el ETF de Argentina (−2,15% contra −0,63%)."
+   },
+   {
+    "factor": "Tasa a 10 años de EE.UU.",
+    "dato": "tocó 5,33%, cerró en 5,08%",
+    "efecto": "negativo",
+    "explica": "Si en EE.UU. se cobra 5% sin riesgo, a la plata le quedan menos razones para venir a Argentina. Mientras siga arriba de 5% es viento en contra."
+   },
+   {
+    "factor": "Datos de Argentina",
+    "dato": "inflación 1,9% · licitación 136% · BCRA comprando",
+    "efecto": "positivo",
+    "explica": "Ayudan de fondo: hay menos inflación, el Tesoro consigue refinanciarse y el BCRA junta dólares. Esta semana no alcanzaron contra lo de afuera."
+   }
+  ],
+  "mirar": [
+   {
+    "que": "Si cierra debajo de 35.21",
+    "por_que": "La baja sigue y el próximo apoyo está lejos, en 33.01 (−8%). Alcanza con un cierre."
+   },
+   {
+    "que": "Si cierra dos días arriba de 36.56",
+    "por_que": "Se corta la baja y el próximo techo es 37.20. Pide dos días porque va contra la tendencia."
+   },
+   {
+    "que": "Riesgo país y tasa a 10 años",
+    "por_que": "Si bajan, le sacan presión a GGAL; si siguen subiendo, cuesta que rebote aunque los datos locales sean buenos."
+   },
+   {
+    "que": "Brasil, la Fed y el Tesoro",
+    "por_que": "El domingo 25 es el balotaje en Brasil (la primera vuelta le dio a GGAL +6,58% en un día). El miércoles 28 decide la Fed y licita el Tesoro."
+   }
+  ],
+  "glosario": [
+   {
+    "termino": "Soporte",
+    "que": "Precio donde la caída se viene frenando, porque aparecen compradores."
+   },
+   {
+    "termino": "Resistencia",
+    "que": "Precio donde la suba se viene frenando, porque aparecen vendedores."
+   },
+   {
+    "termino": "Cierre",
+    "que": "El último precio del día. Las señales se cuentan por cierre: tocar un nivel en el día no alcanza."
+   },
+   {
+    "termino": "Riesgo país",
+    "que": "Cuánto más que EE.UU. paga Argentina por endeudarse, en centésimas de punto (648 = 6,48% de tasa extra)."
+   }
+  ]
+ },
  "notas": "Este reporte reemplaza al de las 10:45, que salió sin feed (cierre, mercados y técnico en null). En esta corrida el MCP de TradingView respondió: todos los precios son del feed (velas diarias; NASDAQ:GGAL resuelve a BATS:GGAL y AMEX:EWZ a BATS:EWZ, como siempre). La EMA20, el RSI14 y la SMA200 se calcularon sobre 300 cierres diarios del feed (al 14-oct dan 38.27, 28.62 y 46.71, lo mismo que el informe de ese día). Volumen de la semana: 3,46 M contra un promedio de 4,49 M de las cuatro anteriores. US10Y: el lunes 12 no hubo rueda de bonos (Columbus Day). Informes de la semana: cierres del 12 (sin datos), 13 y 14; cierre del 15 sin datos y no hay cierre del 16 (la máquina no estaba); aperturas del 12, 13 y 15. Sin auditoría del 16-oct. El mapa de niveles es el del cierre del 14-oct. Noticias: las de la corrida de las 10:45 (Grupo Galicia: búsquedas por Kon, mora de Galicia, Naranja X y sistema, dividendo de octubre en español y en inglés, precio objetivo, resultados del 3T y normas del BCRA, con y sin filtro de medios locales; de la semana solo apareció lo de UBS, vista primero en Benzinga, que dio 403). En esta corrida busqué además el rebote del jueves 15 (Merval, ADRs, riesgo país, con filtro de Ámbito, Cronista, Infobae, iProfesional, Bloomberg Línea y Perfil), el dividendo de octubre, Kon y noticias de GGAL en inglés: nada fechado en la semana. El anuncio del dividendo de octubre no está publicado (el último es el de USD 0,0479, cortado el 28-sep y pagado el 5-oct). La fecha de resultados del 3T aparece como 24-nov (Earnings Whispers) y 25-nov (GuruFocus), sin confirmar por la empresa: no se cargó. Brasil no va como noticia: no encontré una nota fechada en la semana que explique el −3,9% de EWZ. La subida de la tasa a 10 años se corrigió con el feed (la nota de Trading Economics daba 5,12% el viernes; el feed, 5,08%). Licitaciones (`licitaciones_tesoro.py`): ninguna en la semana; la próxima tiene llamado el lunes 26, licitación el miércoles 28 y liquidación el viernes 30. Agenda de EE.UU.: el calendario consultado (Thrive in Markets) no detalla datos de EE.UU. para la semana salvo los PMI preliminares del viernes y el período de silencio de la Fed desde el sábado 17.",
  "velas_fuente": "Velas diarias del ADR (apertura, máximo, mínimo, cierre, volumen) del feed de TradingView, 27-may al 16-oct-2026. El promedio de 20 días, el RSI14 y el volumen relativo se calculan en la página.",
  "velas": [
@@ -1393,8 +1497,12 @@ function render(D){
       h.push('<div class="bloque"><h3>' + esc(b) + '</h3>');
       grupos[b].forEach(function(n){
         var imp = ['positivo','negativo','neutro'].indexOf(n.impacto) >= 0 ? n.impacto : 'neutro';
+        // Magnitud del impacto en Argentina y explicacion desplegable (2026-10-21, a pedido de Tobias).
+        var mag = ['alto','medio','bajo'].indexOf(n.magnitud) >= 0 ? n.magnitud : null;
         h.push('<div class="nota"><span class="chip ' + imp + '">' + imp + '</span><div class="t">' + esc(n.titulo) + '</div>' +
+          (mag ? '<div class="mag ' + mag + '"><span class="pts"><i></i><i></i><i></i></span>Impacto en Argentina: <b>' + mag + '</b></div>' : '') +
           '<div class="d">' + esc(n.detalle) + '</div>' +
+          (n.explicacion ? '<details class="porque"><summary>¿Por qué importa?</summary><p>' + esc(n.explicacion) + '</p></details>' : '') +
           (n.fuente ? '<div class="src">' + (n.url ? '<a href="' + esc(n.url) + '" target="_blank" rel="noopener">' + esc(n.fuente) + '</a>' : esc(n.fuente)) + (n.fecha ? ' · ' + esc(n.fecha) : '') + '</div>' : '') + '</div>');
       });
       h.push('</div>');
@@ -1441,11 +1549,27 @@ function render(D){
 
   if ((D.agenda && D.agenda.length) || (D.escenarios && D.escenarios.length) || D.panorama) {
     h.push('<section><h2>Panorama <small>la semana que viene</small></h2>');
-    if (D.panorama) h.push('<p class="panorama">' + esc(D.panorama) + '</p>');
+    // Panorama didactico (2026-10-21, a pedido de Tobias): en tres pasos en vez de un parrafo.
+    // Un panorama en texto (semanas viejas) se sigue mostrando como parrafo.
+    var P = D.panorama;
+    if (P && typeof P === 'object') {
+      h.push('<div class="pano">');
+      if (P.donde) h.push('<div class="paso"><span class="nro">1</span><div><h3>Dónde está</h3><p>' + esc(P.donde) + '</p></div></div>');
+      if (P.factores && P.factores.length) h.push('<div class="paso"><span class="nro">2</span><div><h3>Qué la viene moviendo</h3><div class="facts">' + P.factores.map(function(f){
+        var imp = ['positivo','negativo','neutro'].indexOf(f.efecto) >= 0 ? f.efecto : 'neutro';
+        var flecha = imp === 'positivo' ? 'a favor' : imp === 'negativo' ? 'en contra' : 'neutro';
+        return '<div class="fact"><span class="chip ' + imp + '">' + flecha + '</span><div><b>' + esc(f.factor) + '</b>' + (f.dato ? ' <span class="dato num">' + esc(f.dato) + '</span>' : '') + '<span class="ex">' + esc(f.explica) + '</span></div></div>';
+      }).join('') + '</div></div></div>');
+      if (P.mirar && P.mirar.length) h.push('<div class="paso"><span class="nro">3</span><div><h3>Qué mirar esta semana</h3><ul class="mirar">' + P.mirar.map(function(m){
+        return '<li><b>' + esc(m.que) + '</b> ' + esc(m.por_que) + '</li>';
+      }).join('') + '</ul></div></div>');
+      h.push('</div>');
+    } else if (P) h.push('<p class="panorama">' + esc(P) + '</p>');
     if (D.agenda && D.agenda.length) {
-      h.push('<div class="agenda" style="margin-top:14px">' + D.agenda.map(function(a){ return '<div class="ag"><div class="dia">' + esc(a.dia) + '</div><div>' + esc(a.evento) + '<span class="por">' + esc(a.por_que) + '</span></div></div>'; }).join('') + '</div>');
+      h.push('<h3 class="sub">Calendario</h3><div class="agenda">' + D.agenda.map(function(a){ return '<div class="ag"><div class="dia">' + esc(a.dia) + '</div><div>' + esc(a.evento) + '<span class="por">' + esc(a.por_que) + '</span></div></div>'; }).join('') + '</div>');
     }
-    if (D.escenarios && D.escenarios.length) h.push('<div style="margin-top:18px">' + escenarios(D.escenarios) + '</div>');
+    if (D.escenarios && D.escenarios.length) h.push('<h3 class="sub">Escenarios <small>según cómo cierre</small></h3>' + escenarios(D.escenarios));
+    if (P && P.glosario && P.glosario.length) h.push('<details class="det glos"><summary>Palabras que aparecen en el reporte</summary><dl>' + P.glosario.map(function(gl){ return '<dt>' + esc(gl.termino) + '</dt><dd>' + esc(gl.que) + '</dd>'; }).join('') + '</dl></details>');
     h.push('</section>');
   }
 

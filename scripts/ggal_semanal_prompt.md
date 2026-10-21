@@ -117,6 +117,13 @@ Reglas:
   encontraste publicado, no existe para este reporte.
 - `impacto` es para GGAL: `positivo`, `negativo` o `neutro`. En `detalle`, una o
   dos oraciones: que paso y por que le importa a GGAL.
+- `magnitud` (`alto`, `medio` o `bajo`): cuanto puede mover a Argentina y a GGAL.
+  `alto` es lo que mueve todo el mercado argentino (riesgo pais, tasa a 10 años,
+  Fed, devaluacion); `bajo`, lo que casi no lo mueve. Y `explicacion`: 2 o 3
+  oraciones para alguien que no sigue el tema, que va en un desplegable "¿Por
+  que importa?": que es el dato y por que llega a Argentina y a un banco. Sin
+  jerga, y si usas un termino tecnico, explicalo en la misma oracion. (Regla del
+  2026-10-21, a pedido de Tobias.)
 - Contexto de fondo que ya esta en la memoria del proyecto (drivers macro de
   Argentina, regimen Fed) usalo para interpretar, no lo repitas como noticia.
 - Las elecciones presidenciales argentinas son el 24-oct-2027; en 2026 no hay
@@ -133,13 +140,23 @@ Reglas:
   Finanzas, un PDF que marca las fechas solo con color y que `WebFetch` no
   puede leer) y cargá en `agenda` el llamado, la licitacion o la liquidacion
   que caigan en la semana. Si no cae ninguna, nombrá la proxima licitacion en
-  el `por_que` del dia mas cercano o en `panorama`. Si el script falla, decilo
+  el `por_que` del dia mas cercano o en `panorama.mirar`. Si el script falla, decilo
   en `notas` con el error.
 - `escenarios`: 2 o 3, con el gatillo **por cierre** tomado del mapa del ultimo
   estudio (misma regla: contra la tendencia, dos cierres para confirmar).
   `sesgo` es `alcista`, `bajista` o `rango`.
-- `panorama`: un parrafo de 3 a 5 oraciones que junte todo: donde esta GGAL, que
-  la viene moviendo (el bloque o ella sola), y que mirar esta semana.
+- `panorama`: **didactico, en tres pasos** (regla del 2026-10-21, a pedido de
+  Tobias: el parrafo unico no se entendia). Es un objeto, no un texto:
+  - `donde`: 2 o 3 oraciones, donde cerro GGAL y entre que soporte y que
+    resistencia quedo.
+  - `factores`: 3 a 5 cosas que la vinieron moviendo, cada una con `factor`,
+    `dato` (el numero corto), `efecto` (`positivo`/`negativo`/`neutro` para GGAL)
+    y `explica`: que es y por que le pega a un banco argentino, en lenguaje
+    simple.
+  - `mirar`: 3 o 4 cosas para la semana, cada una con `que` (corto, en negrita)
+    y `por_que`. Los dos primeros son los gatillos de precio por cierre.
+  - `glosario`: 3 a 5 terminos que aparecen en el reporte (soporte,
+    resistencia, cierre, riesgo pais...), con una oracion cada uno.
 
 ## 5. Armar los datos de la semana
 
@@ -162,7 +179,8 @@ Formato (los numeros son de ejemplo del formato, no datos):
   "mercados": [ { "ticker": "GGAL", "nombre": "Galicia ADR", "cierre": 39.59, "var": -3.4 } ],
   "mercados_nota": "Una linea: GGAL con el bloque o sola, en pp contra ARGT",
   "noticias": [ { "bloque": "Grupo Galicia", "titulo": "", "detalle": "",
-                  "impacto": "negativo", "fuente": "Ambito", "url": "https://...", "fecha": "23-sep" } ],
+                  "impacto": "negativo", "magnitud": "medio", "explicacion": "",
+                  "fuente": "Ambito", "url": "https://...", "fecha": "23-sep" } ],
   "tecnico": { "tendencia": "bajista",
                "tendencia_texto": "desde junio: de 58.14 (17-jun) a 34.70 (15-oct)",
                "frase": "Una oracion simple: donde esta y contra que se esta apoyando o frenando",
@@ -175,7 +193,10 @@ Formato (los numeros son de ejemplo del formato, no datos):
                             { "tipo": "S1", "nivel": 38.87, "que": "" } ] },
   "agenda": [ { "dia": "Mié 30", "evento": "", "por_que": "" } ],
   "escenarios": [ { "nombre": "Rebote", "sesgo": "alcista", "gatillo": "2 cierres > 39.80", "lectura": "" } ],
-  "panorama": "",
+  "panorama": { "donde": "",
+                "factores": [ { "factor": "Riesgo país", "dato": "648", "efecto": "negativo", "explica": "" } ],
+                "mirar": [ { "que": "Si cierra debajo de 35.21", "por_que": "" } ],
+                "glosario": [ { "termino": "Soporte", "que": "" } ] },
   "notas": "Lo que falto o se corrigio en la corrida. Vacio si nada.",
   "velas_fuente": "Velas diarias del ADR (apertura, maximo, minimo, cierre, volumen). Promedio de 20 dias, RSI14 y volumen relativo calculados en la pagina.",
   "velas": [ ["2026-09-25", 40.00, 40.00, 38.74, 38.74, 605698] ]
