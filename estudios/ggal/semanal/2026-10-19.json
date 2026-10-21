@@ -913,5 +913,86 @@
    35.55,
    36.02
   ]
- ]
+ ],
+ "seguimiento": {
+  "actualizado": "2026-10-21",
+  "precio": 35.46,
+  "precio_nota": "cierre del martes (provisorio)",
+  "texto": "El lunes se activó el escenario bajista del reporte: GGAL cerró en 35.09, por primera vez debajo de 35.21, e hizo un nuevo mínimo del tramo en 34.57. Fue una caída argentina, porque afuera subían el S&P y Brasil y ARGT perdió 1,2%. El martes abrió más abajo (34.92), subió hasta 36.45 a la par de Brasil y lo vendieron toda la tarde. Cerró en 35.46, el primer cierre otra vez arriba de 35.21, que contra la tendencia pide un segundo para contar. 36.56 frenó el rebote por cuarta rueda seguida. El RSI está en 33.4, con la divergencia alcista vigente, y la EMA20 en 37.42.",
+  "dias": [
+   {
+    "fecha": "2026-10-19",
+    "apertura": 36.07,
+    "maximo": 36.275,
+    "minimo": 34.57,
+    "cierre": 35.09,
+    "var": -2.58,
+    "provisorio": false,
+    "nota": "Primer cierre debajo de 35.21 y nuevo mínimo del tramo en 34.57: se activa «Nuevo mínimo del tramo». Volumen 95% de la media de 20 ruedas.",
+    "macro": "SPY +0,42% · EWZ +0,24% · ARGT −1,24%"
+   },
+   {
+    "fecha": "2026-10-20",
+    "apertura": 34.92,
+    "maximo": 36.45,
+    "minimo": 34.92,
+    "cierre": 35.46,
+    "var": 1.05,
+    "provisorio": true,
+    "nota": "Abrió en el mínimo, subió 4,4% hasta 36.45 y cerró 0.99 abajo: primer cierre arriba de 35.21, sin confirmar. Volumen 127% de la media, el más alto desde el 15-oct.",
+    "macro": "SPY +0,34% · EWZ +2,41% · ARGT +0,29%"
+   }
+  ],
+  "niveles": [
+   {
+    "tipo": "R2",
+    "nivel": 38.4,
+    "que": "Techo y piso del 3/4/5-sep-2025; rechazos del 30-sep, 5-oct y 6-oct. Arriba, 38.84 (swing del 6-oct); abajo, 37.20, que salió del mapa. +8,3%"
+   },
+   {
+    "tipo": "R1",
+    "nivel": 36.56,
+    "que": "Ex pivote: piso en cierre del 7 al 13-oct. Rechazó el 15-oct (36.575), el 16-oct (36.68) y el 20-oct (36.45). Otro borde: 36.10. +3,1%"
+   },
+   {
+    "tipo": "PIVOTE",
+    "nivel": 35.21,
+    "que": "Mínimo de swing del 1-oct. Perdido en cierre el 19-oct (35.09), recuperado el 20-oct (35.46) después de perforarlo en la apertura. −0,7%"
+   },
+   {
+    "tipo": "S1",
+    "nivel": 34.57,
+    "que": "Mínimo del tramo: 34.70 el 15-oct y 34.57 el 19-oct, sobre los máximos del 9 y 10-oct-2025 en 34.54. Nivel nuevo. −2,5%"
+   },
+   {
+    "tipo": "S2",
+    "nivel": 33.01,
+    "que": "Base del rango de octubre de 2025. Debajo, 31.14. −6,9%"
+   }
+  ],
+  "escenarios": [
+   {
+    "nombre": "Rebote sin confirmar",
+    "sesgo": "rebote",
+    "estado": "activo desde el martes",
+    "gatillo": "2º cierre seguido > 35.21",
+    "lectura": "Con un segundo cierre arriba de 35.21 el miércoles, lo del lunes queda como una perforación de una rueda y vuelve la franja 35.21–36.56. La divergencia del RSI empuja de este lado; la mecha del martes, del otro."
+   },
+   {
+    "nombre": "Nuevo mínimo del tramo",
+    "sesgo": "bajista",
+    "estado": "activado el lunes, en suspenso",
+    "gatillo": "cierre < 35.21 · < 34.57 abre 33.01",
+    "lectura": "Un cierre otra vez debajo de 35.21 lo reactiva y deja el martes como un rebote fallido. 34.57 es el mínimo de la vela de rotura, el nivel más probable de trampa."
+   },
+   {
+    "nombre": "Recuperación",
+    "sesgo": "alcista",
+    "estado": "lejos",
+    "gatillo": "2 cierres seguidos > 36.56",
+    "lectura": "Pide dos cierres porque va contra la tendencia. 36.68, el máximo del 16-oct, es el nivel más probable de trampa. Arriba, 37.20 y 38.40."
+   }
+  ],
+  "fuente": "Estudios de cierre del 19 y del 20-oct. El cierre del lunes es el oficial (35.09; el estudio leyó 35.07 a las 17:16). El del martes es la lectura de las 17:15 y puede cambiar en el cierre oficial."
+ }
 }

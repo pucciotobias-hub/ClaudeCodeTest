@@ -98,6 +98,20 @@ header h1{font-size:clamp(2rem,6vw,3.1rem);font-weight:700}
 .esc .g{font:500 .82rem/1.4 var(--mono);color:var(--muted)}
 .panorama{font-size:1.02rem}
 
+/* Esta semana: los cierres diarios que salieron despues del reporte */
+.seg{border-left:3px solid var(--accent);padding-left:16px;display:grid;gap:14px}
+.dias{display:grid}
+.dia-row{display:grid;grid-template-columns:5.2em auto 1fr;gap:4px 14px;align-items:baseline;padding:10px 0;border-top:1px solid var(--line)}
+.dia-row .f{font:600 .95rem/1.4 var(--display);letter-spacing:.03em;color:var(--accent)}
+.dia-row .cx{font:600 1.25rem/1 var(--mono);font-variant-numeric:tabular-nums}
+.dia-row .vx{font:600 .95rem/1 var(--mono)}
+.dia-row .rg{grid-column:2 / -1;color:var(--muted);font-size:.82rem}
+.dia-row .prov{font:500 .68rem/1 var(--body);text-transform:uppercase;letter-spacing:.08em;color:var(--amber);margin-left:6px}
+.dia-row .nt{grid-column:2 / -1;font-size:.92rem}
+.dia-row .mc{grid-column:2 / -1;color:var(--muted);font:400 .8rem/1.4 var(--mono)}
+.esc .st{font:600 .68rem/1 var(--body);text-transform:uppercase;letter-spacing:.08em;color:var(--accent)}
+.seg-fuente{color:var(--muted);font-size:.8rem}
+
 
 /* Grafico de velas al final: dibujado a escala con los niveles del tecnico */
 .chart-head{display:flex;flex-wrap:wrap;justify-content:space-between;gap:4px 16px;align-items:baseline;margin-top:6px}
@@ -1040,7 +1054,88 @@ footer{color:var(--muted);font-size:.8rem;border-top:1px solid var(--line);paddi
    35.55,
    36.02
   ]
- ]
+ ],
+ "seguimiento": {
+  "actualizado": "2026-10-21",
+  "precio": 35.46,
+  "precio_nota": "cierre del martes (provisorio)",
+  "texto": "El lunes se activó el escenario bajista del reporte: GGAL cerró en 35.09, por primera vez debajo de 35.21, e hizo un nuevo mínimo del tramo en 34.57. Fue una caída argentina, porque afuera subían el S&P y Brasil y ARGT perdió 1,2%. El martes abrió más abajo (34.92), subió hasta 36.45 a la par de Brasil y lo vendieron toda la tarde. Cerró en 35.46, el primer cierre otra vez arriba de 35.21, que contra la tendencia pide un segundo para contar. 36.56 frenó el rebote por cuarta rueda seguida. El RSI está en 33.4, con la divergencia alcista vigente, y la EMA20 en 37.42.",
+  "dias": [
+   {
+    "fecha": "2026-10-19",
+    "apertura": 36.07,
+    "maximo": 36.275,
+    "minimo": 34.57,
+    "cierre": 35.09,
+    "var": -2.58,
+    "provisorio": false,
+    "nota": "Primer cierre debajo de 35.21 y nuevo mínimo del tramo en 34.57: se activa «Nuevo mínimo del tramo». Volumen 95% de la media de 20 ruedas.",
+    "macro": "SPY +0,42% · EWZ +0,24% · ARGT −1,24%"
+   },
+   {
+    "fecha": "2026-10-20",
+    "apertura": 34.92,
+    "maximo": 36.45,
+    "minimo": 34.92,
+    "cierre": 35.46,
+    "var": 1.05,
+    "provisorio": true,
+    "nota": "Abrió en el mínimo, subió 4,4% hasta 36.45 y cerró 0.99 abajo: primer cierre arriba de 35.21, sin confirmar. Volumen 127% de la media, el más alto desde el 15-oct.",
+    "macro": "SPY +0,34% · EWZ +2,41% · ARGT +0,29%"
+   }
+  ],
+  "niveles": [
+   {
+    "tipo": "R2",
+    "nivel": 38.4,
+    "que": "Techo y piso del 3/4/5-sep-2025; rechazos del 30-sep, 5-oct y 6-oct. Arriba, 38.84 (swing del 6-oct); abajo, 37.20, que salió del mapa. +8,3%"
+   },
+   {
+    "tipo": "R1",
+    "nivel": 36.56,
+    "que": "Ex pivote: piso en cierre del 7 al 13-oct. Rechazó el 15-oct (36.575), el 16-oct (36.68) y el 20-oct (36.45). Otro borde: 36.10. +3,1%"
+   },
+   {
+    "tipo": "PIVOTE",
+    "nivel": 35.21,
+    "que": "Mínimo de swing del 1-oct. Perdido en cierre el 19-oct (35.09), recuperado el 20-oct (35.46) después de perforarlo en la apertura. −0,7%"
+   },
+   {
+    "tipo": "S1",
+    "nivel": 34.57,
+    "que": "Mínimo del tramo: 34.70 el 15-oct y 34.57 el 19-oct, sobre los máximos del 9 y 10-oct-2025 en 34.54. Nivel nuevo. −2,5%"
+   },
+   {
+    "tipo": "S2",
+    "nivel": 33.01,
+    "que": "Base del rango de octubre de 2025. Debajo, 31.14. −6,9%"
+   }
+  ],
+  "escenarios": [
+   {
+    "nombre": "Rebote sin confirmar",
+    "sesgo": "rebote",
+    "estado": "activo desde el martes",
+    "gatillo": "2º cierre seguido > 35.21",
+    "lectura": "Con un segundo cierre arriba de 35.21 el miércoles, lo del lunes queda como una perforación de una rueda y vuelve la franja 35.21–36.56. La divergencia del RSI empuja de este lado; la mecha del martes, del otro."
+   },
+   {
+    "nombre": "Nuevo mínimo del tramo",
+    "sesgo": "bajista",
+    "estado": "activado el lunes, en suspenso",
+    "gatillo": "cierre < 35.21 · < 34.57 abre 33.01",
+    "lectura": "Un cierre otra vez debajo de 35.21 lo reactiva y deja el martes como un rebote fallido. 34.57 es el mínimo de la vela de rotura, el nivel más probable de trampa."
+   },
+   {
+    "nombre": "Recuperación",
+    "sesgo": "alcista",
+    "estado": "lejos",
+    "gatillo": "2 cierres seguidos > 36.56",
+    "lectura": "Pide dos cierres porque va contra la tendencia. 36.68, el máximo del 16-oct, es el nivel más probable de trampa. Arriba, 37.20 y 38.40."
+   }
+  ],
+  "fuente": "Estudios de cierre del 19 y del 20-oct. El cierre del lunes es el oficial (35.09; el estudio leyó 35.07 a las 17:16). El del martes es la lectura de las 17:15 y puede cambiar en el cierre oficial."
+ }
 }
 </script>
 
@@ -1053,8 +1148,28 @@ function render(D){
   function cls(v){ return v == null ? 'flat' : v > 0.05 ? 'up' : v < -0.05 ? 'down' : 'flat'; }
   function pct(v){ return v == null ? 'N/D' : (v > 0 ? '+' : v < 0 ? '−' : '') + Math.abs(v).toFixed(2).replace('.', ',') + '%'; }
   function px(v, d){ return v == null ? 'N/D' : Number(v).toFixed(d == null ? 2 : d); }
+  function tablaNiveles(lista, precio, etiqueta){
+    var niv = lista.slice().sort(function(a, b){ return b.nivel - a.nivel; });
+    var puesto = false, rows = [];
+    var fila = '<tr class="precio"><td>Precio</td><td>' + px(precio) + '</td><td>' + esc(etiqueta) + '</td></tr>';
+    niv.forEach(function(n){
+      if (!puesto && precio != null && n.nivel < precio) { rows.push(fila); puesto = true; }
+      var tipo = /^P/i.test(n.tipo) ? 'P' : /^R/i.test(n.tipo) ? 'R' : 'S';
+      rows.push('<tr class="' + tipo + '"><td>' + esc(n.tipo) + '</td><td>' + px(n.nivel) + '</td><td>' + esc(n.que) + '</td></tr>');
+    });
+    if (!puesto && precio != null) rows.push(fila);
+    return '<div class="table-x"><table class="niveles"><tbody>' + rows.join('') + '</tbody></table></div>';
+  }
+  function escenarios(lista){
+    return '<div class="esc">' + lista.map(function(e){
+      var k = /alc|rebot|sub/i.test(e.sesgo || '') ? 'alcista' : /baj|ca[ií]/i.test(e.sesgo || '') ? 'bajista' : '';
+      return '<div class="' + k + '">' + (e.estado ? '<span class="st">' + esc(e.estado) + '</span>' : '') + '<b>' + esc(e.nombre) + '</b><span class="g">' + esc(e.gatillo) + '</span><span>' + esc(e.lectura) + '</span></div>';
+    }).join('') + '</div>';
+  }
   var h = [];
   var g = D.ggal || {};
+  var S = D.seguimiento;
+  if (S && !(S.dias && S.dias.length)) S = null;
 
   h.push('<header><div class="eyebrow">GGAL ADR · semana del ' + esc(D.semana) + '</div>');
   h.push('<h1>' + esc(D.titular || 'Reporte semanal') + '</h1>');
@@ -1064,6 +1179,24 @@ function render(D){
 
   if (D.resumen && D.resumen.length) {
     h.push('<section><h2>Lo importante</h2><ul class="resumen">' + D.resumen.map(function(r){ return '<li>' + esc(r) + '</li>'; }).join('') + '</ul></section>');
+  }
+
+  // Seguimiento: los cierres de los dias que pasaron desde el reporte, sin tocar lo que dice el reporte.
+  if (S) {
+    h.push('<section class="seg"><h2>Esta semana <small>cierres diarios después del reporte</small></h2>');
+    if (S.texto) h.push('<p>' + esc(S.texto) + '</p>');
+    h.push('<div class="dias">' + S.dias.map(function(d){
+      return '<div class="dia-row"><div class="f">' + esc(fechaCorta(d.fecha)) + '</div>' +
+        '<div class="cx">' + px(d.cierre) + (d.provisorio ? '<span class="prov">provisorio</span>' : '') + '</div>' +
+        '<div class="vx ' + cls(d.var) + '">' + pct(d.var) + '</div>' +
+        '<div class="rg num">A ' + px(d.apertura) + ' · M ' + px(d.maximo) + ' · m ' + px(d.minimo) + '</div>' +
+        (d.nota ? '<div class="nt">' + esc(d.nota) + '</div>' : '') +
+        (d.macro ? '<div class="mc">' + esc(d.macro) + '</div>' : '') + '</div>';
+    }).join('') + '</div>');
+    if (S.escenarios && S.escenarios.length) h.push(escenarios(S.escenarios));
+    if (S.niveles && S.niveles.length) h.push('<div class="panel"><h3 style="font-size:1.15rem;font-weight:600">Mapa vigente</h3>' + tablaNiveles(S.niveles, S.precio, S.precio_nota || 'último cierre') + '</div>');
+    if (S.fuente) h.push('<p class="seg-fuente">' + esc(S.fuente) + '</p>');
+    h.push('</section>');
   }
 
   if (D.mercados && D.mercados.length) {
@@ -1099,18 +1232,8 @@ function render(D){
 
   var t = D.tecnico || {};
   if (t.texto || (t.niveles && t.niveles.length)) {
-    h.push('<section><h2>Técnico <small>mapa del último estudio de cierre</small></h2><div class="panel"><p>' + esc(t.texto) + '</p>');
-    if (t.niveles && t.niveles.length) {
-      var niv = t.niveles.slice().sort(function(a, b){ return b.nivel - a.nivel; });
-      var puesto = false, rows = [];
-      niv.forEach(function(n){
-        if (!puesto && g.cierre != null && n.nivel < g.cierre) { rows.push('<tr class="precio"><td>Precio</td><td>' + px(g.cierre) + '</td><td>cierre de la semana</td></tr>'); puesto = true; }
-        var tipo = /^P/i.test(n.tipo) ? 'P' : /^R/i.test(n.tipo) ? 'R' : 'S';
-        rows.push('<tr class="' + tipo + '"><td>' + esc(n.tipo) + '</td><td>' + px(n.nivel) + '</td><td>' + esc(n.que) + '</td></tr>');
-      });
-      if (!puesto && g.cierre != null) rows.push('<tr class="precio"><td>Precio</td><td>' + px(g.cierre) + '</td><td>cierre de la semana</td></tr>');
-      h.push('<div class="table-x"><table class="niveles"><tbody>' + rows.join('') + '</tbody></table></div>');
-    }
+    h.push('<section><h2>Técnico <small>' + (S ? 'mapa al cierre de la semana del reporte' : 'mapa del último estudio de cierre') + '</small></h2><div class="panel"><p>' + esc(t.texto) + '</p>');
+    if (t.niveles && t.niveles.length) h.push(tablaNiveles(t.niveles, g.cierre, 'cierre de la semana'));
     h.push('</div></section>');
   }
 
@@ -1120,12 +1243,7 @@ function render(D){
     if (D.agenda && D.agenda.length) {
       h.push('<div class="agenda" style="margin-top:14px">' + D.agenda.map(function(a){ return '<div class="ag"><div class="dia">' + esc(a.dia) + '</div><div>' + esc(a.evento) + '<span class="por">' + esc(a.por_que) + '</span></div></div>'; }).join('') + '</div>');
     }
-    if (D.escenarios && D.escenarios.length) {
-      h.push('<div class="esc" style="margin-top:18px">' + D.escenarios.map(function(e){
-        var k = /alc|rebot|sub/i.test(e.sesgo || '') ? 'alcista' : /baj|ca[ií]/i.test(e.sesgo || '') ? 'bajista' : '';
-        return '<div class="' + k + '"><b>' + esc(e.nombre) + '</b><span class="g">' + esc(e.gatillo) + '</span><span>' + esc(e.lectura) + '</span></div>';
-      }).join('') + '</div>');
-    }
+    if (D.escenarios && D.escenarios.length) h.push('<div style="margin-top:18px">' + escenarios(D.escenarios) + '</div>');
     h.push('</section>');
   }
 
@@ -1133,7 +1251,7 @@ function render(D){
     h.push('<section><h2>Gráfico <small>velas diarias con los niveles del técnico</small></h2>' +
       '<div class="chart-head"><div class="readout" id="readout"></div></div>' +
       '<div class="chart" id="chart" role="img" aria-label="Gráfico de velas diarias de GGAL con soportes, resistencias y EMA20"></div>' +
-      '<div class="leyenda"><span style="color:var(--accent)"><i></i>EMA20</span><span style="color:var(--down)"><i class="dash"></i>Resistencia</span><span style="color:var(--amber)"><i class="dash"></i>Pivote</span><span style="color:var(--up)"><i class="dash"></i>Soporte</span><span style="color:var(--muted)"><i style="border-top:8px solid var(--line)"></i>Semana del reporte</span></div>' +
+      '<div class="leyenda"><span style="color:var(--accent)"><i></i>EMA20</span><span style="color:var(--down)"><i class="dash"></i>Resistencia</span><span style="color:var(--amber)"><i class="dash"></i>Pivote</span><span style="color:var(--up)"><i class="dash"></i>Soporte</span><span style="color:var(--muted)"><i style="border-top:8px solid var(--line)"></i>Semana del reporte</span>' + (S ? '<span style="color:var(--muted)"><i style="border-top:8px solid var(--accent);opacity:.25"></i>Esta semana</span>' : '') + '</div>' +
       '<p class="chart-nota">Pasá el dedo o el mouse por las velas para ver apertura, máximo, mínimo y cierre de cada día.</p></section>');
   }
 
@@ -1151,7 +1269,12 @@ function fechaCorta(s){ var p = s.split('-'); var d = new Date(+p[0], +p[1]-1, +
 function drawChart(D){
   var box = document.getElementById('chart');
   if (!box || !D.velas) return;
-  var all = D.velas;
+  // Las velas del seguimiento van despues de las de la semana del reporte (las que ya estan, no se repiten).
+  var seg = D.seguimiento && D.seguimiento.dias ? D.seguimiento.dias : [];
+  var ultima = D.velas[D.velas.length - 1][0];
+  var extra = seg.filter(function(d){ return d.fecha > ultima && d.cierre != null; })
+    .map(function(d){ return [d.fecha, d.apertura, d.maximo, d.minimo, d.cierre]; });
+  var all = D.velas.concat(extra);
   // EMA20 sobre todas las velas cargadas
   var k = 2/21, ema = [], e = all[0][4];
   all.forEach(function(r, i){ e = i ? r[4]*k + e*(1-k) : r[4]; ema.push(e); });
@@ -1160,7 +1283,8 @@ function drawChart(D){
   var n = Math.min(all.length - 19, narrow ? 28 : 46);
   var start = all.length - n;
   var bars = all.slice(start), emaS = ema.slice(start);
-  var niveles = ((D.tecnico || {}).niveles || []).slice();
+  // Con seguimiento, el grafico muestra el mapa vigente (el de la tabla "Mapa vigente"), no el de la semana.
+  var niveles = ((extra.length && D.seguimiento.niveles) || (D.tecnico || {}).niveles || []).slice();
   var H = narrow ? 300 : 360;
   var padL = 6, padR = narrow ? 74 : 92, padT = 14, padB = 26;
   var lo = Infinity, hi = -Infinity;
@@ -1178,9 +1302,10 @@ function drawChart(D){
     s.push('<line x1="'+padL+'" x2="'+(padL+pw)+'" y1="'+Y(g).toFixed(1)+'" y2="'+Y(g).toFixed(1)+'" stroke="var(--line)" stroke-width="1" opacity=".7"/>');
     if (Y(g) > padT + 10) s.push('<text x="'+(padL+2)+'" y="'+(Y(g)-3).toFixed(1)+'" font-size="10" fill="var(--muted)">'+g+'</text>');
   }
-  // franja de la semana del reporte (ultimas 5 velas)
-  var wk = Math.min(5, n);
-  s.push('<rect x="'+(padL+step*(n-wk)).toFixed(1)+'" y="'+padT+'" width="'+(step*wk).toFixed(1)+'" height="'+ph+'" fill="var(--flat-bg)"/>');
+  // franja de la semana del reporte (las 5 velas antes del seguimiento) y la de esta semana
+  var ne = Math.min(extra.length, n), wk = Math.min(5, n - ne);
+  s.push('<rect x="'+(padL+step*(n-ne-wk)).toFixed(1)+'" y="'+padT+'" width="'+(step*wk).toFixed(1)+'" height="'+ph+'" fill="var(--flat-bg)"/>');
+  if (ne) s.push('<rect x="'+(padL+step*(n-ne)).toFixed(1)+'" y="'+padT+'" width="'+(step*ne).toFixed(1)+'" height="'+ph+'" fill="var(--accent)" opacity=".09"/>');
   // eje de meses
   var prevM = null;
   bars.forEach(function(r, i){
