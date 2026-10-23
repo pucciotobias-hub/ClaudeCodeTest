@@ -1,0 +1,23 @@
+{
+  "permissions": {
+    "deny": [
+      "mcp__tradingview__draw_clear",
+      "mcp__tradingview__data_get_study_values"
+    ]
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash|PowerShell",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "py \"$CLAUDE_PROJECT_DIR/.claude/hooks/proteger_git.py\"",
+            "timeout": 20,
+            "statusMessage": "Revisando que contado/ y las credenciales no vayan a git"
+          }
+        ]
+      }
+    ]
+  }
+}

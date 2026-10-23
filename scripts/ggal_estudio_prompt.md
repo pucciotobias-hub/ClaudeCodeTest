@@ -129,7 +129,12 @@ desplaza a uno de los dos. Se calcula con las barras (punto 4) y va solo al info
 
 ## 5. Redibujar los niveles
 
-- `draw_list` para ver que hay, despues `draw_clear`, despues redibujar todo.
+- `draw_list` para ver que hay; borrá **solo las lineas propias**, una por una con
+  `draw_remove_one` (id): las que tienen etiqueta del estudio (`R1`…, `S1`…, `PIVOTE`,
+  `Directriz`; si `draw_list` no trae el texto, leelo con `draw_get_properties`).
+  Todo lo demas lo dibujo Tobias a mano y no se toca. Despues redibujar.
+  **`draw_clear` esta bloqueado** en `.claude/settings.json` (desde el 2026-10-23, a
+  pedido de Tobias): se llevaba tambien sus lineas editadas a mano.
 - **Pocos niveles y todos con fundamento.** Maximo **7 lineas horizontales**: el
   pivote y hasta 3 de cada lado. Es un techo, no una cuota: si hay 2 niveles
   buenos de un lado, van 2. (El 24-sep quedaron 9 lineas entre 38.87 y 42.01, una
