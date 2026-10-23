@@ -43,6 +43,13 @@ MULTIPLICADOR = {"GGAL": 100, "RFX20": 1, "DLR": 1000,
                  # Petroleo WTI: 10 barriles por contrato (contractMultiplier del ref-data de A3, 23-oct-2026).
                  # Cotiza en dolares: su resultado sale en USD, no en pesos.
                  "WTI": 10}
+# Contratos que cotizan en dolares: su resultado va aparte (en US$) y no se suma al del dia en pesos
+# (23-oct-2026, a pedido: "en dolares dejalo aparte").
+EN_DOLARES = {"WTI"}
+
+
+def etiqueta(inst):
+    return f"{inst} (US$)" if inst in EN_DOLARES else inst
 ENCABEZADO = ["N°", "Instrumento", "Posición", "Cantidad", "Hora entrada", "Precio entrada", "Hora salida",
               "Precio salida", "Diferencia", "Resultado $", "Duración (min)", "Estado", "Nota"]
 
@@ -100,7 +107,7 @@ def filas(d):
     for t in sorted(d["trades"], key=lambda x: (x["hora_entrada"], x["n"])):
         dif, res = resultado(t)
         # "comprado"/"vendido" y no "compra"/"venta": cada fila es un trade entero (entrada y salida), no una orden.
-        salida.append([t["n"], t["instrumento"], "comprado" if t["lado"] == "compra" else "vendido", t["cantidad"], t["hora_entrada"], t["entrada"],
+        salida.append([t["n"], etiqueta(t["instrumento"]), "comprado" if t["lado"] == "compra" else "vendido", t["cantidad"], t["hora_entrada"], t["entrada"],
                        t.get("hora_salida") or "", t.get("salida") if t.get("salida") is not None else "",
                        "" if dif is None else round(dif, 4), "" if res is None else round(res, 2),
                        minutos(t["hora_entrada"], t["hora_salida"]) if t.get("hora_salida") else "",
@@ -137,23 +144,30 @@ def movimientos(d):
     for (hora, inst, lado, precio, entra), o in sorted(ordenes.items(), key=lambda x: (x[0][0], not x[0][4], x[1]["n"])):
         firmada = o["cant"] if lado == "compra" else -o["cant"]
         posicion[inst] = posicion.get(inst, 0) + firmada
-        salida.append([hora, inst, lado, firmada, precio, posicion[inst],
+        salida.append([hora, etiqueta(inst), lado, firmada, precio, posicion[inst],
                        "" if o["res"] is None else round(o["res"], 2), " · ".join(o["notas"])])
     return salida
 
 
 def resumen(d):
-    res = [resultado(t)[1] for t in d["trades"] if t.get("salida") is not None]
+    cerrados = [t for t in d["trades"] if t.get("salida") is not None]
+    # La plata en pesos y en dolares no se suma: promedios, mejor y peor son solo de los trades en pesos.
+    res = [resultado(t)[1] for t in cerrados if t["instrumento"] not in EN_DOLARES]
+    usd = [resultado(t)[1] for t in cerrados if t["instrumento"] in EN_DOLARES]
+    todos = res + usd
     gan, per = [r for r in res if r > 0], [r for r in res if r < 0]
+    ganados = sum(1 for r in todos if r > 0)
     # El acierto va como texto ("7 de 8 (88%)"): con "88%" a secas la planilla lo tomaba como porcentaje y
     # le pegaba ese formato a las celdas vecinas del resumen (8 trades cerrados se veian "800%").
     plata = lambda x: "$ " + f"{x:,.2f}".replace(",", "_").replace(".", ",").replace("_", ".")
-    return [
-        ["Resultado del día $", round(sum(res), 2)],
-        ["Trades cerrados", len(res)],
-        ["Ganadores", len(gan)],
-        ["Perdedores", len(per)],
-        ["Acierto", f"{len(gan)} de {len(res)} ({len(gan) / len(res):.0%})" if res else "—"],
+    filas_ = [["Resultado del día $", round(sum(res), 2)]]
+    if usd or any(t["instrumento"] in EN_DOLARES for t in d["trades"]):
+        filas_.append(["Resultado del día US$", round(sum(usd), 2)])
+    return filas_ + [
+        ["Trades cerrados", len(todos)],
+        ["Ganadores", ganados],
+        ["Perdedores", sum(1 for r in todos if r < 0)],
+        ["Acierto", f"{ganados} de {len(todos)} ({ganados / len(todos):.0%})" if todos else "—"],
         ["Ganancia promedio", plata(sum(gan) / len(gan)) if gan else "—"],
         ["Pérdida promedio", plata(sum(per) / len(per)) if per else "—"],
         ["Mejor trade", plata(max(res)) if res else "—"],
@@ -189,7 +203,8 @@ def mostrar(d):
     print(f"Diario {d['fecha']}")
     for f in filas(d):
         n, inst, lado, cant, he, pe, hs, ps, dif, res, dur, estado, nota = f
-        cola = f"-> {hs} a {ps}  dif {dif:+g}  resultado $ {res:+,.2f}  ({dur} min)" if estado == "cerrado" else "ABIERTO"
+        moneda = "US$" if inst.endswith("(US$)") else "$"
+        cola = f"-> {hs} a {ps}  dif {dif:+g}  resultado {moneda} {res:+,.2f}  ({dur} min)" if estado == "cerrado" else "ABIERTO"
         print(f"  #{n} {he} {lado} {cant} {inst} a {pe}  {cola}" + (f"  | {nota}" if nota else ""))
     for rot, val in resumen(d):
         print(f"  {rot}: {val}")
