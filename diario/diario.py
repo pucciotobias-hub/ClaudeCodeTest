@@ -39,7 +39,10 @@ TRADES = DIR / "trades"
 MULTIPLICADOR = {"GGAL": 100, "RFX20": 1, "DLR": 1000,
                  # Caucion: cotiza en tasa (TNA %). 8.219 es el "Tamaño" que muestra eTrader (3.000.000 / 365), y con
                  # el el resultado coincide con el del broker (13-oct-2026: 16 contratos, 21,25 -> 21,30 = $ 6.575,20).
-                 "CAUC": 8219}
+                 "CAUC": 8219,
+                 # Petroleo WTI: 10 barriles por contrato (contractMultiplier del ref-data de A3, 23-oct-2026).
+                 # Cotiza en dolares: su resultado sale en USD, no en pesos.
+                 "WTI": 10}
 ENCABEZADO = ["N°", "Instrumento", "Posición", "Cantidad", "Hora entrada", "Precio entrada", "Hora salida",
               "Precio salida", "Diferencia", "Resultado $", "Duración (min)", "Estado", "Nota"]
 
