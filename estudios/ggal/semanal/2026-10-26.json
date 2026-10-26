@@ -1,0 +1,240 @@
+{
+ "semana": "19 al 23 de octubre de 2026",
+ "generado": "2026-10-26 09:55 ART",
+ "titular": "GGAL +5,25%: salió del rango y cerró arriba de 37.63, pero Lula ganó en Brasil",
+ "ggal": {
+  "cierre": 37.91,
+  "var_semana": 5.25,
+  "cierre_previo": 36.02,
+  "maximo": 38.06,
+  "minimo": 34.57,
+  "ema20": 37.31,
+  "rsi": 49.6,
+  "volumen_rel": "124% del promedio de las 4 semanas anteriores"
+ },
+ "resumen": [
+  {
+   "tema": "La semana",
+   "dato": "+5,25%",
+   "tono": "positivo",
+   "grafico": "semana",
+   "titulo": "La mejor semana desde la del 6 al 10 de julio, y 6,3 puntos mejor que el ETF de Argentina",
+   "texto": "GGAL cerró la semana en 37.91, +5,25% (viernes anterior 36.02), contra −1,05% de ARGT. Cierres: lunes 35.09, martes 35.46, miércoles 36.82, jueves 36.12 y viernes 37.91. El volumen fue 124% del de las cuatro semanas anteriores. Las dos ruedas fuertes (miércoles +3,84% y viernes +4,96%) fueron propias: ARGT subió 0,22% y 1,55% esos días."
+  },
+  {
+   "tema": "Técnico",
+   "dato": "37.20 – 38.40",
+   "tono": "neutro",
+   "titulo": "Cerró arriba de 37.63 y del promedio de 20 días; le falta un segundo cierre para confirmarlo",
+   "texto": "El lunes perdió 35.21 en cierre (35.09) y marcó el mínimo del tramo en 34.57, pero el martes y el miércoles lo recuperó con dos cierres. El miércoles pasó 36.56 y el jueves volvió a perderlo. El viernes salió por arriba con una vela de 35.64 a 38.06 y cerró en 37.91: arriba de 37.63 y, por primera vez desde el 10-sep, arriba de la EMA20 (37.31). La serie de máximos decrecientes sigue en pie mientras no cierre arriba de 38.84."
+  },
+  {
+   "tema": "Empresa",
+   "dato": "USD 70",
+   "tono": "positivo",
+   "titulo": "Morgan Stanley puso a Galicia primera entre 206 empresas latinoamericanas",
+   "texto": "El miércoles 21 trascendió que Morgan Stanley tiene a GGAL con precio objetivo de USD 70, 97% arriba del cierre del 20-oct, el mayor potencial de las 206 compañías de la región que sigue. El viernes la encuesta de crédito del BCRA mostró que los bancos esperan más demanda de préstamos de las familias en el cuarto trimestre, con la mora de las familias todavía en 12,8%. No hubo anuncio de dividendo ni declaraciones de Kon en la semana."
+  },
+  {
+   "tema": "Argentina",
+   "dato": "648 → 707",
+   "tono": "negativo",
+   "titulo": "El riesgo país pasó los 700 puntos, el nivel más alto desde octubre de 2025",
+   "texto": "El riesgo país subió de 648 a 707 en la semana: 675 el lunes, tocó 710 el martes, y saltó a 704 el jueves con los bonos en dólares en baja. Los motivos citados: la tasa larga de EE.UU., la venta de emergentes y las dudas sobre 2027. Del lado bueno, el BCRA compró USD 270 M en la semana (USD 1.253 M en octubre) y las reservas quedaron en USD 50.203 M; el dólar mayorista subió seis ruedas seguidas hasta $1.529,50."
+  },
+  {
+   "tema": "Afuera",
+   "dato": "Lula 51,8%",
+   "tono": "negativo",
+   "titulo": "La semana terminó tranquila afuera, pero el domingo Lula ganó en Brasil contra lo esperado",
+   "texto": "En la semana la tasa a 10 años de EE.UU. bajó de 5,08% a 5,00% (el jueves cerró en 4,96%, la primera vez debajo de 5% desde el 23-sep), el S&P perdió 0,43%, Brasil subió 1,82% y el Brent llegó a USD 116,72 por la tensión en Medio Oriente. El domingo 25 Lula ganó el balotaje con 51,8% contra Flávio Bolsonaro: el lunes a la mañana el ETF de Brasil caía 27% antes de la apertura y GGAL 5,57% (Ámbito)."
+  }
+ ],
+ "mercados": [
+  { "ticker": "GGAL", "nombre": "Galicia ADR", "cierre": 37.91, "var": 5.25 },
+  { "ticker": "ARGT", "nombre": "ETF Argentina", "cierre": 87.08, "var": -1.05 },
+  { "ticker": "EWZ", "nombre": "ETF Brasil", "cierre": 42.59, "var": 1.82 },
+  { "ticker": "SPY", "nombre": "S&P 500", "cierre": 759.97, "var": -0.43 },
+  { "ticker": "DXY", "nombre": "Índice dólar", "cierre": 101.751, "var": -0.03 },
+  { "ticker": "US10Y", "nombre": "Tasa 10 años EE.UU.", "cierre": 4.999, "var": -1.61 }
+ ],
+ "mercados_nota": "GGAL +5,25% contra ARGT −1,05%: 6,3 pp mejor que el bloque, la primera semana a favor desde fines de septiembre. Casi toda la diferencia salió del miércoles (+3,84% contra +0,22%) y del viernes (+4,96% contra +1,55%); el jueves cayó igual que ARGT (−1,90% contra −1,91%).",
+ "noticias": [
+  {
+   "bloque": "Grupo Galicia",
+   "titulo": "Morgan Stanley pone a Galicia primera de 206 empresas latinoamericanas, con objetivo de USD 70",
+   "detalle": "El objetivo de USD 70 implica 97% de suba contra el cierre del 20-oct, el mayor potencial de la región según el banco; Supervielle, BBVA Argentina y Macro también figuran con 66% a 78%. Salió el miércoles 21, el día en que GGAL subió 3,84% sola.",
+   "impacto": "positivo",
+   "magnitud": "medio",
+   "explicacion": "El precio objetivo es lo que un banco de inversión cree que puede valer la acción en un año. Que Morgan Stanley la ponga primera de su lista atrae a los fondos que siguen sus recomendaciones. Contrasta con UBS, que la semana anterior había bajado su objetivo a USD 45.",
+   "fuente": "iProfesional",
+   "url": "https://www.iprofesional.com/finanzas/467096-mercadolibre-podria-subir-mas-de-30-por-ciento-en-un-ano-segun-morgan-stanley",
+   "fecha": "21-oct"
+  },
+  {
+   "bloque": "Grupo Galicia",
+   "titulo": "Los bancos esperan más demanda de crédito de las familias, con la mora todavía en 12,8%",
+   "detalle": "La Encuesta de Condiciones Crediticias del BCRA anticipa más pedidos de hipotecarios, tarjetas y préstamos personales en el cuarto trimestre. La mora de las familias bajó apenas, de 12,9% en julio a 12,8% en agosto, y sigue en niveles récord: es el punto débil de Galicia y de Naranja X.",
+   "impacto": "neutro",
+   "magnitud": "medio",
+   "explicacion": "La mora es la parte de los préstamos que no se está pagando a tiempo. Un banco gana prestando, así que más demanda de crédito es buena noticia, pero con casi 13% de las familias atrasadas cada préstamo nuevo tiene más riesgo de no cobrarse.",
+   "fuente": "Infobae",
+   "url": "https://www.infobae.com/economia/2026/10/23/los-bancos-proyectan-una-mayor-demanda-de-credito-por-parte-de-las-familias-pese-a-la-mora-en-niveles-record/",
+   "fecha": "23-oct"
+  },
+  {
+   "bloque": "Argentina",
+   "titulo": "El riesgo país pasó los 700 puntos y cerró la semana en 707, el máximo desde octubre de 2025",
+   "detalle": "Subió a 675 el lunes, tocó 710 el martes antes de cerrar en 672, y el jueves saltó a 704 con los bonos en dólares en baja; el viernes cerró en 707 (Rava). Los analistas citan la tasa larga de EE.UU., la venta de emergentes y la incertidumbre de cara a 2027. GGAL subió igual en la semana, contra la corriente de los bonos.",
+   "impacto": "negativo",
+   "magnitud": "alto",
+   "explicacion": "El riesgo país es la tasa extra que se le pide a Argentina para prestarle, medida contra EE.UU. (707 = 7,07 puntos por encima). Cuando sube, caen los bonos, y los bancos como Galicia tienen muchos bonos del Tesoro en su cartera: les pega directo.",
+   "fuente": "Infobae",
+   "url": "https://www.infobae.com/economia/2026/10/20/el-riesgo-pais-supero-la-linea-de-los-700-puntos-basicos-tras-una-nueva-caida-de-los-bonos-argentinos/",
+   "fecha": "20-oct"
+  },
+  {
+   "bloque": "Argentina",
+   "titulo": "El BCRA compró USD 270 M en la semana y las reservas quedaron arriba de USD 50.000 M",
+   "detalle": "Lleva USD 1.253 M comprados en octubre y USD 15.821 M en el año, contra una meta de USD 10.000 M con el FMI; las reservas cerraron en USD 50.203 M. Compró menos que la semana anterior (USD 642 M) y el dólar mayorista subió seis ruedas seguidas hasta $1.529,50, lejos del techo de la banda ($1.943,56).",
+   "impacto": "positivo",
+   "magnitud": "medio",
+   "explicacion": "Las reservas son los dólares que tiene el Banco Central para pagar deuda y sostener el peso. Cuantas más compra, menos riesgo de una devaluación brusca, lo que con el tiempo ayuda a bajar el riesgo país y a los bancos.",
+   "fuente": "Infobae",
+   "url": "https://www.infobae.com/economia/2026/10/23/el-bcra-ya-compro-mas-de-usd-1200-millones-en-octubre-y-las-reservas-se-consolidan-por-encima-de-los-usd-50000-millones/",
+   "fecha": "23-oct"
+  },
+  {
+   "bloque": "EE.UU. y global",
+   "titulo": "La tasa a 10 años de EE.UU. bajó de 5% por primera vez desde el 23-sep",
+   "detalle": "El jueves cayó de 5,13% a 4,96%, en un día de venta de acciones tecnológicas y suba del petróleo en que los inversores buscaron refugio en bonos del Tesoro; el viernes cerró en 5,00%. En el feed, la semana terminó en 4,999%, 8 pb debajo del viernes anterior.",
+   "impacto": "positivo",
+   "magnitud": "alto",
+   "explicacion": "Si en EE.UU. se cobra 5% sin riesgo, a la plata le quedan menos razones para venir a Argentina. Que baje de 5% le saca presión a los bonos y acciones de países emergentes, aunque esta vez la baja vino por miedo y no por buenas noticias.",
+   "fuente": "WRE News",
+   "url": "https://wrenews.com/ten-year-treasury-yield-five-percent-oil-mortgage-rates-october-23-2026/",
+   "fecha": "24-oct"
+  },
+  {
+   "bloque": "EE.UU. y global",
+   "titulo": "El Brent cerró la semana en USD 116,72 por el riesgo de cortes de suministro en Medio Oriente",
+   "detalle": "Cerró el viernes 23 en USD 116,72. A Argentina le suma dólares por la exportación de energía (las notas del BCRA lo citan entre los motivos de las compras), pero mantiene alta la inflación de EE.UU. y la presión sobre la Fed.",
+   "impacto": "negativo",
+   "magnitud": "medio",
+   "explicacion": "El Brent es el precio de referencia del petróleo. Caro ayuda a las petroleras argentinas y a las reservas, pero a un banco le pega por otro lado: sube la inflación en EE.UU., la Fed sube tasas y la plata se va de los emergentes.",
+   "fuente": "WRE News",
+   "url": "https://wrenews.com/ten-year-treasury-yield-five-percent-oil-mortgage-rates-october-23-2026/",
+   "fecha": "24-oct"
+  }
+ ],
+ "tecnico": {
+  "tendencia": "bajista",
+  "tendencia_texto": "desde junio: de 58.14 (17-jun) a 34.57 (19-oct); desde el 28-sep, cierres entre 35.09 y 38.25",
+  "frase": "Salió por arriba del rango 35.21–36.56 y cerró en 37.91, apoyada en 37.20 y con la resistencia de 38.40 encima.",
+  "techo": {
+   "nivel": 38.40,
+   "si": "Dos cierres seguidos arriba, y sobre todo arriba de 38.84, cortan la serie de máximos más bajos que viene desde junio."
+  },
+  "piso": {
+   "nivel": 37.20,
+   "si": "Un cierre debajo deja la suba del viernes como otra salida fallida; debajo de 36.56 vuelve al rango de la semana."
+  },
+  "texto": "Tendencia bajista de fondo desde 58.14 (17-jun), con máximos y mínimos decrecientes: último máximo de swing 38.84 (6-oct), intacto; último mínimo 34.57 (19-oct), confirmado el jueves. El lunes cerró debajo de 35.21 (35.09) e hizo el mínimo del tramo en 34.57; el martes y el miércoles lo recuperó con dos cierres (35.46 y 36.82), y el miércoles además cerró arriba de 36.56. El jueves perdió 36.56 (36.12, bajó hasta 35.35): la salida por arriba duró una rueda. El viernes abrió en 35.70, subió de punta a punta hasta 38.06 y cerró en 37.91, arriba de 36.56, de 37.20 y de 37.63, y por primera vez desde el 10-sep arriba de la EMA20 (37.31). Se respetó: 37.63 hasta el jueves y la resistencia de 38.04–38.06 (máximos del 30-sep, 8-oct y 23-oct). Se rompió en cierre: 35.21 (una rueda, el lunes) y 36.56 (el viernes, con volumen en la media, 99%). El RSI subió de 30.5 a 49.6; la divergencia alcista que marcaban los estudios desde el 14-oct se resolvió con este rebote. Mapa del cierre del 23-oct; distancias contra 37.91.",
+  "niveles": [
+   { "tipo": "R1", "nivel": 38.40, "que": "Resistencia: techo y piso del 3/4/5-sep-2025; rechazos del 30-sep, 5-oct y 6-oct. Debajo, 38.04–38.06 (máximos del 30-sep, 8-oct y 23-oct). Arriba, 38.84, máximo de swing del 6-oct: un cierre arriba rompe la serie de máximos decrecientes. +1,3%" },
+   { "tipo": "PIVOTE", "nivel": 37.20, "que": "Soporte: mínimo y apertura del gap del 5-oct, piso del 7 al 13-oct. Otro borde: 37.63, tres máximos rechazados el 7, 9 y 13-oct, superado en cierre el viernes. −1,9%" },
+   { "tipo": "S1", "nivel": 36.56, "que": "Soporte: mínimo del 2-sep-2025 y del 29-sep, piso del 7 al 13-oct y techo del 14 al 22-oct. Otro borde: 36.10. −3,6%" },
+   { "tipo": "S2", "nivel": 35.21, "que": "Soporte: mínimo de swing del 1-oct, piso del rango del 14 al 22-oct. Debajo, 34.57 (mínimo de swing del 19-oct) y 33.01 (base de octubre de 2025). −7,1%" }
+  ]
+ },
+ "agenda": [
+  { "dia": "Lun 26", "evento": "Primera rueda después del triunfo de Lula en Brasil · llamado a licitación del Tesoro", "por_que": "Antes de la apertura el ETF de Brasil caía 27% y GGAL 5,57% (Ámbito). La pregunta es si GGAL sostiene 37.20 o si el viernes queda como otra salida fallida." },
+  { "dia": "Mar 27", "evento": "Pedidos de bienes durables y confianza del consumidor (EE.UU.)", "por_que": "Datos de segunda línea, pero llegan la víspera de la Fed y pueden mover la tasa a 10 años, que está justo en 5%." },
+  { "dia": "Mié 28", "evento": "Decisión de la Fed y conferencia de Warsh · licitación del Tesoro", "por_que": "El mercado da ~88% a que la tasa quede en 3,75–4,00% y espera la suba en diciembre; una sorpresa empujaría la tasa larga para arriba. El mismo día el Tesoro renueva deuda en pesos, donde los bancos son los principales compradores." },
+  { "dia": "Jue 29", "evento": "PIB del tercer trimestre y PCE de septiembre (EE.UU.) · decisión del BCE", "por_que": "El PCE es la inflación que mira la Fed: si sale arriba de 0,3% en el núcleo, vuelve la presión sobre la tasa a 10 años y los emergentes." },
+  { "dia": "Vie 30", "evento": "Liquidación de la licitación del Tesoro · costo laboral (ECI) en EE.UU.", "por_que": "Cierre de mes. La próxima licitación tiene llamado el lunes 9-nov y se hace el miércoles 11-nov." }
+ ],
+ "escenarios": [
+  {
+   "nombre": "Rebote confirmado",
+   "sesgo": "alcista",
+   "gatillo": "2 cierres seguidos > 37.63 (el viernes fue el primero)",
+   "lectura": "Va contra la tendencia de fondo, así que pide dos cierres. Con el segundo, el rebote desde 34.57 queda confirmado y arriba esperan 38.04–38.06 y 38.40; la serie de máximos decrecientes se rompe recién con dos cierres arriba de 38.84. 38.06, el máximo del viernes, es el nivel más probable de trampa."
+  },
+  {
+   "nombre": "Rebote fallido",
+   "sesgo": "rango",
+   "gatillo": "cierre < 37.20 · < 36.56 vuelve al rango",
+   "lectura": "Un cierre debajo de 37.20 repite lo del miércoles 21: salida por arriba que se devuelve a la rueda siguiente. Debajo de 36.56 el precio vuelve a quedar entre 35.21 y 36.56, donde estuvo del 14 al 22-oct. Con la preapertura del lunes cayendo 5,57%, es el escenario que se pone a prueba primero."
+  },
+  {
+   "nombre": "Vuelta de la baja",
+   "sesgo": "bajista",
+   "gatillo": "1 cierre < 35.21",
+   "lectura": "A favor de la tendencia, vale con un cierre; está a 7,1% del viernes. Debajo esperan 34.57, el mínimo de swing del 19-oct, y 33.01. El lunes 19 hubo un cierre debajo (35.09) y se dio vuelta al día siguiente: en este rango, ese borde ya falló una vez."
+  }
+ ],
+ "panorama": {
+  "donde": "GGAL cerró la semana en 37.91, +5,25%, la mejor semana desde julio. Quedó entre el soporte de 37.20, que pasó el viernes, y la resistencia de 38.40, con 38.84 más arriba. El domingo Lula ganó en Brasil y el lunes los ADRs argentinos arrancaban en baja.",
+  "factores": [
+   {
+    "factor": "Riesgo país",
+    "dato": "648 → 707",
+    "efecto": "negativo",
+    "explica": "Es la tasa extra que el mercado le pide a Argentina para prestarle. Subió 59 puntos en la semana, al máximo desde octubre de 2025. Los bancos tienen muchos bonos del Tesoro: cuando caen los bonos, les pega. Esta semana GGAL subió igual."
+   },
+   {
+    "factor": "Tasa a 10 años de EE.UU.",
+    "dato": "5,08% → 5,00%",
+    "efecto": "positivo",
+    "explica": "Si en EE.UU. se cobra 5% sin riesgo, hay menos razones para traer la plata a Argentina. El jueves bajó a 4,96%, la primera vez debajo de 5% en un mes."
+   },
+   {
+    "factor": "Morgan Stanley",
+    "dato": "objetivo USD 70",
+    "efecto": "positivo",
+    "explica": "Un banco de inversión grande puso a Galicia primera de su lista en América Latina. Atrae compradores: el miércoles GGAL subió 3,84% mientras el ETF de Argentina subía 0,22%."
+   },
+   {
+    "factor": "Brasil",
+    "dato": "Lula 51,8%",
+    "efecto": "negativo",
+    "explica": "El mercado esperaba que ganara Flávio Bolsonaro y un cambio de orientación económica. Brasil es el principal socio comercial de Argentina, y cuando sus activos caen fuerte, los fondos venden toda la región."
+   },
+   {
+    "factor": "Petróleo",
+    "dato": "Brent USD 116,72",
+    "efecto": "neutro",
+    "explica": "Ayuda a Argentina porque exporta energía y el BCRA compra esos dólares, pero empuja la inflación de EE.UU. y con ella las tasas, que es lo que más le pega a un banco emergente."
+   }
+  ],
+  "mirar": [
+   {
+    "que": "Si cierra dos días seguidos arriba de 37.63",
+    "por_que": "El viernes fue el primero. Con el segundo, el rebote queda confirmado y el próximo techo es 38.40; arriba de 38.84 (con dos cierres) se corta la serie de máximos más bajos que viene desde junio."
+   },
+   {
+    "que": "Si cierra debajo de 37.20",
+    "por_que": "La suba del viernes quedaría como otra salida fallida, como la del miércoles 21. Debajo de 36.56 vuelve al rango de la semana pasada, y recién un cierre debajo de 35.21 vuelve a la baja."
+   },
+   {
+    "que": "Cuánto arrastra Brasil",
+    "por_que": "Antes de la apertura del lunes GGAL caía 5,57% y el ETF de Brasil 27% (Ámbito). Lo que importa es dónde cierra GGAL, no la apertura."
+   },
+   {
+    "que": "La Fed el miércoles 28 y la inflación el jueves 29",
+    "por_que": "Se espera que la Fed no toque la tasa. Si sorprende con una suba o el PCE sale alto, la tasa a 10 años vuelve arriba de 5%. El miércoles también licita el Tesoro."
+   }
+  ],
+  "glosario": [
+   { "termino": "Soporte", "que": "Precio donde la caída se viene frenando, porque aparecen compradores." },
+   { "termino": "Resistencia", "que": "Precio donde la suba se viene frenando, porque aparecen vendedores." },
+   { "termino": "Cierre", "que": "El último precio del día. Las señales se cuentan por cierre: tocar un nivel durante el día no alcanza." },
+   { "termino": "Promedio de 20 días (EMA20)", "que": "El precio promedio de las últimas 20 ruedas, con más peso en las recientes. Estar arriba quiere decir que el precio le ganó a su historia reciente." },
+   { "termino": "Riesgo país", "que": "Cuánto más que EE.UU. paga Argentina por endeudarse, en centésimas de punto (707 = 7,07% de tasa extra)." }
+  ]
+ },
+ "notas": "Precios del feed de TradingView (velas diarias; NASDAQ:GGAL resuelve a BATS:GGAL y AMEX:EWZ a BATS:EWZ). Cierre del viernes 23 confirmado en 37.91 (volumen 995.984). EMA20 (37.31) y RSI14 (49.59) del estudio de cierre del 23-oct, que los calculó sobre los cierres del feed. Volumen de la semana: 5,81 M contra un promedio de 4,68 M de las cuatro anteriores. DXY y US10Y: la barra de cada sesión viene fechada el día anterior; se tomó la del viernes 23. Informes de la semana: cierres del 19, 20, 21, 22 y 23 y mediodía del 20; sin aperturas (son a pedido); auditoría del 23-oct (sus tres propuestas no están aplicadas, así que los escenarios siguen la receta vigente). El mapa de niveles es el del cierre del 23-oct. La preapertura del lunes 26 no está en el feed (sin horario extendido): el −5,57% de GGAL es el que publicó Ámbito. Noticias de Grupo Galicia: busqué declaraciones de Kon, mora de Galicia, de Naranja X y del sistema, dividendo de octubre (en español y en inglés), cambios de precio objetivo, fecha de resultados y normas del BCRA (encajes), con y sin filtro de medios locales. De la semana aparecieron Morgan Stanley y la encuesta de crédito del BCRA. No encontré anuncio de dividendo después de la tercera cuota del cronograma del tercer trimestre (septiembre), ni declaraciones de Kon fechadas en la semana (la última que apareció es del 12-oct), ni normas nuevas de encajes. La fecha de resultados del 3T no está confirmada por la empresa: el indicador del chart decía 3-nov y los calendarios de la web, 24-nov. La mora de agosto (12,81% familias, 7,75% el sistema) salió el viernes 16 (Perfil): entra por la nota de Infobae del 23. El triunfo de Lula (domingo 25) es posterior a la semana: va en panorama, agenda y escenarios, no como noticia. Brasil no va como bloque: EWZ subió 1,82% en la semana sin una nota que lo explique. No abrieron (403): CNBC (tasa del jueves), MDZ (ADRs del lunes), Forbes (Fed), Conclusión (mora); se citaron otros medios con el mismo dato. Probabilidad de la Fed (~88% de mantener) y agenda de EE.UU.: Heygotrade, 26-oct. El EMAE de agosto: una nota del 23-oct ya da +0,1% mensual y otra lo ubica el miércoles 28; no se cargó en la agenda. Licitaciones (`licitaciones_tesoro.py`): llamado lunes 26, licitación miércoles 28 y liquidación viernes 30; la siguiente, 9/11/13-nov.",
+ "velas_fuente": "Velas diarias del ADR (apertura, máximo, mínimo, cierre, volumen) del feed de TradingView, 3-jun al 23-oct-2026. El promedio de 20 días, el RSI14 y el volumen relativo se calculan en la página.",
+ "velas": [["2026-06-03",49.62,49.99,48.28,48.33,956379],["2026-06-04",48.25,49.62,48.25,48.62,729353],["2026-06-05",48.35,48.56,47.24,47.81,659510],["2026-06-08",48.22,49.06,47.01,48.04,962023],["2026-06-09",48.46,50.58,47.32,49.99,1791555],["2026-06-10",49.6,50.65,48.93,49.62,961675],["2026-06-11",51.1,55.7,51.08,55.41,4237614],["2026-06-12",55.49,56.25,54.56,55.16,1264690],["2026-06-15",55.8,56.6,55.52,55.96,1230513],["2026-06-16",55.96,56.2,54.12,54.44,991594],["2026-06-17",54.44,58.14,54.4,55.55,1684432],["2026-06-18",56.82,57.94,56.09,56.37,1334564],["2026-06-22",55.56,56.3,52.8,53.33,1698323],["2026-06-23",52,52.28,51.03,51.35,913668],["2026-06-24",50.74,50.8,48.89,49.1,1145024],["2026-06-25",49.86,50.23,48.75,49.42,511265],["2026-06-26",48.78,50.8,48.78,49.97,648105],["2026-06-29",50.87,51.87,49.94,50.9,1096369],["2026-06-30",50.62,51.88,49.52,50.03,688538],["2026-07-01",49.85,50.81,47.84,49.05,910729],["2026-07-02",49.92,50.72,49.23,50.37,810422],["2026-07-06",50.81,53.5,50.41,53.02,1365405],["2026-07-07",52.53,53.64,50.92,51.1,572775],["2026-07-08",50.13,51.46,49.99,50.25,1485647],["2026-07-09",50.38,50.48,48.67,49.39,617481],["2026-07-10",50.36,53.86,49.96,53.73,1808483],["2026-07-13",53.82,54.04,51.41,51.41,747095],["2026-07-14",52.66,53.1,50.65,50.8,1164074],["2026-07-15",50.83,53.19,50.79,52.67,1614688],["2026-07-16",52.23,52.27,49.76,50.18,1234816],["2026-07-17",49.42,50.01,48.45,49.94,1119567],["2026-07-20",49.58,50.46,48.97,49.95,667537],["2026-07-21",50.5,51.63,50.18,50.94,774507],["2026-07-22",51.92,53.34,51.67,53.24,1688772],["2026-07-23",52.66,52.8,50.11,50.15,756127],["2026-07-24",50.17,51.48,49.04,49.3,774887],["2026-07-27",49.72,50.48,49.43,50,328996],["2026-07-28",49.33,49.66,47.9,49.19,953983],["2026-07-29",48.59,50.25,48.19,49.15,665409],["2026-07-30",49.04,51.69,48.64,51.61,750311],["2026-07-31",52,52.24,49.72,49.77,642211],["2026-08-03",50.23,50.79,49.85,50.51,510500],["2026-08-04",51.02,51.02,48.7,48.92,757473],["2026-08-05",48.72,49.75,48.18,48.36,660357],["2026-08-06",48.08,48.54,46.6,46.73,695934],["2026-08-07",47.26,47.52,45.58,46.18,714738],["2026-08-10",46.18,46.59,45.53,46.42,573602],["2026-08-11",46.9,47.75,43.87,44.53,1263445],["2026-08-12",44.41,44.83,43.6,44.22,765889],["2026-08-13",44.18,45.31,43.53,44.99,800023],["2026-08-14",45.15,45.21,43.37,43.37,596551],["2026-08-17",43.72,43.99,43,43.42,505215],["2026-08-18",43,43.32,41.8,42.12,920226],["2026-08-19",42,42.82,40.89,41.47,885805],["2026-08-20",42.59,42.59,40.6,41,1895423],["2026-08-21",41.18,42.44,41.13,41.45,1758005],["2026-08-24",41.12,44,41.12,43.45,1215477],["2026-08-25",43.66,44.28,42.5,44.2,796405],["2026-08-26",44.36,45.2,43.42,43.91,1005410],["2026-08-27",43.99,44.41,42.63,42.91,690253],["2026-08-28",43.04,43.34,41.69,42.24,787490],["2026-08-31",42.5,44.57,42.5,43.75,1095737],["2026-09-01",43.35,45.08,42.92,44.29,752689],["2026-09-02",44.28,45.14,43.98,45.01,793526],["2026-09-03",44.72,46.09,44.02,44.63,615791],["2026-09-04",44.56,44.95,43.82,44.36,481940],["2026-09-08",44.6,44.67,43.5,44.12,761880],["2026-09-09",43.99,44.79,43.08,44.49,425550],["2026-09-10",43.63,45.72,43.63,44.72,1017818],["2026-09-11",45,45.42,43.17,43.86,739390],["2026-09-14",43.48,43.87,42.65,42.96,773802],["2026-09-15",42.7,43.08,41.94,42.14,689556],["2026-09-16",42.19,42.86,41.58,42.27,364905],["2026-09-17",43,43.09,42.37,42.62,379014],["2026-09-18",42.2,42.43,41.5,41.76,524697],["2026-09-21",42.05,42.2,41.33,41.76,456205],["2026-09-22",41.54,41.92,40.28,41.25,929594],["2026-09-23",41.11,42.01,39.93,39.99,1022555],["2026-09-24",39.83,40.44,39.28,39.59,940052],["2026-09-25",40,40,38.74,38.74,605698],["2026-09-28",38.09,38.53,36.73,36.98,1079477],["2026-09-29",37.02,37.83,36.56,37.02,729993],["2026-09-30",37.15,38.04,36.69,37.24,850192],["2026-10-01",37,37.23,35.21,36.07,1697295],["2026-10-02",36.17,36.68,35.66,35.89,848794],["2026-10-05",37.2,38.62,37.2,38.25,1823913],["2026-10-06",38.5,38.84,38.05,38.18,1398868],["2026-10-07",37.62,37.65,36.77,37.05,941879],["2026-10-08",36.51,38.04,36.51,36.76,1111671],["2026-10-09",37.07,37.6,36.45,36.81,805732],["2026-10-12",36.82,37.15,36.57,36.78,376283],["2026-10-13",36.95,37.63,36.57,36.79,859347],["2026-10-14",36.24,36.63,35.46,35.55,701547],["2026-10-15",35.3,36.58,34.7,36.47,941303],["2026-10-16",36.61,36.68,35.55,36.02,584411],["2026-10-19",36.07,36.28,34.57,35.09,906898],["2026-10-20",34.92,36.45,34.92,35.46,1217207],["2026-10-21",35.8,36.83,35.67,36.82,1308571],["2026-10-22",36.2,36.43,35.35,36.12,1377610],["2026-10-23",35.7,38.06,35.64,37.91,995984]]
+}
