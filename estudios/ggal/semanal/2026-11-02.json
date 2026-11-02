@@ -1,0 +1,262 @@
+{
+ "semana": "26 al 30 de octubre de 2026",
+ "generado": "2026-11-02 11:25 ART",
+ "titular": "GGAL −14,8%: Lula, riesgo país en 790 y el cierre más bajo del año, 32.30",
+ "ggal": {
+  "cierre": 32.30,
+  "var_semana": -14.80,
+  "cierre_previo": 37.91,
+  "maximo": 36.33,
+  "minimo": 32.02,
+  "ema20": 35.98,
+  "rsi": 30.4,
+  "volumen_rel": "138% del promedio de las 4 semanas anteriores"
+ },
+ "resumen": [
+  {
+   "tema": "La semana",
+   "dato": "−14,80%",
+   "tono": "negativo",
+   "grafico": "semana",
+   "titulo": "Cinco ruedas en baja, con volumen alto, y 5,7 puntos peor que el ETF de Argentina",
+   "texto": "GGAL cerró la semana en 32.30, −14,80% (viernes anterior 37.91), contra −9,07% de ARGT y −23,79% del ETF de Brasil. Cierres: lunes 35.35, martes 35.14, miércoles 33.84, jueves 33.73 y viernes 32.30. El lunes abrió 5,5% abajo por el triunfo de Lula en Brasil; el martes, el miércoles y el viernes cayó más que el bloque. El volumen fue 138% del de las cuatro semanas anteriores: la baja vino con venta."
+  },
+  {
+   "tema": "Técnico",
+   "dato": "31.74 – 33.01",
+   "tono": "negativo",
+   "titulo": "Perdió en cierre 35.21, 34.57, 33.66 y 33.01: quedó sobre los mínimos de octubre de 2025",
+   "texto": "La suba del viernes 23 falló en una rueda: el lunes perdió 37.20 y 36.56, y el martes cerró debajo de 35.21 (35.14), saliendo por abajo del rango en el que estaba desde el 14-oct. El miércoles perdió 34.57, el jueves el soporte de 33.66 aguantó en cierre, y el viernes cayó 4,24% y cerró debajo de 33.66 y de 33.01, con mínimo del año en 32.02. Está 10,2% debajo de la EMA20 (35.98) y con el RSI en 30.4, al borde de la sobreventa."
+  },
+  {
+   "tema": "Empresa",
+   "dato": "12,81% → 12,2%",
+   "tono": "positivo",
+   "titulo": "La mora de las familias bajó en septiembre, según el BCRA y la consultora 1816",
+   "texto": "El jueves 29 el BCRA anticipó en su informe de política monetaria (IPOM) que la mora de las familias bajó de 12,81% en agosto a 12,2% en septiembre, y la del total del sistema de 7,75% a 7,5%; el lunes 26 su vicepresidente, Vladimir Werning, presentó en la Di Tella que el ciclo de la mora 'finaliza'. Es el principal problema de Galicia y de Naranja X. No hubo anuncio de dividendo, declaraciones de Kon ni cambios de precio objetivo en la semana; la fecha del balance del tercer trimestre no está confirmada."
+  },
+  {
+   "tema": "Argentina",
+   "dato": "707 → 790",
+   "tono": "negativo",
+   "titulo": "El riesgo país cerró octubre en 790, el máximo del año, después de saltar 58 puntos el lunes",
+   "texto": "El lunes 26, con el triunfo de Lula, el riesgo país saltó de 707 a 765 y Galicia cayó 4,79% en Buenos Aires; los bancos encabezaron las bajas de los ADRs. El viernes 30 sumó otros 49 puntos y cerró en 790, con una suba de 30,1% en el mes; el Merval perdió 7,3% en octubre. Del lado bueno, el BCRA lleva USD 15.800 M comprados en el año y el dólar mayorista cerró octubre en $1.534, lejos del techo de la banda."
+  },
+  {
+   "tema": "Afuera",
+   "dato": "EWZ −23,8%",
+   "tono": "negativo",
+   "titulo": "Brasil se desplomó con Lula y la Fed dejó abierta una suba en diciembre",
+   "texto": "El ETF de Brasil cayó 19,8% el lunes y 23,8% en la semana; el real perdió cerca de 10%. El miércoles 28 la Fed mantuvo la tasa en 3,75–4,00%, con dos votos a favor de subirla, y el jueves la inflación del PCE subió a 3,6% anual (núcleo 3,1%) con el PIB creciendo 3,4%: el mercado da cerca de 80% a una suba en diciembre. La tasa a 10 años terminó en 4,93%, un poco abajo de la semana anterior, y el S&P perdió 0,56%."
+  }
+ ],
+ "mercados": [
+  { "ticker": "GGAL", "nombre": "Galicia ADR", "cierre": 32.30, "var": -14.80 },
+  { "ticker": "ARGT", "nombre": "ETF Argentina", "cierre": 79.18, "var": -9.07 },
+  { "ticker": "EWZ", "nombre": "ETF Brasil", "cierre": 32.46, "var": -23.79 },
+  { "ticker": "SPY", "nombre": "S&P 500", "cierre": 755.72, "var": -0.56 },
+  { "ticker": "DXY", "nombre": "Índice dólar", "cierre": 101.963, "var": 0.21 },
+  { "ticker": "US10Y", "nombre": "Tasa 10 años EE.UU.", "cierre": 4.933, "var": -1.32 }
+ ],
+ "mercados_nota": "GGAL −14,80% contra ARGT −9,07%: 5,7 pp peor que el bloque, después de una semana con 6,3 pp a favor. El golpe vino de Brasil (EWZ −23,79%), pero solo el lunes y el jueves GGAL se movió parecido a ARGT; el martes (−0,59% contra +0,21%), el miércoles (−3,70% contra −0,74%) y el viernes (−4,24% contra −2,82%) cayó sola o más que el resto.",
+ "noticias": [
+  {
+   "bloque": "Grupo Galicia",
+   "titulo": "El BCRA dice que la mora de las familias bajó en septiembre: de 12,81% a 12,2%",
+   "detalle": "En el informe de política monetaria, el BCRA anticipó que la irregularidad de los préstamos a familias bajó de 12,81% en agosto a 12,2% en septiembre, y la del total de los bancos de 7,75% a 7,5%. El IPOM dice que 'el descenso reciente de la mora favorece el ciclo de crédito bancario'; es la baja más grande desde el récord de 12,9% de julio.",
+   "impacto": "positivo",
+   "magnitud": "medio",
+   "explicacion": "La mora es la parte de los préstamos que no se está pagando a tiempo. Galicia y su tarjeta Naranja X tienen mucho crédito a familias, así que cada punto menos de mora es menos plata que tienen que reservar para cubrir deudas incobrables y más ganancia.",
+   "fuente": "Bloomberg Línea",
+   "url": "https://www.bloomberglinea.com/latinoamerica/argentina/la-mora-de-los-bancos-argentinos-cayo-en-septiembre-dice-el-bcra-en-el-ipom/",
+   "fecha": "29-oct"
+  },
+  {
+   "bloque": "Grupo Galicia",
+   "titulo": "El vicepresidente del BCRA presentó que el ciclo de la mora 'finaliza' y el crédito repunta",
+   "detalle": "Vladimir Werning habló el lunes 26 en la Universidad Di Tella con el título 'El ciclo de crédito (repunta) y de la mora (finaliza)'. Es la postura oficial de que la mora ya tocó su pico; Kon, el CEO de Galicia, había dicho en septiembre que la baja iba a ser lenta.",
+   "impacto": "neutro",
+   "magnitud": "bajo",
+   "explicacion": "El Banco Central regula a los bancos y es el que publica la mora de todo el sistema. Que diga que el problema terminó es una señal para los inversores, pero el mercado espera los datos: el lunes en que habló, las acciones de los bancos fueron las que más cayeron.",
+   "fuente": "BCRA",
+   "url": "https://www.bcra.gob.ar/noticias/presentacion-del-vicepresidente-del-bcra-en-la-universidad-torcuato-di-tella-2/",
+   "fecha": "27-oct"
+  },
+  {
+   "bloque": "Argentina",
+   "titulo": "Con el triunfo de Lula el riesgo país saltó 58 puntos, a 765, y Galicia cayó 4,79% en Buenos Aires",
+   "detalle": "El lunes 26 el riesgo país pasó de 707 a 765, el Merval cayó 2,98% y Galicia bajó de $6.260 a $5.960 en la bolsa porteña. El real cerró con una devaluación de 9,2%. En el feed, GGAL cerró ese día −6,75% en Nueva York.",
+   "impacto": "negativo",
+   "magnitud": "alto",
+   "explicacion": "Brasil es el principal socio comercial de Argentina, y cuando sus activos se derrumban los fondos venden toda la región. El riesgo país es la tasa extra que se le pide a Argentina para prestarle: si sube, caen los bonos, y los bancos tienen muchos en su cartera.",
+   "fuente": "Rankia",
+   "url": "https://www.rankia.com.ar/noticias/bolsa/7527560-riesgo-pais-hoy-salta-765-puntos-merval-cae-casi-3-triunfo-lula",
+   "fecha": "27-oct"
+  },
+  {
+   "bloque": "Argentina",
+   "titulo": "El riesgo país cerró octubre en 790 puntos, el máximo de 2026",
+   "detalle": "El viernes 30 subió 49 puntos (6,6%) y cerró en 790, con una suba de 30,1% en el mes; los bonos cayeron hasta 1,6% y el Merval 2,9% en el día (−7,3% en octubre). El dólar mayorista cerró en $1.534. Fue el día en que GGAL perdió 33.01 y marcó el mínimo del año.",
+   "impacto": "negativo",
+   "magnitud": "alto",
+   "explicacion": "790 quiere decir que Argentina paga 7,9 puntos de tasa más que EE.UU. para endeudarse. En julio estaba en 402: casi se duplicó en tres meses, y eso aleja la posibilidad de que el país salga a emitir deuda para pagar los vencimientos de 2027.",
+   "fuente": "Forbes Argentina",
+   "url": "https://www.forbesargentina.com/money/el-riesgo-pais-despide-octubre-nivel-mas-alto-ano-n101465",
+   "fecha": "30-oct"
+  },
+  {
+   "bloque": "Argentina",
+   "titulo": "Las acciones argentinas pierden hasta 42% en dólares en el año; Galicia −37,2%",
+   "detalle": "Quince de los dieciocho ADRs argentinos pierden en el año, con Galicia −37,2% y −9,4% en el mes al 29-oct. Del otro lado, el BCRA ya compró USD 15.800 M en 2026 y la inflación de octubre rondaría 1,8%-1,9% mensual.",
+   "impacto": "neutro",
+   "magnitud": "medio",
+   "explicacion": "Es la foto del año: la economía muestra datos buenos (el Banco Central junta dólares, la inflación baja), pero los inversores de afuera venden por el riesgo político de 2027 y por las tasas altas en EE.UU.",
+   "fuente": "El Economista",
+   "url": "https://eleconomista.com.ar/finanzas/para-olvido-acciones-argentinas-desploman-42-dolares-ano-n99317",
+   "fecha": "29-oct"
+  },
+  {
+   "bloque": "EE.UU. y global",
+   "titulo": "La Fed mantuvo la tasa en 3,75–4,00%, pero dos miembros votaron por subirla",
+   "detalle": "Primera decisión de Kevin Warsh como presidente: 10 votos a 2, con Lisa Cook y Beth Hammack a favor de subir 0,25. Warsh no dio pistas sobre diciembre y el mercado sigue descontando una suba el 9-dic; la tasa a 10 años subió a 5,05% ese día.",
+   "impacto": "negativo",
+   "magnitud": "alto",
+   "explicacion": "La tasa de la Fed es la base del costo del dinero en el mundo. Si sube, la plata se queda en EE.UU. cobrando más sin riesgo y sale de países como Argentina, lo que les pega a los bonos y a las acciones de los bancos.",
+   "fuente": "Admiral Markets",
+   "url": "https://admiralmarkets.com/es/analytics/traders-blog/conferencia-de-prensa-de-warsh-octubre-2026",
+   "fecha": "28-oct"
+  },
+  {
+   "bloque": "EE.UU. y global",
+   "titulo": "La inflación de EE.UU. subió a 3,6% en septiembre y el PIB creció 3,4%",
+   "detalle": "El PCE, la inflación que mira la Fed, subió 0,5% en el mes y 3,6% anual; el núcleo (sin alimentos ni energía), 0,3% y 3,1%. Con la economía creciendo 3,4%, el mercado puso en 79,6% la probabilidad de una suba de la Fed en diciembre.",
+   "impacto": "negativo",
+   "magnitud": "medio",
+   "explicacion": "Inflación alta con la economía fuerte le da a la Fed motivos para subir la tasa. Para Argentina eso es dinero más caro afuera y menos apetito por riesgo emergente.",
+   "fuente": "Fox Business",
+   "url": "https://www.foxbusiness.com/economy/september-2026-pce-inflation",
+   "fecha": "29-oct"
+  },
+  {
+   "bloque": "Brasil",
+   "titulo": "Lula ganó el balotaje y el ETF de Brasil llegó a caer más de 20% en un día",
+   "detalle": "Con Lula reelecto (51,79%) contra Flávio Bolsonaro, el real se devaluó 10,4% (de R$4,98 a R$5,50) y el EWZ llegó a perder más de 20% el lunes 26. En el feed cerró ese día −19,8% y la semana −23,8%; arrastró a los ADRs argentinos.",
+   "impacto": "negativo",
+   "magnitud": "alto",
+   "explicacion": "El mercado esperaba un cambio de gobierno en Brasil y no se dio. Brasil es el mayor socio comercial de Argentina y el mayor mercado de la región: cuando se derrumba, los fondos que invierten en América Latina venden todo, Galicia incluida.",
+   "fuente": "Forbes Argentina",
+   "url": "https://www.forbesargentina.com/money/efecto-contagio-acciones-argentinas-cayeron-10-wall-street-subio-dolar-tambien-riesgo-pais-n101114",
+   "fecha": "26-oct"
+  }
+ ],
+ "tecnico": {
+  "tendencia": "bajista",
+  "tendencia_texto": "desde junio: de 58.14 (17-jun) a 32.02 (30-oct), con máximos y mínimos cada vez más bajos",
+  "frase": "Cerró en 32.30, debajo de la resistencia de 33.01 y apoyada arriba del soporte de 31.74, sobre los mínimos de octubre de 2025.",
+  "techo": {
+   "nivel": 33.01,
+   "si": "Dos cierres seguidos arriba de 33.01 dejarían la caída del viernes como una perforación de un día."
+  },
+  "piso": {
+   "nivel": 31.74,
+   "si": "Un cierre debajo de 31.74 abre el camino a 31.14, el fondo de octubre de 2025."
+  },
+  "texto": "Tendencia bajista desde 58.14 (17-jun), con máximos y mínimos decrecientes: último máximo de swing confirmado 38.84 (6-oct); máximos diarios de la semana escalonados para abajo (36.33 el 27, 35.185 el 28, 34.53 el 29 y 33.42 el 30). Se rompió en cierre: el lunes 37.20 y 36.56 (con gap regional), el martes 35.21 (35.14, por 0.07, salida del rango 35.21–36.56 del 14 al 22-oct), el miércoles 34.57, y el viernes 33.66 y 33.01 en la misma rueda, con volumen de 135% de la media. Se respetó: 33.66 aguantó dos cierres (miércoles y jueves) con perforaciones intradía a 33.39 y 33.08, y los soportes perdidos frenaron los rebotes casi al centavo (35.185 contra 35.21 el miércoles, 34.53 contra 34.57 el jueves). Mínimo del año: 32.02 (30-oct), sin confirmar. RSI 30.4: precio y RSI hacen mínimos más bajos juntos, sin divergencia en el tramo. Mapa del cierre del 30-oct; distancias contra 32.30.",
+  "niveles": [
+   { "tipo": "R2", "nivel": 34.57, "que": "Resistencia: mínimo de swing del 19-oct y máximos del 9 y 10-oct-2025; frenó el rebote del 29-oct en 34.53. +7,0%" },
+   { "tipo": "R1", "nivel": 33.66, "que": "Resistencia: mínimo del 26-oct; aguantó dos cierres y se perdió el 30-oct. +4,2%" },
+   { "tipo": "PIVOTE", "nivel": 33.01, "que": "Resistencia: mínimo del 23-oct-2025 y cierre del 22-oct-2025; perdido en cierre el 30-oct. +2,2%" },
+   { "tipo": "S1", "nivel": 31.74, "que": "Soporte: mínimos del 15, 20 y 21-oct-2025 (31.69, 31.74 y 31.84). −1,7%" },
+   { "tipo": "S2", "nivel": 31.14, "que": "Soporte: mínimo de swing del 22-oct-2025, fondo de la base de octubre de 2025. −3,6%" },
+   { "tipo": "S3", "nivel": 29.22, "que": "Soporte: mínimo de swing del 8-sep-2025 y toques del 12, 15 y 29-sep-2025. −9,5%" }
+  ]
+ },
+ "agenda": [
+  { "dia": "Lun 2", "evento": "Índice manufacturero ISM (EE.UU.)", "por_que": "Primer dato de actividad de noviembre. Con la Fed mirando si sube en diciembre, un dato fuerte empuja la tasa a 10 años para arriba." },
+  { "dia": "Mar 3", "evento": "Elecciones legislativas de medio término en EE.UU. · encuesta de empleos vacantes (JOLTS)", "por_que": "Se renuevan la Cámara de Representantes y un tercio del Senado. El resultado puede mover el dólar y las tasas el miércoles; para Argentina importa por la tasa larga y el apetito por riesgo." },
+  { "dia": "Vie 6", "evento": "Informe de empleo de octubre (EE.UU.)", "por_que": "El de septiembre dio apenas 29 mil puestos. Un número fuerte refuerza la suba de la Fed en diciembre; uno flojo le saca presión. La próxima licitación del Tesoro argentino tiene llamado el lunes 9 y se hace el miércoles 11-nov." }
+ ],
+ "escenarios": [
+  {
+   "nombre": "Baja en curso",
+   "sesgo": "bajista",
+   "gatillo": "1 cierre < 31.74 · < 31.14 abre 29.22",
+   "lectura": "Ya activado el viernes con el cierre debajo de 33.66 y de 33.01, a favor de la tendencia. El próximo soporte es 31.74 y después 31.14, el fondo de octubre de 2025; un cierre debajo de 31.14 deja como siguiente 29.22. El mínimo del viernes, 32.02, es el nivel más probable de trampa: perforarlo en el día y volver no cuenta."
+  },
+  {
+   "nombre": "Rotura fallida",
+   "sesgo": "alcista",
+   "gatillo": "2 cierres seguidos > 33.01",
+   "lectura": "Va contra la tendencia, así que pide dos cierres; con uno solo es un rebote sin confirmar. Dejaría lo del viernes como una perforación de un día, y recién un cierre arriba de 33.66 devuelve al precio a la pausa del 28 y 29-oct."
+  },
+  {
+   "nombre": "Pausa en la base vieja",
+   "sesgo": "rango",
+   "gatillo": "cierres entre 31.74 y 33.01",
+   "lectura": "El precio frena sobre los mínimos de octubre de 2025 sin recuperar lo perdido. No cambia la tendencia: es una pausa con el RSI cerca de la sobreventa."
+  }
+ ],
+ "panorama": {
+  "donde": "GGAL cerró la semana en 32.30, −14,8%, el cierre más bajo del año, con mínimo en 32.02. Quedó entre el soporte de 31.74 y la resistencia de 33.01, que perdió el viernes. Está 10% debajo de su promedio de 20 días.",
+  "factores": [
+   {
+    "factor": "Brasil",
+    "dato": "EWZ −23,8%",
+    "efecto": "negativo",
+    "explica": "Lula ganó contra lo que esperaba el mercado y los activos de Brasil se derrumbaron el lunes. Es el mayor socio de Argentina y los fondos que venden Brasil venden también la región: GGAL abrió 5,5% abajo."
+   },
+   {
+    "factor": "Riesgo país",
+    "dato": "707 → 790",
+    "efecto": "negativo",
+    "explica": "Es la tasa extra que el mercado le pide a Argentina para prestarle. Subió 83 puntos en la semana, al máximo del año. Los bancos tienen muchos bonos del Tesoro: cuando los bonos caen, les pega directo."
+   },
+   {
+    "factor": "La Fed",
+    "dato": "3,75–4,00%, 2 votos por subir",
+    "efecto": "negativo",
+    "explica": "La Fed no tocó la tasa pero dos miembros querían subirla, y la inflación de septiembre subió a 3,6%. Si en diciembre sube, la plata tiene más motivos para quedarse en EE.UU. y no venir a emergentes."
+   },
+   {
+    "factor": "Mora de las familias",
+    "dato": "12,81% → 12,2%",
+    "efecto": "positivo",
+    "explica": "Es el porcentaje de préstamos a familias que no se pagan a tiempo. El BCRA dice que bajó en septiembre por primera vez con claridad. Es la mejor noticia propia de Galicia, pero esta semana pesó menos que lo de afuera."
+   },
+   {
+    "factor": "GGAL contra el bloque",
+    "dato": "−5,7 pp vs ARGT",
+    "efecto": "negativo",
+    "explica": "Galicia cayó más que el ETF de Argentina: después del lunes, siguió bajando sola el martes y el miércoles. Que un papel caiga más que su grupo indica que hay venta propia, no solo arrastre."
+   }
+  ],
+  "mirar": [
+   {
+    "que": "Si cierra debajo de 31.74",
+    "por_que": "Es a favor de la tendencia, así que alcanza con un cierre. El próximo soporte es 31.14, el fondo de octubre de 2025, y debajo, 29.22."
+   },
+   {
+    "que": "Si cierra dos días seguidos arriba de 33.01",
+    "por_que": "Dejaría la caída del viernes como una trampa de un día. Con un solo cierre arriba es un rebote sin confirmar; recién arriba de 33.66 vuelve a donde estaba el miércoles y el jueves."
+   },
+   {
+    "que": "El riesgo país y Brasil",
+    "por_que": "El riesgo país cerró en 790 y subió 49 puntos solo el viernes. Si sigue subiendo, los bancos siguen bajo presión; si Brasil se estabiliza, le saca peso a la región."
+   },
+   {
+    "que": "Las elecciones en EE.UU. el martes 3 y el empleo el viernes 6",
+    "por_que": "Pueden mover la tasa a 10 años, que está en 4,93%. Un empleo fuerte refuerza la suba de la Fed en diciembre, que es lo que más le pesa a un banco emergente."
+   }
+  ],
+  "glosario": [
+   { "termino": "Soporte", "que": "Precio donde la caída se viene frenando, porque aparecen compradores." },
+   { "termino": "Resistencia", "que": "Precio donde la suba se viene frenando, porque aparecen vendedores. Un soporte que se pierde suele pasar a ser resistencia." },
+   { "termino": "Cierre", "que": "El último precio del día. Las señales se cuentan por cierre: tocar un nivel durante el día no alcanza." },
+   { "termino": "Riesgo país", "que": "Cuánto más que EE.UU. paga Argentina por endeudarse, en centésimas de punto (790 = 7,9% de tasa extra)." },
+   { "termino": "RSI", "que": "Indicador de 0 a 100 que mide la fuerza de las subas contra las bajas recientes; debajo de 30 se dice que la acción está sobrevendida." }
+  ]
+ },
+ "notas": "Precios del feed de TradingView (velas diarias; NASDAQ:GGAL resuelve a BATS:GGAL y AMEX:EWZ a BATS:EWZ). Los símbolos se cambiaron con activeChart().setSymbol() por ui_evaluate, verificando símbolo y resolución en cada uno (chart_set_symbol se colgó 30 minutos el 30-oct). Cierre del viernes 30 confirmado en 32.30 (volumen 1.467.387); el 29-oct oficial es 33.73, no 33.74. EMA20 (35.98) y RSI14 (30.41) del estudio de cierre del 30-oct, que los calculó sobre los cierres del feed. Volumen de la semana: 7,07 M contra un promedio de 5,14 M de las cuatro anteriores. DXY y US10Y: la barra de cada sesión viene fechada el día anterior; se tomó la del viernes 30. Informes de la semana: cierres del 26, 27, 28, 29 y 30-oct y auditoría del 30-oct; sin aperturas ni mediodías. El mapa es el del cierre del 30-oct. La directriz bajista que mencionaba ese cierre no se usa: la auditoría del 30-oct mostró que su ancla (40.63 el 21-sep) no existe en las barras del feed. Noticias de Grupo Galicia: busqué declaraciones de Kon (en español y con filtro de medios locales: las últimas que aparecen son de septiembre, sobre la mora), mora de Galicia, de Naranja X y del sistema, dividendo (en español y en inglés: no encontré aviso de pago para octubre ni noviembre después de la tercera cuota del tercer trimestre), cambios de precio objetivo (el último es el de UBS, de USD 60 a 45, del 12-oct) y normas del BCRA para bancos (encajes: nada nuevo de la semana). Fecha de balance del tercer trimestre sin confirmar: el informe del 30-oct decía 3-nov (indicador del chart), Bloomberg Línea y Forbes dan como fecha estimada el 13-nov y los calendarios de la web el 24 o 25-nov; no va en la agenda. La presentación de Werning (PDF del BCRA) no se pudo leer como texto; se cita la página de la noticia. El Brent no se cargó: no encontré un cierre del 30-oct publicado. La mora de septiembre (12,2% familias, 7,5% total) coincide en Infobae del 29-oct, que la atribuye a la consultora 1816. Licitaciones (`licitaciones_tesoro.py`): ninguna en la semana del 2 al 6-nov; la próxima, llamado el 9, licitación el 11 y liquidación el 13-nov. Agenda de EE.UU.: ISM y JOLTS de calendarios de la web (financecalendar), empleo del 6-nov de varios calendarios con el cronograma del BLS.",
+ "velas_fuente": "Velas diarias del ADR (apertura, máximo, mínimo, cierre, volumen) del feed de TradingView, 10-jun al 30-oct-2026. El promedio de 20 días, el RSI14 y el volumen relativo se calculan en la página.",
+ "velas": [["2026-06-10",49.6,50.65,48.93,49.62,961675],["2026-06-11",51.1,55.7,51.08,55.41,4237614],["2026-06-12",55.49,56.25,54.56,55.16,1264690],["2026-06-15",55.8,56.6,55.52,55.96,1230513],["2026-06-16",55.96,56.2,54.12,54.44,991594],["2026-06-17",54.44,58.14,54.4,55.55,1684432],["2026-06-18",56.82,57.94,56.09,56.37,1334564],["2026-06-22",55.56,56.3,52.8,53.33,1698323],["2026-06-23",52,52.28,51.03,51.35,913668],["2026-06-24",50.74,50.8,48.89,49.1,1145024],["2026-06-25",49.86,50.23,48.75,49.42,511265],["2026-06-26",48.78,50.8,48.78,49.97,648105],["2026-06-29",50.87,51.87,49.94,50.9,1096369],["2026-06-30",50.62,51.88,49.52,50.03,688538],["2026-07-01",49.85,50.81,47.84,49.05,910729],["2026-07-02",49.92,50.72,49.23,50.37,810422],["2026-07-06",50.81,53.5,50.41,53.02,1365405],["2026-07-07",52.53,53.64,50.92,51.1,572775],["2026-07-08",50.13,51.46,49.99,50.25,1485647],["2026-07-09",50.38,50.48,48.67,49.39,617481],["2026-07-10",50.36,53.86,49.96,53.73,1808483],["2026-07-13",53.82,54.04,51.41,51.41,747095],["2026-07-14",52.66,53.1,50.65,50.8,1164074],["2026-07-15",50.83,53.19,50.79,52.67,1614688],["2026-07-16",52.23,52.27,49.76,50.18,1234816],["2026-07-17",49.42,50.01,48.45,49.94,1119567],["2026-07-20",49.58,50.46,48.97,49.95,667537],["2026-07-21",50.5,51.63,50.18,50.94,774507],["2026-07-22",51.92,53.34,51.67,53.24,1688772],["2026-07-23",52.66,52.8,50.11,50.15,756127],["2026-07-24",50.17,51.48,49.04,49.3,774887],["2026-07-27",49.72,50.48,49.43,50,328996],["2026-07-28",49.33,49.66,47.9,49.19,953983],["2026-07-29",48.59,50.25,48.19,49.15,665409],["2026-07-30",49.04,51.69,48.64,51.61,750311],["2026-07-31",52,52.24,49.72,49.77,642211],["2026-08-03",50.23,50.79,49.85,50.51,510500],["2026-08-04",51.02,51.02,48.7,48.92,757473],["2026-08-05",48.72,49.75,48.18,48.36,660357],["2026-08-06",48.08,48.54,46.6,46.73,695934],["2026-08-07",47.26,47.52,45.58,46.18,714738],["2026-08-10",46.18,46.59,45.53,46.42,573602],["2026-08-11",46.9,47.75,43.87,44.53,1263445],["2026-08-12",44.41,44.83,43.6,44.22,765889],["2026-08-13",44.18,45.31,43.53,44.99,800023],["2026-08-14",45.15,45.21,43.37,43.37,596551],["2026-08-17",43.72,43.99,43,43.42,505215],["2026-08-18",43,43.32,41.8,42.12,920226],["2026-08-19",42,42.82,40.89,41.47,885805],["2026-08-20",42.59,42.59,40.6,41,1895423],["2026-08-21",41.18,42.44,41.13,41.45,1758005],["2026-08-24",41.12,44,41.12,43.45,1215477],["2026-08-25",43.66,44.28,42.5,44.2,796405],["2026-08-26",44.36,45.2,43.42,43.91,1005410],["2026-08-27",43.99,44.41,42.63,42.91,690253],["2026-08-28",43.04,43.34,41.69,42.24,787490],["2026-08-31",42.5,44.57,42.5,43.75,1095737],["2026-09-01",43.35,45.08,42.92,44.29,752689],["2026-09-02",44.28,45.14,43.98,45.01,793526],["2026-09-03",44.72,46.09,44.02,44.63,615791],["2026-09-04",44.56,44.95,43.82,44.36,481940],["2026-09-08",44.6,44.67,43.5,44.12,761880],["2026-09-09",43.99,44.79,43.08,44.49,425550],["2026-09-10",43.63,45.72,43.63,44.72,1017818],["2026-09-11",45,45.42,43.17,43.86,739390],["2026-09-14",43.48,43.87,42.65,42.96,773802],["2026-09-15",42.7,43.08,41.94,42.14,689556],["2026-09-16",42.19,42.86,41.58,42.27,364905],["2026-09-17",43,43.09,42.37,42.62,379014],["2026-09-18",42.2,42.43,41.5,41.76,524697],["2026-09-21",42.05,42.2,41.33,41.76,456205],["2026-09-22",41.54,41.92,40.28,41.25,929594],["2026-09-23",41.11,42.01,39.93,39.99,1022555],["2026-09-24",39.83,40.44,39.28,39.59,940052],["2026-09-25",40,40,38.74,38.74,605698],["2026-09-28",38.09,38.53,36.73,36.98,1079477],["2026-09-29",37.02,37.83,36.56,37.02,729993],["2026-09-30",37.15,38.04,36.69,37.24,850192],["2026-10-01",37,37.23,35.21,36.07,1697295],["2026-10-02",36.17,36.68,35.66,35.89,848794],["2026-10-05",37.2,38.62,37.2,38.25,1823913],["2026-10-06",38.5,38.84,38.05,38.18,1398868],["2026-10-07",37.62,37.65,36.77,37.05,941879],["2026-10-08",36.51,38.04,36.51,36.76,1111671],["2026-10-09",37.07,37.6,36.45,36.81,805732],["2026-10-12",36.82,37.15,36.57,36.78,376283],["2026-10-13",36.95,37.63,36.57,36.79,859347],["2026-10-14",36.24,36.63,35.46,35.55,701547],["2026-10-15",35.3,36.58,34.7,36.47,941303],["2026-10-16",36.61,36.68,35.55,36.02,584411],["2026-10-19",36.07,36.28,34.57,35.09,906898],["2026-10-20",34.92,36.45,34.92,35.46,1217207],["2026-10-21",35.8,36.83,35.67,36.82,1308571],["2026-10-22",36.2,36.43,35.35,36.12,1377610],["2026-10-23",35.7,38.06,35.64,37.91,996142],["2026-10-26",35.84,35.9,33.66,35.35,1981805],["2026-10-27",35.86,36.33,34.92,35.14,1154211],["2026-10-28",34.97,35.19,33.39,33.84,1185504],["2026-10-29",34.04,34.53,33.08,33.73,1281585],["2026-10-30",33.11,33.42,32.02,32.3,1467387]]
+}
