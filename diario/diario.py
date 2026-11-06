@@ -42,7 +42,10 @@ MULTIPLICADOR = {"GGAL": 100, "RFX20": 1, "DLR": 1000,
                  "CAUC": 8219,
                  # Petroleo WTI: 10 barriles por contrato (contractMultiplier del ref-data de A3, 23-oct-2026).
                  # Cotiza en dolares: su resultado sale en USD, no en pesos.
-                 "WTI": 10}
+                 "WTI": 10,
+                 # YPF: 100 acciones por contrato (contractMultiplier de rx_DUAL_YPFD_DIC26 en el ref-data de A3, 6-nov-2026).
+                 # Se anota como YPFD, el activo con que pnl.py busca el futuro.
+                 "YPFD": 100}
 # Contratos que cotizan en dolares: su resultado va aparte (en US$) y no se suma al del dia en pesos
 # (23-oct-2026, a pedido: "en dolares dejalo aparte").
 EN_DOLARES = {"WTI"}
