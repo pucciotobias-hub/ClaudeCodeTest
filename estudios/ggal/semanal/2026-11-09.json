@@ -1,0 +1,332 @@
+{
+ "semana": "2 al 6 de noviembre de 2026",
+ "generado": "2026-11-09 09:40 ART",
+ "titular": "GGAL −8,85%: el riesgo país saltó a 939 y cerró en 29.44, mínimo del año",
+ "ggal": {
+  "cierre": 29.44,
+  "var_semana": -8.85,
+  "cierre_previo": 32.3,
+  "maximo": 32.84,
+  "minimo": 29.31,
+  "ema20": 33.83,
+  "rsi": 23.4,
+  "volumen_rel": "109% del promedio de las 4 semanas anteriores"
+ },
+ "resumen": [
+  {
+   "tema": "La semana",
+   "dato": "−8,85%",
+   "tono": "negativo",
+   "grafico": "semana",
+   "titulo": "Cuarta rueda en baja de cinco, y 1,9 puntos peor que el ETF de Argentina",
+   "texto": "GGAL cerró la semana en 29.44, −8,85% (viernes anterior 32.30), contra −6,96% de ARGT, −1,48% del ETF de Brasil y −2,70% del S&P. Cierres: lunes 31.48, martes 31.48, miércoles 30.95, jueves 29.90 y viernes 29.44, el más bajo del año. Cayó sola el lunes, el miércoles y el viernes; el jueves, con todo el mercado, cayó menos que ARGT. En dos semanas: GGAL −22,3% y ARGT −15,4%. Volumen 109% del de las cuatro semanas anteriores."
+  },
+  {
+   "tema": "Técnico",
+   "dato": "29.22 – 30.42",
+   "tono": "negativo",
+   "titulo": "Perdió en cierre 31.74, 31.14 y 30.42, y el viernes quedó a 0.22 del soporte de 29.22",
+   "texto": "Cada soporte que se perdió en cierre fue a favor de la tendencia y la baja siguió: 31.74 el lunes, 31.14 el miércoles y 30.42 el jueves. Los rebotes del miércoles (máximo 32.60) y del viernes (31.03) se devolvieron enteros. El viernes hizo mínimo del año en 29.31, 0.09 arriba de 29.22, y cerró en 29.44. Está 13% debajo de la EMA20 (33.83) y con el RSI en 23.4, en sobreventa profunda."
+  },
+  {
+   "tema": "Empresa",
+   "dato": "−40% en el año",
+   "tono": "negativo",
+   "titulo": "Sin noticias propias: los bancos argentinos cayeron a mínimos del año por el riesgo país",
+   "texto": "Infobae contó el martes que Galicia acumula −40% en 2026 y que los bancos argentinos perdieron más de la mitad desde el pico de enero de 2025; Supervielle cayó cerca de 12% el jueves. De la empresa no hubo nada en la semana: ni declaraciones de Kon, ni dato nuevo de mora, ni cambios de recomendación, ni dividendo (el último pago fue la tercera cuota, el 10-sep). La fecha del balance del tercer trimestre sigue sin confirmar: Bloomberg estimaba el 13-nov y otros calendarios el 24 o 25-nov."
+  },
+  {
+   "tema": "Argentina",
+   "dato": "787 → 939",
+   "tono": "negativo",
+   "titulo": "El riesgo país subió 19% en la semana, al máximo desde octubre de 2025",
+   "texto": "El riesgo país subió todos los días: 805, 831, 852, el jueves 925 (+73 en un día) y el viernes 939. Los bonos en dólares perdieron cerca de 5% en la semana y el Merval 9% en dólares. El Banco Central casi no compró dólares (USD 9 M hasta el miércoles, contra USD 1.395 M en octubre), pagó USD 880 M al FMI y las reservas quedaron en USD 49.642 M; el dólar mayorista, quieto en $1.545, lejos del techo de la banda."
+  },
+  {
+   "tema": "Afuera",
+   "dato": "S&P −4,4% el jueves",
+   "tono": "negativo",
+   "titulo": "Los demócratas ganaron el Congreso y Wall Street tuvo su peor día desde abril de 2025",
+   "texto": "El martes los demócratas ganaron la Cámara y el Senado en las elecciones de medio término. El jueves el S&P cayó 4,36%, con las tecnológicas y los chips adelante (Nvidia −9%), y lo argentino cayó más. El viernes el empleo de octubre sumó 165 mil puestos contra 65 mil esperados, y la chance de que la Fed suba la tasa en diciembre pasó a 77%. La tasa a 10 años igual bajó en la semana, de 4,93% a 4,86%."
+  }
+ ],
+ "mercados": [
+  {
+   "ticker": "GGAL",
+   "nombre": "Galicia ADR",
+   "cierre": 29.44,
+   "var": -8.85
+  },
+  {
+   "ticker": "ARGT",
+   "nombre": "ETF Argentina",
+   "cierre": 73.67,
+   "var": -6.96
+  },
+  {
+   "ticker": "EWZ",
+   "nombre": "ETF Brasil",
+   "cierre": 31.98,
+   "var": -1.48
+  },
+  {
+   "ticker": "SPY",
+   "nombre": "S&P 500",
+   "cierre": 735.29,
+   "var": -2.7
+  },
+  {
+   "ticker": "DXY",
+   "nombre": "Índice dólar",
+   "cierre": 102.279,
+   "var": 0.31
+  },
+  {
+   "ticker": "US10Y",
+   "nombre": "Tasa 10 años EE.UU.",
+   "cierre": 4.859,
+   "var": -1.5
+  }
+ ],
+ "mercados_nota": "GGAL −8,85% contra ARGT −6,96%: 1,9 pp peor que el bloque, y −6,9 pp en dos semanas (−22,3% contra −15,4%). Cayó más que ARGT el lunes (−2,54% contra −1,28%), el miércoles (−1,68% contra +0,20%) y el viernes (−1,54% contra −0,46%); el jueves, el día del riesgo país en 925, cayó menos (−3,39% contra −5,66%). Lo argentino cayó mucho más que el resto: EWZ −1,48% y SPY −2,70%.",
+ "noticias": [
+  {
+   "bloque": "Grupo Galicia",
+   "titulo": "Por la suba del riesgo país, las acciones de los bancos cotizan en mínimos del año; Galicia pierde 40% en 2026",
+   "detalle": "Infobae contó el martes 3 que Galicia cayó 2,5% el lunes en Nueva York y acumula −40% en el año; Supervielle −46%, BBVA −37% y Macro −33%, y los bancos valen menos de la mitad que en el pico de enero de 2025. La nota calcula que el riesgo país implica una chance de reelección de Milei de 55%, contra más de 85% hace tres meses.",
+   "impacto": "negativo",
+   "magnitud": "medio",
+   "explicacion": "Los bancos son lo primero que venden los fondos cuando sube el riesgo de Argentina: tienen bonos del Tesoro en su cartera y su negocio depende de que la economía crezca. Por eso caen más que el resto cuando el mercado duda de las elecciones de 2027.",
+   "fuente": "Infobae",
+   "url": "https://www.infobae.com/economia/2026/11/03/por-la-suba-del-riesgo-pais-las-acciones-de-un-sector-clave-acumulan-caidas-de-hasta-46-y-cotizan-en-minimos-del-ano/",
+   "fecha": "3-nov"
+  },
+  {
+   "bloque": "Argentina",
+   "titulo": "El riesgo país pasó los 900 puntos y cerró la semana en 939, el máximo desde octubre de 2025",
+   "detalle": "Subió más de 150 puntos (19%) en la semana; los Bonares y Globales perdieron en promedio 5% y el Merval 9% en dólares, con Supervielle cerca de −12%. Infobae lo atribuye al giro de Wall Street después de las elecciones de EE.UU. y a un componente de riesgo político propio.",
+   "impacto": "negativo",
+   "magnitud": "alto",
+   "explicacion": "El riesgo país es cuánto más que EE.UU. paga Argentina para endeudarse: 939 son 9,39 puntos de tasa extra. En julio estaba en 402. Cuanto más alto, más lejos queda la posibilidad de refinanciar los vencimientos de 2027 en el mercado, y más pierden los bonos que tienen los bancos.",
+   "fuente": "Infobae",
+   "url": "https://www.infobae.com/economia/2026/11/07/el-riesgo-pais-paso-los-900-puntos-y-las-acciones-argentinas-se-hundieron-ante-un-incierto-contexto-externo/",
+   "fecha": "7-nov"
+  },
+  {
+   "bloque": "Argentina",
+   "titulo": "Jueves negro: el riesgo país saltó a 927 y el Merval cayó 4,8%",
+   "detalle": "El jueves 5 el riesgo país subió 80 puntos en el día y el Merval cayó 4,8%, con los bonos perdiendo hasta 3%. Los analistas consultados lo explican por la caída de Wall Street y por la 'prima electoral' mirando 2027. Fue el día en que GGAL perdió 30.42 en cierre (−3,39%).",
+   "impacto": "negativo",
+   "magnitud": "alto",
+   "explicacion": "Cuando Wall Street cae fuerte, los inversores venden primero lo más riesgoso, y Argentina está en esa lista. Un salto de 80 puntos en un día es de los más grandes del año: muestra que el mercado está nervioso con el país, no solo con el mundo.",
+   "fuente": "El Economista",
+   "url": "https://eleconomista.com.ar/economia/riesgo-pais-imparable-rumbo-1000-puntos-n99504",
+   "fecha": "5-nov"
+  },
+  {
+   "bloque": "Argentina",
+   "titulo": "El Banco Central casi no compró dólares en noviembre: USD 9 M contra USD 1.395 M en octubre",
+   "detalle": "El miércoles 4 el BCRA compró USD 9 M después de dos ruedas sin comprar, y las reservas quedaron en USD 50.435 M. El viernes, después de pagar USD 880 M al FMI, quedaron en USD 49.642 M (Infobae). El dólar mayorista siguió quieto en $1.545, lejos del techo de la banda ($1.989 a fin de mes).",
+   "impacto": "neutro",
+   "magnitud": "medio",
+   "explicacion": "Las compras de dólares del Banco Central son lo que el mercado mira para saber si Argentina va a poder pagar su deuda de 2027. Que se frenen no es una alarma por sí sola (el dólar está tranquilo), pero en una semana de riesgo país en alza le saca un argumento a favor.",
+   "fuente": "Ámbito",
+   "url": "https://www.ambito.com/finanzas/el-bcra-volvio-comprar-una-pausa-dos-ruedas-y-las-reservas-se-recuperaron-gracias-al-oro-n6341633",
+   "fecha": "4-nov"
+  },
+  {
+   "bloque": "EE.UU. y global",
+   "titulo": "Wall Street tuvo su peor día desde abril de 2025: el S&P cayó 4,36%",
+   "detalle": "El jueves 5 el S&P 500 cayó 4,36% y el Nasdaq 5,52%, con los chips adelante (índice de semiconductores −12%, Nvidia −9%); el VIX subió casi 70%. El análisis lo vincula al temor de que el Congreso demócrata frene la inversión en centros de datos y a toma de ganancias de los fondos.",
+   "impacto": "negativo",
+   "magnitud": "alto",
+   "explicacion": "Cuando la bolsa de EE.UU. cae así, los fondos reducen riesgo en todo el mundo y venden primero los mercados chicos y volátiles como el argentino. Ese día ARGT cayó 5,7% y el riesgo país saltó 80 puntos.",
+   "fuente": "InvestingCube",
+   "url": "https://www.investingcube.com/indices/sp-500-forecast-index-drops-4-4-what-comes-next/",
+   "fecha": "6-nov"
+  },
+  {
+   "bloque": "EE.UU. y global",
+   "titulo": "Los demócratas ganaron la Cámara y el Senado en las elecciones de medio término",
+   "detalle": "En las elecciones del martes 3, los demócratas se aseguraron 228 bancas en la Cámara (218 hacen mayoría) y 54 en el Senado, con votos todavía por contar. Es el cambio de política que el mercado leyó el jueves como riesgo para las tecnológicas.",
+   "impacto": "negativo",
+   "magnitud": "medio",
+   "explicacion": "Con el Congreso en contra, Trump va a tener más difícil aprobar leyes de gasto e impuestos. Para Argentina importa por dos lados: por cómo reaccionan Wall Street y la tasa a 10 años, y porque el apoyo financiero del Tesoro de EE.UU. a Argentina de 2025 dependía de la Casa Blanca.",
+   "fuente": "El Economista",
+   "url": "https://eleconomista.com.ar/internacional/una-ola-azul-arrasa-trump-como-democratas-tomaron-control-capitolio-n99460",
+   "fecha": "4-nov"
+  },
+  {
+   "bloque": "EE.UU. y global",
+   "titulo": "El empleo de octubre sumó 165 mil puestos, contra 65 mil esperados, y crece la apuesta a una suba de la Fed",
+   "detalle": "El desempleo bajó a 4,1% y los salarios subieron 3,1% anual; agosto y septiembre se corrigieron para arriba en 84 mil puestos. La probabilidad de que la Fed suba la tasa 0,25 el 9 de diciembre pasó de 66,9% a 76,8%.",
+   "impacto": "negativo",
+   "magnitud": "alto",
+   "explicacion": "Un mercado laboral fuerte le da a la Fed motivos para subir la tasa y frenar la inflación. Si la tasa sube en EE.UU., la plata tiene más motivos para quedarse allá y no venir a países como Argentina, lo que les pega a los bonos y a los bancos.",
+   "fuente": "Fox Business",
+   "url": "https://www.foxbusiness.com/economy/us-jobs-report-october-2026.amp",
+   "fecha": "6-nov"
+  }
+ ],
+ "tecnico": {
+  "tendencia": "bajista",
+  "tendencia_texto": "desde junio: de 58.14 (17-jun) a 29.31 (6-nov), con máximos y mínimos cada vez más bajos",
+  "frase": "Cerró en 29.44, el precio más bajo del año, apoyada 0.22 arriba del soporte de 29.22 y debajo de la resistencia de 30.42, que perdió el jueves.",
+  "techo": {
+   "nivel": 30.42,
+   "si": "Dos cierres seguidos arriba de 30.42 serían el primer rebote confirmado desde octubre; con uno solo es un intento."
+  },
+  "piso": {
+   "nivel": 29.22,
+   "si": "Un cierre debajo de 29.22 deja como próximo soporte 27.37, 7% más abajo."
+  },
+  "texto": "Tendencia bajista desde 58.14 (17-jun), con máximos y mínimos decrecientes; último máximo de swing confirmado 38.84 (6-oct). Se rompió en cierre, siempre a favor de la tendencia y con un solo cierre: el lunes 31.74 (cierre 31.48), el miércoles 31.14 (30.95) y el jueves 30.42 (29.90). Cada rotura siguió de 3% a 5% en las ruedas siguientes. Se respetó: los soportes perdidos frenaron los rebotes al cierre (31.74 el martes y el miércoles, con máximos de 31.83 y 32.60; 30.42 el viernes, con máximo de 31.03), pero con perforaciones intradía de hasta 2,7%. 29.22 todavía no se tocó: el viernes el mínimo del año quedó en 29.31 (0.09 arriba). Mínimo del año sin confirmar. RSI 23.4 en sobreventa profunda; el cierre más bajo vino con el RSI más bajo, así que no hay divergencia de corto. Mapa del cierre del 6-nov; distancias contra 29.44.",
+  "niveles": [
+   {
+    "tipo": "R2",
+    "nivel": 31.14,
+    "que": "Resistencia: mínimo de swing del 22-oct-2025, perdido en cierre el 4-nov; el máximo del 6-nov frenó 0.11 debajo. +5,8%"
+   },
+   {
+    "tipo": "R1",
+    "nivel": 30.42,
+    "que": "Resistencia: mínimos del 10 y 25-sep-2025 y máximos del 15 y 29-sep-2025, cuatro toques; perdido en cierre el 5-nov y rechazó el rebote del 6-nov. +3,3%"
+   },
+   {
+    "tipo": "PIVOTE",
+    "nivel": 29.22,
+    "que": "Soporte: mínimo de swing del 8-sep-2025 y toques del 12, 15 y 29-sep-2025; el mínimo del 6-nov quedó 0.09 arriba. −0,7%"
+   },
+   {
+    "tipo": "S1",
+    "nivel": 27.37,
+    "que": "Soporte: mínimos del 30-sep, 3, 6 y 8-oct-2025 y cierre del 18-sep-2025, cuatro toques. −7,0%"
+   }
+  ]
+ },
+ "agenda": [
+  {
+   "dia": "Lun 9",
+   "evento": "Feriado nacional en Argentina (visita del papa León XIV) · llamado a licitación del Tesoro",
+   "por_que": "Sin bolsa en Buenos Aires; GGAL opera igual en Nueva York, con menos referencia local. Los feriados siguen el martes en CABA y Córdoba y el miércoles en la provincia de Buenos Aires."
+  },
+  {
+   "dia": "Mar 10",
+   "evento": "Inflación de octubre en EE.UU. (CPI), 10:30 ART",
+   "por_que": "Después del empleo fuerte, un CPI alto deja casi cerrada la suba de la Fed del 9 de diciembre y empuja la tasa a 10 años para arriba; uno bajo le saca presión."
+  },
+  {
+   "dia": "Mié 11",
+   "evento": "Licitación del Tesoro argentino",
+   "por_que": "Con el riesgo país en 939, mide a qué tasa y cuánto consigue refinanciar el Tesoro en pesos. Los bancos son los grandes compradores de esa deuda."
+  },
+  {
+   "dia": "Jue 12",
+   "evento": "Inflación de octubre en Argentina (INDEC)",
+   "por_que": "El REM del Banco Central esperaba 1,7%. Un dato bajo sostiene la idea de que las tasas en pesos pueden bajar, lo que ayuda al crédito y a la mora de los bancos."
+  },
+  {
+   "dia": "Vie 13",
+   "evento": "Liquidación de la licitación · posible balance de Galicia (sin confirmar)",
+   "por_que": "Bloomberg estimaba el 13-nov para el balance del tercer trimestre de Galicia y Macro; otros calendarios dicen 24 o 25-nov. Si sale, la mora y la ganancia del trimestre pueden mover el precio fuerte."
+  }
+ ],
+ "escenarios": [
+  {
+   "nombre": "Baja en curso",
+   "sesgo": "bajista",
+   "gatillo": "1 cierre < 29.22 · abre 27.37",
+   "lectura": "A favor de la tendencia, alcanza con un cierre: en dos semanas, las seis roturas de un solo cierre siguieron de 3% a 5%. El próximo soporte es 27.37, 7% abajo. El mínimo del viernes, 29.31, es la trampa más probable: perforarlo en el día y volver no cuenta."
+  },
+  {
+   "nombre": "Rango sobre 29.22",
+   "sesgo": "rango",
+   "gatillo": "cierres entre 29.22 y 30.42",
+   "lectura": "Lo que pasó el viernes: el precio frena sobre el soporte de septiembre de 2025 sin recuperar 30.42. No cambia la tendencia; es una pausa con el RSI en sobreventa profunda (23.4)."
+  },
+  {
+   "nombre": "Rebote",
+   "sesgo": "alcista",
+   "gatillo": "2 cierres seguidos > 30.42",
+   "lectura": "Va contra la tendencia, así que pide dos cierres; con uno es un rebote sin confirmar. Los dos intentos de la semana (32.60 el miércoles y 31.03 el viernes) se devolvieron en el día. Para algo más, dos cierres arriba de 31.14."
+  }
+ ],
+ "panorama": {
+  "donde": "GGAL cerró la semana en 29.44, −8,85%, el cierre más bajo del año, con mínimo en 29.31. Quedó entre el soporte de 29.22, 0.22 abajo, y la resistencia de 30.42, que perdió el jueves. Está 13% debajo de su promedio de 20 días y con el RSI en 23.4, muy sobrevendida.",
+  "factores": [
+   {
+    "factor": "Riesgo país",
+    "dato": "787 → 939",
+    "efecto": "negativo",
+    "explica": "Es la tasa extra que el mercado le pide a Argentina para prestarle. Subió 19% en la semana y en julio estaba en 402. Los bancos tienen muchos bonos del Tesoro: cuando los bonos caen, les pega directo, y además el mercado lee el riesgo país como la duda sobre 2027."
+   },
+   {
+    "factor": "Wall Street",
+    "dato": "S&P −4,4% el jueves",
+    "efecto": "negativo",
+    "explica": "La bolsa de EE.UU. tuvo su peor día en un año y medio después de que los demócratas ganaran el Congreso. Cuando los fondos reducen riesgo, venden primero lo más volátil, y Argentina está en esa lista: ese día ARGT cayó 5,7%."
+   },
+   {
+    "factor": "La Fed",
+    "dato": "77% de chance de suba",
+    "efecto": "negativo",
+    "explica": "El empleo de octubre salió mucho más fuerte de lo esperado y el mercado da como probable que la Fed suba la tasa el 9 de diciembre. Si la tasa sube en EE.UU., hay menos plata dispuesta a venir a emergentes."
+   },
+   {
+    "factor": "GGAL contra el bloque",
+    "dato": "−1,9 pp vs ARGT",
+    "efecto": "negativo",
+    "explica": "Galicia cayó más que el ETF de Argentina por segunda semana: −6,9 puntos en dos semanas. Que un papel caiga más que su grupo indica venta propia, no solo arrastre; los bancos son lo que más castiga el mercado cuando sube el riesgo país."
+   },
+   {
+    "factor": "Tasa a 10 años",
+    "dato": "4,93% → 4,86%",
+    "efecto": "positivo",
+    "explica": "Es la tasa de los bonos largos de EE.UU., la referencia para todos los préstamos del mundo. Bajó un poco en la semana a pesar del empleo fuerte, porque los inversores buscaron refugio en esos bonos. Es lo único de afuera que no jugó en contra."
+   }
+  ],
+  "mirar": [
+   {
+    "que": "Si cierra debajo de 29.22",
+    "por_que": "Es a favor de la tendencia, así que alcanza con un cierre. El próximo soporte es 27.37, 7% más abajo. El mínimo del viernes, 29.31, puede perforarse en el día sin que cuente."
+   },
+   {
+    "que": "Si cierra dos días seguidos arriba de 30.42",
+    "por_que": "Sería el primer rebote confirmado desde octubre. Con un solo cierre arriba es un intento; esta semana hubo dos y los dos se devolvieron en el día."
+   },
+   {
+    "que": "El riesgo país, arriba de 900",
+    "por_que": "Si sigue subiendo, los bancos siguen bajo presión. La licitación del Tesoro del miércoles 11 muestra a qué tasa consigue plata el Estado con este riesgo país."
+   },
+   {
+    "que": "La inflación: EE.UU. el martes y Argentina el jueves",
+    "por_que": "La de EE.UU. define si la Fed sube en diciembre; la argentina, si las tasas en pesos pueden bajar, que es lo que necesita el crédito de los bancos. Y puede salir el balance de Galicia (fecha sin confirmar)."
+   }
+  ],
+  "glosario": [
+   {
+    "termino": "Soporte",
+    "que": "Precio donde la caída se viene frenando, porque aparecen compradores."
+   },
+   {
+    "termino": "Resistencia",
+    "que": "Precio donde la suba se viene frenando, porque aparecen vendedores. Un soporte que se pierde suele pasar a ser resistencia, como 30.42 esta semana."
+   },
+   {
+    "termino": "Cierre",
+    "que": "El último precio del día. Las señales se cuentan por cierre: tocar un nivel durante el día no alcanza."
+   },
+   {
+    "termino": "Riesgo país",
+    "que": "Cuánto más que EE.UU. paga Argentina por endeudarse, en centésimas de punto (939 = 9,39% de tasa extra)."
+   },
+   {
+    "termino": "RSI",
+    "que": "Indicador de 0 a 100 que mide la fuerza de las subas contra las bajas recientes; debajo de 30 se dice que la acción está sobrevendida."
+   }
+  ]
+ },
+ "notas": "Precios del feed de TradingView (velas diarias; NASDAQ:GGAL resuelve a BATS:GGAL y AMEX:EWZ a BATS:EWZ). Los símbolos se cambiaron con activeChart().setSymbol() por ui_evaluate, verificando símbolo y resolución en cada uno. Al pasar a ARGT el feed se quedó pegado con las barras de GGAL: se recargó la página (volvió en NYSE:YPF a 45 min), se puso D y después cada símbolo, y desde ahí todo leyó bien. El chart quedó en GGAL diario. Cierre oficial del viernes 6: 29.44 (no 29.58 como decía el cierre de las 17:16, que leyó con NY abierta: desde el 2-nov NY cierra a las 18:00 ART), mínimo 29.31 (no 29.44), volumen 839.417. EMA20 (33.83) y RSI14 (23.41, Wilder) calculados sobre los 100 cierres diarios del feed; el RSI difiere en centésimas del de los informes, que usan más historia. Volumen de la semana: 6,12 M contra un promedio de 5,61 M de las cuatro anteriores. DXY y US10Y: la barra de cada sesión viene fechada el día anterior; se tomó la del viernes 6. Informes de la semana: cierres del 2 al 6-nov y auditoría del 6-nov; sin aperturas ni mediodías. El mapa es el del cierre del 6-nov, con distancias contra el cierre oficial. La directriz bajista no se usa (la auditoría del 6-nov repite que su ancla no existe en el feed). Noticias de Grupo Galicia: busqué declaraciones de Kon (en español, con filtro de medios locales: las últimas son de septiembre, sobre la mora), mora de Galicia, de Naranja X y del sistema (nada nuevo de la semana; el último dato del sistema es el de septiembre del IPOM), dividendo (en español y en inglés; según los 6-K, la tercera y última cuota se pagó el 10-sep y no hubo aviso para octubre ni noviembre), recomendaciones (en inglés y en español: la última es la de UBS del 12-oct, de USD 60 a 45) y normas del BCRA para bancos (encajes: nada nuevo). Fecha del balance del tercer trimestre sin confirmar: Bloomberg Línea (19-oct) estimaba el 13-nov; otros calendarios, el 24 o 25-nov. No va como noticia la crisis bancaria de Paraguay (Ueno Bank, resolución desde el 3-nov, Perfil del 5-nov): ninguna fuente la vincula con la caída argentina. La nota de MDZ del 5-nov que la mencionaba dio 403. El petróleo: Infobae da Brent −16% en la semana, El Economista lo daba en USD 98 el jueves; no lo cargué como noticia porque le pega a las energéticas, no a los bancos. Riesgo país diario de Rava (805, 831, 852, 925 y 939). Agenda: licitaciones de `licitaciones_tesoro.py` (llamado el 9, licitación el 11, liquidación el 13; el 9 es feriado, pero el cronograma marca el llamado ese día); feriados del Decreto 1103/2026 según Canal 26; CPI de EE.UU. del 10-nov según FXNX; IPC del INDEC del 12-nov según el calendario que publicó iProUP (lo vi en el buscador, no abrí la nota). Un resultado mencionaba un feriado bancario nacional el 10-nov (Comunicación A 8487) que no pude confirmar: no va en la agenda.",
+ "velas_fuente": "Velas diarias del ADR (apertura, máximo, mínimo, cierre, volumen) del feed de TradingView, 17-jun al 6-nov-2026. El promedio de 20 días, el RSI14 y el volumen relativo se calculan en la página.",
+ "velas": [["2026-06-17",54.44,58.14,54.4,55.55,1684432],["2026-06-18",56.82,57.94,56.09,56.37,1334564],["2026-06-22",55.56,56.3,52.8,53.33,1698323],["2026-06-23",52,52.28,51.03,51.35,913668],["2026-06-24",50.74,50.8,48.89,49.1,1145024],["2026-06-25",49.86,50.23,48.75,49.42,511265],["2026-06-26",48.78,50.8,48.78,49.97,648105],["2026-06-29",50.87,51.87,49.94,50.9,1096369],["2026-06-30",50.62,51.88,49.52,50.03,688538],["2026-07-01",49.85,50.81,47.84,49.05,910729],["2026-07-02",49.92,50.72,49.23,50.37,810422],["2026-07-06",50.81,53.5,50.41,53.02,1365405],["2026-07-07",52.53,53.64,50.92,51.1,572775],["2026-07-08",50.13,51.46,49.99,50.25,1485647],["2026-07-09",50.38,50.48,48.67,49.39,617481],["2026-07-10",50.36,53.86,49.96,53.73,1808483],["2026-07-13",53.82,54.04,51.41,51.41,747095],["2026-07-14",52.66,53.1,50.65,50.8,1164074],["2026-07-15",50.83,53.19,50.79,52.67,1614688],["2026-07-16",52.23,52.27,49.76,50.18,1234816],["2026-07-17",49.42,50.01,48.45,49.94,1119567],["2026-07-20",49.58,50.46,48.97,49.95,667537],["2026-07-21",50.5,51.63,50.18,50.94,774507],["2026-07-22",51.92,53.34,51.67,53.24,1688772],["2026-07-23",52.66,52.8,50.11,50.15,756127],["2026-07-24",50.17,51.48,49.04,49.3,774887],["2026-07-27",49.72,50.48,49.43,50,328996],["2026-07-28",49.33,49.66,47.9,49.19,953983],["2026-07-29",48.59,50.25,48.19,49.15,665409],["2026-07-30",49.04,51.69,48.64,51.61,750311],["2026-07-31",52,52.24,49.72,49.77,642211],["2026-08-03",50.23,50.79,49.85,50.51,510500],["2026-08-04",51.02,51.02,48.7,48.92,757473],["2026-08-05",48.72,49.75,48.18,48.36,660357],["2026-08-06",48.08,48.54,46.6,46.73,695934],["2026-08-07",47.26,47.52,45.58,46.18,714738],["2026-08-10",46.18,46.59,45.53,46.42,573602],["2026-08-11",46.9,47.75,43.87,44.53,1263445],["2026-08-12",44.41,44.83,43.6,44.22,765889],["2026-08-13",44.18,45.31,43.53,44.99,800023],["2026-08-14",45.15,45.21,43.37,43.37,596551],["2026-08-17",43.72,43.99,43,43.42,505215],["2026-08-18",43,43.32,41.8,42.12,920226],["2026-08-19",42,42.82,40.89,41.47,885805],["2026-08-20",42.59,42.59,40.6,41,1895423],["2026-08-21",41.18,42.44,41.13,41.45,1758005],["2026-08-24",41.12,44,41.12,43.45,1215477],["2026-08-25",43.66,44.28,42.5,44.2,796405],["2026-08-26",44.36,45.2,43.42,43.91,1005410],["2026-08-27",43.99,44.41,42.63,42.91,690253],["2026-08-28",43.04,43.34,41.69,42.24,787490],["2026-08-31",42.5,44.57,42.5,43.75,1095737],["2026-09-01",43.35,45.08,42.92,44.29,752689],["2026-09-02",44.28,45.14,43.98,45.01,793526],["2026-09-03",44.72,46.09,44.02,44.63,615791],["2026-09-04",44.56,44.95,43.82,44.36,481940],["2026-09-08",44.6,44.67,43.5,44.12,761880],["2026-09-09",43.99,44.79,43.08,44.49,425550],["2026-09-10",43.63,45.72,43.63,44.72,1017818],["2026-09-11",45,45.42,43.17,43.86,739390],["2026-09-14",43.48,43.87,42.65,42.96,773802],["2026-09-15",42.7,43.08,41.94,42.14,689556],["2026-09-16",42.19,42.86,41.58,42.27,364905],["2026-09-17",43,43.09,42.37,42.62,379014],["2026-09-18",42.2,42.43,41.5,41.76,524697],["2026-09-21",42.05,42.2,41.33,41.76,456205],["2026-09-22",41.54,41.92,40.28,41.25,929594],["2026-09-23",41.11,42.01,39.93,39.99,1022555],["2026-09-24",39.83,40.44,39.28,39.59,940052],["2026-09-25",40,40,38.74,38.74,605698],["2026-09-28",38.09,38.53,36.73,36.98,1079477],["2026-09-29",37.02,37.83,36.56,37.02,729993],["2026-09-30",37.15,38.04,36.69,37.24,850192],["2026-10-01",37,37.23,35.21,36.07,1697295],["2026-10-02",36.17,36.68,35.66,35.89,848794],["2026-10-05",37.2,38.62,37.2,38.25,1823913],["2026-10-06",38.5,38.84,38.05,38.18,1398868],["2026-10-07",37.62,37.65,36.77,37.05,941879],["2026-10-08",36.51,38.04,36.51,36.76,1111671],["2026-10-09",37.07,37.6,36.45,36.81,805732],["2026-10-12",36.82,37.15,36.57,36.78,376283],["2026-10-13",36.95,37.63,36.57,36.79,859347],["2026-10-14",36.24,36.63,35.46,35.55,701547],["2026-10-15",35.3,36.58,34.7,36.47,941303],["2026-10-16",36.61,36.68,35.55,36.02,584411],["2026-10-19",36.07,36.28,34.57,35.09,906898],["2026-10-20",34.92,36.45,34.92,35.46,1217207],["2026-10-21",35.8,36.83,35.67,36.82,1308571],["2026-10-22",36.2,36.43,35.35,36.12,1377610],["2026-10-23",35.7,38.06,35.64,37.91,996142],["2026-10-26",35.84,35.9,33.66,35.35,1981805],["2026-10-27",35.86,36.33,34.92,35.14,1154211],["2026-10-28",34.97,35.19,33.39,33.84,1185504],["2026-10-29",34.04,34.53,33.08,33.73,1281585],["2026-10-30",33.11,33.42,32.02,32.3,1467387],["2026-11-02",32.62,32.84,30.79,31.48,1139076],["2026-11-03",31.25,31.83,30.72,31.48,1054220],["2026-11-04",31.76,32.6,30.65,30.95,1417493],["2026-11-05",30.87,30.87,29.43,29.9,1668904],["2026-11-06",30.19,31.03,29.31,29.44,839417]]
+}
