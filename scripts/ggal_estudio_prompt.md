@@ -138,8 +138,9 @@ desplaza a uno de los dos. Se calcula con las barras (punto 4) y va solo al info
   - las del formato viejo, hasta el 2026-11-10, que se van la primera vez y no
     vuelven: texto que arranca con `R` o `S` seguida de un numero y un espacio
     (`R1 30.42 …`, `S1 27.37 …`), o con `PIVOTE`.
-  **Nunca** borres `RxXa1k` (32.61) ni `r6PZ7F` (29.39, rosa sin etiqueta), aunque
-  su texto parezca propio: las movio o las puso Tobias. Todo lo demas lo dibujo
+  **Nunca** borres `RxXa1k` (32.61, dice "R2 31.74…" pero la movio Tobias),
+  `r6PZ7F` (29.39, rosa sin etiqueta) ni `jNWmPy` (38.77, roja gruesa sin
+  etiqueta), aunque su texto parezca propio: las movio o las puso Tobias. Todo lo demas lo dibujo
   Tobias a mano y no se toca. Despues redibujar.
   **`draw_clear` esta bloqueado** en `.claude/settings.json` (desde el 2026-10-23, a
   pedido de Tobias): se llevaba tambien sus lineas editadas a mano.
@@ -155,10 +156,10 @@ desplaza a uno de los dos. Se calcula con las barras (punto 4) y va solo al info
 - **Que cuenta como nivel: tiene que haber hecho girar al precio, no solo estar
   ahi.** (Cambiado el 2026-11-11 a pedido de Tobias: "muchas veces dibuja lineas que
   no se respetan nunca". Con los criterios viejos, en las 5 ruedas siguientes a cada
-  cierre de oct-nov: los niveles de "2 o mas toques" sin reaccion medida se
-  rompieron en cierre 10 de 17 veces que se testearon; los swings con rebote
-  confirmado aguantaron 15 de 18; y el mapa entero marco menos giros que una grilla
-  pareja en 5 auditorias seguidas.) Todo se calcula en un `ui_evaluate` sobre
+  cierre de oct-nov, contando cada mapa diario: los niveles de "2 o mas toques" se
+  rompieron en cierre 10 de las 18 veces que el precio llego; los swings
+  confirmados aguantaron 15 de 18; y el mapa entero marco menos giros que una
+  grilla pareja en 5 auditorias seguidas.) Todo se calcula en un `ui_evaluate` sobre
   `mainSeries().bars()` en diario (hasta 300 velas), sin archivos:
   - **Reaccion**: una vela "toca" un nivel si su minimo (soporte) o maximo
     (resistencia) queda a 0,8% o menos del nivel. El toque tiene **reaccion** si
@@ -194,6 +195,59 @@ desplaza a uno de los dos. Se calcula con las barras (punto 4) y va solo al info
   velas), ese lado queda vacio y se dice: **mejor un lado vacio que una linea sin
   fundamento.**
 - A mas de 5% del precio, una sola linea por lado (el gatillo de fondo).
+- **La cuenta, siempre con esta funcion** (probada el 2026-11-11 contra los cierres
+  de oct-nov: de las veces que el precio llego a una linea, aguanto en cierre el 83%,
+  contra 67% con los criterios viejos; a cambio salen menos lineas). No la
+  reescribas ni la "mejores" en la corrida: si algo no cierra, anotalo en el informe.
+  `B` es el array de velas diarias `[tiempo, open, high, low, close]` armado con
+  `mainSeries().bars()`, como para la SMA200, con la ultima vela como la de hoy.
+  Precisiones: el 3% y el 5% se miden **desde el nivel**; un toque cuenta para los
+  dos lados (un ex soporte que rechazo desde abajo suma como resistencia); un toque
+  de las ultimas 5 velas todavia no puede tener reaccion y **no** cuenta como "sin
+  reaccion"; el precio del nivel es el minimo o maximo de la vela de swing.
+
+  ```js
+  function niveles(B) {
+    const T = B.length - 1, P = B[T][4], TQ = 0.008, RE = 0.03, FU = 0.05, V = 5, VF = 10, SEP = 0.015, REC = 20;
+    const reac = (L) => { const con = [], sin = [];
+      for (let j = 0; j <= T; j++) { const [, , h, l, c] = B[j]; let tipo = null;
+        if (Math.abs(l / L - 1) <= TQ && c >= L * (1 - TQ)) tipo = 's';
+        else if (Math.abs(h / L - 1) <= TQ && c <= L * (1 + TQ)) tipo = 'r';
+        if (!tipo) continue; let ok = false;
+        for (let k = j + 1; k <= Math.min(j + V, T); k++) { const ck = B[k][4];
+          if (tipo === 's') { if (ck < L * (1 - TQ)) break; if (ck >= L * (1 + RE)) { ok = true; break; } }
+          else { if (ck > L * (1 + TQ)) break; if (ck <= L * (1 - RE)) { ok = true; break; } } }
+        if (ok) { if (!con.length || j - con[con.length - 1] >= V) con.push(j); }
+        else if (j + V <= T) sin.push(j); }
+      return { con, sin }; };
+    const fuerte = (j, L, tipo) => { for (let k = j + 1; k <= Math.min(j + VF, T); k++) {
+        if (tipo === 's' && B[k][4] >= L * (1 + FU)) return true;
+        if (tipo === 'r' && B[k][4] <= L * (1 - FU)) return true; } return false; };
+    const cands = [];
+    for (let j = 3; j < T - 2; j++) { const v = B.slice(j - 3, j + 4);
+      const sw = [];
+      if (B[j][3] === Math.min(...v.map(x => x[3]))) sw.push([B[j][3], 's']);
+      if (B[j][2] === Math.max(...v.map(x => x[2]))) sw.push([B[j][2], 'r']);
+      for (const [L, tipo] of sw) { const { con, sin } = reac(L);
+        if (!(con.length >= 2 || fuerte(j, L, tipo))) continue;
+        const cl = B.slice(Math.max(0, T - REC + 1)).map(x => x[4]);
+        let cruces = 0; for (let i = 1; i < cl.length; i++) if ((cl[i - 1] - L) * (cl[i] - L) < 0) cruces++;
+        const gastado = sin.filter(x => x > T - REC).length >= 3 && !con.some(x => x > T - REC);
+        if (cruces >= 2 || gastado) continue;
+        cands.push({ L, ultima: Math.max(j, ...con), n: con.length, reac: con.map(i => B[i][0]), swing: B[j][0] }); } }
+    const lado = (arriba) => { const cs = cands.filter(c => arriba ? c.L > P : c.L < P)
+        .sort((a, b) => b.ultima - a.ultima || b.n - a.n);
+      const el = []; for (const c of cs) if (el.every(e => Math.abs(c.L / e.L - 1) >= SEP)) el.push(c);
+      el.sort((a, b) => Math.abs(a.L - P) - Math.abs(b.L - P));
+      const fin = []; let lejos = false;
+      for (const c of el) { if (fin.length === 3) break;
+        if (Math.abs(c.L / P - 1) > 0.05) { if (lejos) continue; lejos = true; } fin.push(c); }
+      return fin; };
+    return { resistencias: lado(true), soportes: lado(false) };
+  }
+  ```
+  Las fechas (`reac`, `swing`) vienen en el formato de tiempo de las velas:
+  pasalas a dia para el informe.
 - **Antes de dibujar**, armá la lista final (nivel, reacciones con fecha, ultima
   reaccion) y chequeá cantidad, separacion y las dos reglas de salida. Si una linea
   no pasa, no se dibuja. En el informe decí que entro y que salio, y por que.
