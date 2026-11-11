@@ -167,10 +167,12 @@ desplaza a uno de los dos. Se calcula con las barras (punto 4) y va solo al info
     velas siguientes, sin cerrar antes del otro lado del nivel. (El 0,8% es la
     perforacion mediana de los niveles que aguantaron, ver mas abajo.)
   - **Entra** si tiene una de estas, con fecha en la columna "Que es":
-    - **2 o mas reacciones** en ruedas distintas, separadas por 5 velas o mas; o
-    - **1 reaccion fuerte**: un swing confirmado (3 velas con minimos mas altos, o
-      maximos mas bajos, de cada lado) desde el que el precio cerro **5% o mas**
-      del lado del rebote dentro de las 10 velas siguientes.
+    - si el precio es el minimo o maximo de un **swing confirmado** (3 velas con
+      minimos mas altos, o maximos mas bajos, de cada lado; al principio de la serie,
+      las que haya antes): **2 o mas reacciones** en ruedas distintas, separadas por 5
+      velas o mas, o **1 reaccion fuerte** (cerro **5% o mas** del lado del rebote
+      dentro de las 10 velas siguientes);
+    - si es el minimo o maximo de **cualquier otra vela**: **3 o mas reacciones**.
   - **Sale**, aunque cumpla lo anterior, si:
     - en las **ultimas 20 velas el precio lo cruzo en cierre 2 veces o mas** (cerro
       de un lado, despues del otro, y otra vez): un nivel que el precio atraviesa
@@ -196,15 +198,15 @@ desplaza a uno de los dos. Se calcula con las barras (punto 4) y va solo al info
   fundamento.**
 - A mas de 5% del precio, una sola linea por lado (el gatillo de fondo).
 - **La cuenta, siempre con esta funcion** (probada el 2026-11-11 contra los cierres
-  de oct-nov: de las veces que el precio llego a una linea, aguanto en cierre el 83%,
-  contra 67% con los criterios viejos; a cambio salen menos lineas). No la
+  de oct-nov: de las veces que el precio llego a una linea, aguanto en cierre el 70%,
+  contra 67% con los criterios viejos y 53% exigiendo solo 2 reacciones a cualquier vela). No la
   reescribas ni la "mejores" en la corrida: si algo no cierra, anotalo en el informe.
   `B` es el array de velas diarias `[tiempo, open, high, low, close]` armado con
   `mainSeries().bars()`, como para la SMA200, con la ultima vela como la de hoy.
   Precisiones: el 3% y el 5% se miden **desde el nivel**; un toque cuenta para los
   dos lados (un ex soporte que rechazo desde abajo suma como resistencia); un toque
   de las ultimas 5 velas todavia no puede tener reaccion y **no** cuenta como "sin
-  reaccion"; el precio del nivel es el minimo o maximo de la vela de swing.
+  reaccion"; el precio del nivel es el minimo o maximo de la vela candidata (la que gana el desempate de abajo).
 
   ```js
   function niveles(B) {
@@ -223,18 +225,23 @@ desplaza a uno de los dos. Se calcula con las barras (punto 4) y va solo al info
     const fuerte = (j, L, tipo) => { for (let k = j + 1; k <= Math.min(j + VF, T); k++) {
         if (tipo === 's' && B[k][4] >= L * (1 + FU)) return true;
         if (tipo === 'r' && B[k][4] <= L * (1 - FU)) return true; } return false; };
+    // Candidatos: el minimo y el maximo de TODAS las velas (no solo los swings: el 11-nov la
+    // primera version solo miraba swings y dejo afuera 29.22 y 31.74, con 4 reacciones cada uno,
+    // porque su swing caia en el borde de la serie o no habia vela de swing en ese precio).
+    // Un swing confirmado (3 velas despues; antes, las que haya) entra con 2 reacciones o 1 fuerte;
+    // cualquier otra vela necesita 3 reacciones (con 2, el 53% de las lineas aguantaba: peor que antes).
     const cands = [];
-    for (let j = 3; j < T - 2; j++) { const v = B.slice(j - 3, j + 4);
-      const sw = [];
-      if (B[j][3] === Math.min(...v.map(x => x[3]))) sw.push([B[j][3], 's']);
-      if (B[j][2] === Math.max(...v.map(x => x[2]))) sw.push([B[j][2], 'r']);
-      for (const [L, tipo] of sw) { const { con, sin } = reac(L);
-        if (!(con.length >= 2 || fuerte(j, L, tipo))) continue;
+    for (let j = 0; j <= T; j++) {
+      const v = B.slice(Math.max(0, j - 3), j + 4), conf = j + 3 <= T;
+      for (const [L, tipo] of [[B[j][3], 's'], [B[j][2], 'r']]) {
+        const swing = conf && (tipo === 's' ? L === Math.min(...v.map(x => x[3])) : L === Math.max(...v.map(x => x[2])));
+        const { con, sin } = reac(L);
+        if (!(con.length >= (swing ? 2 : 3) || (swing && fuerte(j, L, tipo)))) continue;
         const cl = B.slice(Math.max(0, T - REC + 1)).map(x => x[4]);
         let cruces = 0; for (let i = 1; i < cl.length; i++) if ((cl[i - 1] - L) * (cl[i] - L) < 0) cruces++;
         const gastado = sin.filter(x => x > T - REC).length >= 3 && !con.some(x => x > T - REC);
         if (cruces >= 2 || gastado) continue;
-        cands.push({ L, ultima: Math.max(j, ...con), n: con.length, reac: con.map(i => B[i][0]), swing: B[j][0] }); } }
+        cands.push({ L, ultima: Math.max(swing ? j : -1, ...con), n: con.length, reac: con.map(i => B[i][0]), swing: swing ? B[j][0] : null }); } }
     const lado = (arriba) => { const cs = cands.filter(c => arriba ? c.L > P : c.L < P)
         .sort((a, b) => b.ultima - a.ultima || b.n - a.n);
       const el = []; for (const c of cs) if (el.every(e => Math.abs(c.L / e.L - 1) >= SEP)) el.push(c);
