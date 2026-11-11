@@ -129,37 +129,74 @@ desplaza a uno de los dos. Se calcula con las barras (punto 4) y va solo al info
 
 ## 5. Redibujar los niveles
 
-- `draw_list` para ver que hay; borrá **solo las lineas propias**, una por una con
-  `draw_remove_one` (id): las que tienen etiqueta del estudio (`R1`…, `S1`…, `PIVOTE`,
-  `Directriz`; si `draw_list` no trae el texto, leelo con `draw_get_properties`).
-  Todo lo demas lo dibujo Tobias a mano y no se toca. Despues redibujar.
+- `draw_list` para ver que hay y borrá **solo las lineas propias**, una por una con
+  `draw_remove_one` (id). Leé el texto de cada una con `draw_get_properties` si
+  `draw_list` no lo trae. Son propias solo estas:
+  - texto **exacto** `Resistencia N` o `Soporte N` (N un numero, nada mas: una
+    linea de Tobias dice "Resistencia mayor" y no se toca);
+  - la directriz (texto que arranca con `Directriz`);
+  - las del formato viejo, hasta el 2026-11-10, que se van la primera vez y no
+    vuelven: texto que arranca con `R` o `S` seguida de un numero y un espacio
+    (`R1 30.42 …`, `S1 27.37 …`), o con `PIVOTE`.
+  **Nunca** borres `RxXa1k` (32.61) ni `r6PZ7F` (29.39, rosa sin etiqueta), aunque
+  su texto parezca propio: las movio o las puso Tobias. Todo lo demas lo dibujo
+  Tobias a mano y no se toca. Despues redibujar.
   **`draw_clear` esta bloqueado** en `.claude/settings.json` (desde el 2026-10-23, a
   pedido de Tobias): se llevaba tambien sus lineas editadas a mano.
-- **Pocos niveles y todos con fundamento.** Maximo **7 lineas horizontales**: el
-  pivote y hasta 3 de cada lado. Es un techo, no una cuota: si hay 2 niveles
-  buenos de un lado, van 2. (El 24-sep quedaron 9 lineas entre 38.87 y 42.01, una
-  cada ~1%, y el chart no se podia leer. La regla vieja de "por lo menos 3 de
-  cada lado" obligaba a rellenar; se saco el 2026-09-25 a pedido de Tobias.)
-- **Que cuenta como nivel.** Solo entra si cumple al menos una de estas, y el
-  fundamento va con fecha en la columna "Que es":
-  1. Maximo o minimo de swing **confirmado** en diario: la vela tiene por lo menos
-     3 velas con maximos mas bajos (o minimos mas altos) de cada lado.
-  2. Zona con **2 o mas toques/rechazos** en ruedas distintas.
-  3. Borde de un gap, o maximo/minimo de un periodo relevante (mes, año, piso
-     de un rango de varias semanas).
-  No cuentan: un cierre suelto, un maximo intradia de una sola vela sin reaccion
-  despues, un numero redondo, ni "el punto medio" entre dos niveles.
-- **Separacion minima de 1,5% entre lineas** (~0,60 USD con GGAL en 40). Si dos
-  candidatos quedan mas cerca, quedate con el que tiene mas toques o es de mayor
-  temporalidad; el otro se nombra en la columna "Que es" de ese nivel, no se dibuja.
-- Candidatos: swings de las ultimas ~60 ruedas, el mapa del informe anterior, y
-  si hacia donde va la tendencia no hay nada, swings de meses o del año anterior.
-  Si aun asi un lado queda con 1 nivel, se deja con 1 y se dice: **mejor un lado
-  corto que una linea sin fundamento.**
+- **Sin pivote** (desde el 2026-11-11, a pedido de Tobias: "el pivote tampoco lo
+  quiero mas"). El mapa son resistencias arriba del precio y soportes abajo, y nada
+  mas. El nivel que antes era el pivote es un soporte o una resistencia como los
+  demas, segun de que lado quede.
+- **Pocos niveles y todos con fundamento.** Maximo **6 lineas horizontales**: hasta
+  3 de cada lado. Es un techo, no una cuota: si hay 1 nivel bueno de un lado, va 1,
+  y si no hay ninguno, el lado queda vacio y se dice. (El 24-sep quedaron 9 lineas
+  entre 38.87 y 42.01 y el chart no se podia leer; la regla de "por lo menos 3 de
+  cada lado" se saco el 2026-09-25 a pedido de Tobias.)
+- **Que cuenta como nivel: tiene que haber hecho girar al precio, no solo estar
+  ahi.** (Cambiado el 2026-11-11 a pedido de Tobias: "muchas veces dibuja lineas que
+  no se respetan nunca". Con los criterios viejos, en las 5 ruedas siguientes a cada
+  cierre de oct-nov: los niveles de "2 o mas toques" sin reaccion medida se
+  rompieron en cierre 10 de 17 veces que se testearon; los swings con rebote
+  confirmado aguantaron 15 de 18; y el mapa entero marco menos giros que una grilla
+  pareja en 5 auditorias seguidas.) Todo se calcula en un `ui_evaluate` sobre
+  `mainSeries().bars()` en diario (hasta 300 velas), sin archivos:
+  - **Reaccion**: una vela "toca" un nivel si su minimo (soporte) o maximo
+    (resistencia) queda a 0,8% o menos del nivel. El toque tiene **reaccion** si
+    despues el precio **cierra** por lo menos 3% del lado del rebote dentro de las 5
+    velas siguientes, sin cerrar antes del otro lado del nivel. (El 0,8% es la
+    perforacion mediana de los niveles que aguantaron, ver mas abajo.)
+  - **Entra** si tiene una de estas, con fecha en la columna "Que es":
+    - **2 o mas reacciones** en ruedas distintas, separadas por 5 velas o mas; o
+    - **1 reaccion fuerte**: un swing confirmado (3 velas con minimos mas altos, o
+      maximos mas bajos, de cada lado) desde el que el precio cerro **5% o mas**
+      del lado del rebote dentro de las 10 velas siguientes.
+  - **Sale**, aunque cumpla lo anterior, si:
+    - en las **ultimas 20 velas el precio lo cruzo en cierre 2 veces o mas** (cerro
+      de un lado, despues del otro, y otra vez): un nivel que el precio atraviesa
+      para los dos lados no esta frenando nada; o
+    - en las ultimas 20 velas tuvo **3 toques o mas sin ninguna reaccion**: lo
+      estan gastando. Se nombra en "Estructura" como nivel gastado y no se dibuja.
+  - **Cuentan mas las reacciones recientes**: con dos candidatos para la misma
+    linea, gana el que tiene la ultima reaccion mas cerca de hoy; despues, el de
+    mas reacciones.
+  - No cuentan: un cierre suelto, un maximo o minimo de una sola vela sin
+    reaccion, un borde de gap o un maximo/minimo de periodo (mes, año) **sin
+    reaccion medida**, un numero redondo, ni "el punto medio" entre dos niveles.
+    Un gap abierto se sigue nombrando en "Estructura" (ver mas abajo), pero solo
+    se dibuja si su borde tiene reacciones.
+- **Separacion minima de 1,5% entre lineas** (~0,45 USD con GGAL en 30). Si dos
+  candidatos quedan mas cerca, se queda el de la regla de recencia de arriba; el
+  otro se nombra en la columna "Que es" de ese nivel, no se dibuja.
+- **Cada corrida califica todo de nuevo.** Candidatos: los swings y toques de las
+  velas que traiga la serie. El mapa del informe anterior **no** es fuente: una
+  linea que estaba y ya no pasa los criterios, sale, y se dice en "Entro y salio".
+  Si la serie no alcanza hacia un lado (precio en minimos o maximos de las 300
+  velas), ese lado queda vacio y se dice: **mejor un lado vacio que una linea sin
+  fundamento.**
 - A mas de 5% del precio, una sola linea por lado (el gatillo de fondo).
-- **Antes de dibujar**, armá la lista final (nivel, criterio 1/2/3, fecha) y
-  chequeá cantidad y separacion. Si una linea no pasa, no se dibuja. En el
-  informe decí que entro y que salio.
+- **Antes de dibujar**, armá la lista final (nivel, reacciones con fecha, ultima
+  reaccion) y chequeá cantidad, separacion y las dos reglas de salida. Si una linea
+  no pasa, no se dibuja. En el informe decí que entro y que salio, y por que.
 - **R o S se decide por la posicion contra el ultimo precio, no por la historia del
   nivel.** Un "ex soporte" que quedo debajo del precio es S. La historia va en la
   columna "Que es".
@@ -170,7 +207,7 @@ desplaza a uno de los dos. Se calcula con las barras (punto 4) y va solo al info
   linea (ver "Solo lineas" mas abajo).
 - **Se llaman soporte o resistencia, y nada mas.** No uses "estante", "repisa",
   "plataforma", "zona" ni "banda" para nombrar un nivel, ni en el chart ni en el
-  informe: es S o R (o el pivote), con su precio y su fundamento. (Sacado el
+  informe: es soporte o resistencia, con su precio y su fundamento. (Sacado el
   2026-10-06 a pedido de Tobias: "no me gustan los estantes que arma el bot,
   quiero solo resistencias y soportes".)
 - **Colores, siempre con opacidad baja.** Las lineas son referencia, no protagonistas:
@@ -181,23 +218,27 @@ desplaza a uno de los dos. Se calcula con las barras (punto 4) y va solo al info
   |---|---|---|
   | Resistencias | `rgba(239,83,80,0.45)` | |
   | Soportes | `rgba(38,166,154,0.45)` | |
-  | Pivote | `rgba(255,179,0,0.75)` | linewidth 3. Va mas marcado a proposito: es el nivel que define |
   | Directriz | `rgba(150,150,150,0.40)` | punteada |
 
-  Etiquetá cada linea con `showLabel:true` y un `text` corto (ej. `S1 43.50 piso triple`).
-  **El `textcolor` va aparte y sin alfa** (`#ef5350`, `#26a69a`, `#ffb300`): la linea se
-  atenua, la etiqueta tiene que seguir legible.
+  Etiquetá cada linea con `showLabel:true` y como `text` **solo el nombre**:
+  `Resistencia 1`, `Resistencia 2`, `Resistencia 3` arriba del precio y `Soporte 1`,
+  `Soporte 2`, `Soporte 3` abajo, **numerados desde el precio hacia afuera** (la 1 es
+  la mas cercana). Ni el precio, que ya lo muestra el eje, ni el fundamento, ni
+  fechas: eso va en el informe. (Desde el 2026-11-11, a pedido de Tobias: no quiere
+  etiquetas tipo "R1 30.42 triple toque 23-oct", quiere "Resistencia 1, Resistencia
+  2, etc.".) **El `textcolor` va aparte y sin alfa** (`#ef5350`, `#26a69a`): la
+  linea se atenua, la etiqueta tiene que seguir legible.
 - **Solo lineas: ningun `rectangle`.** En el chart van unicamente las lineas
-  horizontales de soporte y resistencia (con el pivote) y la directriz. No se dibuja
-  la zona critica alrededor del pivote ni la banda de ningun nivel. (Hasta el
+  horizontales de soporte y resistencia y la directriz. No se dibuja la banda de
+  ningun nivel. (Hasta el
   5-oct-2026 se dibujaban un rectangulo azul en el pivote y uno por cada nivel con
   banda; el chart quedaba lleno de "estantes" y Tobias pidio el 2026-10-06 dejar
   solo resistencias y soportes.)
-- **El otro borde de un nivel va en la etiqueta, o como linea propia.** Si un nivel
+- **El otro borde de un nivel va en el informe, o como linea propia.** Si un nivel
   tiene un segundo borde que importa (el otro lado de un gap, el fondo de un
-  rango), ponelo en el `text` de la linea (ej. `S2 36.56 gap hasta 36.10`). Si ese
-  borde cumple por si solo un criterio de nivel y entra en el techo de 7 y en la
-  separacion de 1,5%, se dibuja como una linea mas, con su S o R. (El 1-oct-2026
+  rango), nombralo en la columna "Que es" y en "Estructura" (la etiqueta del chart
+  es solo el nombre). Si ese borde cumple por si solo los criterios de nivel y entra
+  en el techo de 6 y en la separacion de 1,5%, se dibuja como una linea mas. (El 1-oct-2026
   el precio fue a 36.10 a cerrar el gap del 27-oct-25 y en el chart solo estaba la
   linea de 36.56: el borde figuraba en la tabla y en ningun otro lado.)
 - **Gaps abiertos: se nombran.** Si el precio esta a menos de 5% de terminar de
@@ -238,7 +279,9 @@ Estructura:
 
 ## Mapa de niveles
 | | Nivel | Que es |
-(tabla con R3..R1, PIVOTE, S1..S3, y en "Que es" el fundamento con fecha)
+(tabla de arriba hacia abajo: Resistencia 3..Resistencia 1, Soporte 1..Soporte 3,
+con los mismos nombres que en el chart; en "Que es" las reacciones con fecha y la
+ultima, y si algun candidato salio por las reglas de salida)
 
 ## Indicadores
 (EMA20 vs precio, RSI y si hay divergencia, volumen relativo, y la SMA200 como

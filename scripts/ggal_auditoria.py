@@ -31,7 +31,9 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 RE_ARCHIVO = re.compile(r"^(\d{4}-\d{2}-\d{2})-(apertura|cierre)\.md$")
-RE_NIVEL = re.compile(r"^\|\s*\**(R\d+|S\d+|PIVOTE)\**\s*\|\s*\**([\d.]+)\**\s*\|")
+# Desde el 2026-11-11 los mapas dicen "Resistencia 1"/"Soporte 1" y no hay PIVOTE; los viejos
+# (R1, S1, PIVOTE) siguen valiendo. Despues del precio puede venir "(+4,0%)": se ignora.
+RE_NIVEL = re.compile(r"^\|\s*\**(R\d+|S\d+|PIVOTE|Resistencia \d+|Soporte \d+)\**\s*\|\s*\**([\d.]+)[^|]*\|")
 RE_PRECIO = re.compile(r"\*\*Precio\*\*\s*([\d.]+)")
 RE_DIA = re.compile(
     r"\*\*D[ií]a\*\*\s*O\s*([\d.]+)\s*/\s*H\s*([\d.]+)\s*/\s*L\s*([\d.]+)\s*/\s*C\s*([\d.]+)"
