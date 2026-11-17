@@ -24,8 +24,13 @@ def main():
     # y sin grafico y parecia actualizada (paso el 19-oct).
     if datos["ggal"].get("cierre") is None:
         raise SystemExit("El JSON no trae el cierre de GGAL (corrida sin feed?): no se toca la pagina.")
-    if len(datos.get("velas") or []) < 6:
-        print("aviso: el JSON no trae 'velas'; la pagina sale sin grafico.")
+    # El 16-nov las velas vinieron como el texto "__VELAS__": len() daba 9 y pasaba el
+    # control viejo, y la pagina salio sin grafico. Se exige una lista de filas de 6.
+    velas = datos.get("velas")
+    if not (isinstance(velas, list) and len(velas) >= 6
+            and all(isinstance(v, list) and len(v) == 6 for v in velas)):
+        raise SystemExit("Las 'velas' no son una lista de filas [fecha, a, M, m, c, vol]: "
+                         "correr antes scripts/ggal_semanal_velas.py. No se toca la pagina.")
     # "</" cerraria el <script> si apareciera en un texto.
     bloque = json.dumps(datos, ensure_ascii=False, indent=1).replace("</", "<\\/")
 

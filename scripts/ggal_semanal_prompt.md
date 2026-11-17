@@ -58,11 +58,16 @@ estudio diario).
 - Para GGAL, ademas: maximo y minimo de la semana, EMA20 y RSI14 al viernes
   (calculalos sobre los cierres diarios o tomalos del ultimo informe de cierre),
   y volumen de la semana contra el promedio de las 4 anteriores.
-- **Velas para el grafico de la pagina:** de `NASDAQ:GGAL` diario,
-  `data_get_ohlcv` count=100 (sin summary) y cargá en `velas` una fila por rueda,
-  de la mas vieja a la mas nueva: `["AAAA-MM-DD", apertura, maximo, minimo,
-  cierre, volumen]`, precios con 2 decimales y volumen entero, hasta el viernes
-  de la semana (si hay vela de hoy, afuera). La pagina dibuja con eso las velas,
+- **Velas para el grafico de la pagina: no las copies a mano.** Escribí el JSON
+  con `"velas": []` y, con el chart ya en `NASDAQ:GGAL` diario, corré
+  `py scripts/ggal_semanal_velas.py <ARCHIVO DE SALIDA> <VIERNES AAAA-MM-DD>`:
+  lee las ultimas 100 ruedas del chart hasta el viernes y las carga como
+  `["AAAA-MM-DD", apertura, maximo, minimo, cierre, volumen]`. Tiene que
+  responder `ok: 100 velas ...`; si aborta, el motivo dice que arreglar (chart en
+  otro simbolo, sin CDP). No dejes marcadores tipo `"__VELAS__"`: `incorporar`
+  ahora aborta si `velas` no es una lista de filas. (Cambiado el 2026-11-17: el
+  16-nov la corrida dejo `"velas": "__VELAS__"` sin reemplazar, el control viejo
+  lo dejo pasar y la pagina salio sin grafico.) La pagina dibuja con eso las velas,
   el volumen, el promedio de 20 dias y el RSI, y calcula el volumen relativo;
   sin `velas` el grafico no aparece. (Desde el 19-oct: el grafico se agrego a
   mano a la pagina el 13-oct y la receta no lo pedia, asi que el JSON del lunes
@@ -201,7 +206,7 @@ Formato (los numeros son de ejemplo del formato, no datos):
                 "glosario": [ { "termino": "Soporte", "que": "" } ] },
   "notas": "Lo que falto o se corrigio en la corrida. Vacio si nada.",
   "velas_fuente": "Velas diarias del ADR (apertura, maximo, minimo, cierre, volumen). Promedio de 20 dias, RSI14 y volumen relativo calculados en la pagina.",
-  "velas": [ ["2026-09-25", 40.00, 40.00, 38.74, 38.74, 605698] ]
+  "velas": []
 }
 ```
 
@@ -236,6 +241,8 @@ La pagina muestra la semana que trae adentro; no puede leer datos de afuera
 (hasta el 5-oct-2026 intentaba leer un documento de Claude Docs y eso falla
 para cualquier visor: mostro la semana vieja sin avisar). Por eso se republica.
 
+0. Si todavia no lo corriste: `py scripts/ggal_semanal_velas.py <ARCHIVO DE
+   SALIDA> <VIERNES AAAA-MM-DD>` (ver §2, "Velas"), con el chart en GGAL diario.
 1. `py scripts/ggal_semanal_incorporar.py <ARCHIVO DE SALIDA>`: reemplaza el
    bloque de datos de `scripts/ggal_semanal_pagina.html`. No edites ese archivo
    a mano.
