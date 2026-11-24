@@ -1,0 +1,1099 @@
+{
+ "semana": "16 al 20 de noviembre de 2026",
+ "generado": "2026-11-24 12:05 ART",
+ "titular": "GGAL −15% en una semana de pánico global: riesgo país sobre 1.000",
+ "ggal": {
+  "cierre": 25.29,
+  "var_semana": -15.0,
+  "cierre_previo": 29.75,
+  "maximo": 29.385,
+  "minimo": 25.03,
+  "ema20": 30.17,
+  "rsi": 21.6,
+  "volumen_rel": "117% del promedio de 4 semanas"
+ },
+ "resumen": [
+  {
+   "tema": "La semana",
+   "dato": "−15,0%",
+   "tono": "negativo",
+   "grafico": "semana",
+   "titulo": "Cinco ruedas de baja y mínimo de todo el año en 25.03",
+   "texto": "GGAL pasó de 29.75 a 25.29: cerró 28.20, 28.53, 27.78, 26.07 y 25.29. El viernes marcó 25.03, el precio más bajo de las últimas 300 ruedas, con el volumen 17% arriba del promedio de las cuatro semanas anteriores. Cayó 2,5 puntos más que el ETF de Argentina."
+  },
+  {
+   "tema": "Técnico",
+   "dato": "25.03 – 25.89",
+   "tono": "negativo",
+   "titulo": "Perdió el soporte de 25.89 y abajo no queda ningún piso marcado",
+   "texto": "El soporte de 25.89 (mínimo de septiembre de 2025) se perdió en cierre el viernes y pasó a ser resistencia. La resistencia siguiente es 29.00. Debajo del mínimo de 25.03 no hay ningún precio de referencia en el último año. El RSI está en 21,6, sobreventa profunda, y ya no tiene divergencia alcista."
+  },
+  {
+   "tema": "Empresa",
+   "dato": "−52,8% en 2026",
+   "tono": "negativo",
+   "titulo": "Galicia, entre los ADR argentinos más castigados del año",
+   "texto": "Con la baja de la semana, el ADR de Galicia acumula más de 50% de caída en 2026, junto a Supervielle, BBVA y Macro. El mercado espera los balances del tercer trimestre de los bancos argentinos, con la mora y los bonos del Tesoro en cartera como los dos temas que más pesan."
+  },
+  {
+   "tema": "Argentina",
+   "dato": "1.070",
+   "tono": "negativo",
+   "titulo": "El riesgo país pasó los 1.000 puntos por primera vez en 13 meses",
+   "texto": "El viernes 20 saltó 14,9% hasta 1.070 puntos y los bonos en dólares perdieron 7% en la semana. El dólar mayorista hizo récord nominal en $1.580 y el contado con liquidación pasó $1.790. Pesan las reservas estancadas, los vencimientos de enero y de 2027 y las tasas altas en EE.UU."
+  },
+  {
+   "tema": "Afuera",
+   "dato": "SPY −8,6%",
+   "tono": "negativo",
+   "titulo": "Wall Street tuvo su peor semana en 18 meses y entró en corrección",
+   "texto": "El S&P 500 cayó siete ruedas seguidas y el viernes −3,7%, arrastrado por las dudas sobre el negocio de la inteligencia artificial. Brasil (EWZ) perdió 11,4%. El dólar global apenas se movió y la tasa a 10 años bajó de 5,14% a 4,95%."
+  }
+ ],
+ "mercados": [
+  {
+   "ticker": "GGAL",
+   "nombre": "Galicia ADR",
+   "cierre": 25.29,
+   "var": -15.0
+  },
+  {
+   "ticker": "ARGT",
+   "nombre": "ETF Argentina",
+   "cierre": 64.56,
+   "var": -12.5
+  },
+  {
+   "ticker": "EWZ",
+   "nombre": "ETF Brasil",
+   "cierre": 28.54,
+   "var": -11.4
+  },
+  {
+   "ticker": "SPY",
+   "nombre": "S&P 500",
+   "cierre": 689.81,
+   "var": -8.6
+  },
+  {
+   "ticker": "DXY",
+   "nombre": "Índice dólar",
+   "cierre": 103.84,
+   "var": 0.4
+  },
+  {
+   "ticker": "US10Y",
+   "nombre": "Tasa 10 años EE.UU.",
+   "cierre": 4.95,
+   "var": -3.7
+  }
+ ],
+ "mercados_nota": "GGAL cayó con el bloque pero más: −2,5 pp contra ARGT y −3,6 pp contra EWZ. La caída fue global; lo argentino y lo de Brasil cayeron más que Wall Street.",
+ "noticias": [
+  {
+   "bloque": "Argentina",
+   "titulo": "El riesgo país saltó 14,9% en un día y llegó a 1.070 puntos",
+   "detalle": "El viernes 20 los bonos en dólares cayeron hasta 3% y el índice de JP Morgan llegó a 1.070, el máximo en 13 meses (en julio estaba en 402). Un banco argentino tiene bonos del Tesoro en cartera y financia empresas que dependen de ese costo de deuda: le pega directo.",
+   "impacto": "negativo",
+   "magnitud": "alto",
+   "explicacion": "El riesgo país mide cuánto más que EE.UU. le piden los inversores a la Argentina para prestarle. Si sube, la deuda vale menos, financiarse cuesta más y los inversores de afuera venden todo lo argentino, empezando por los bancos.",
+   "fuente": "iProfesional",
+   "url": "https://www.iprofesional.com/finanzas/469661-el-riesgo-pais-supero-los-1000-puntos-y-pone-en-jaque-a-los-bonos-argentinos",
+   "fecha": "20-nov"
+  },
+  {
+   "bloque": "Argentina",
+   "titulo": "Dólar mayorista en récord nominal y brecha de 13,6% con el CCL",
+   "detalle": "El mayorista subió a $1.580 sin intervención del BCRA y el contado con liquidación pasó $1.790. Los bonos acumularon −7% en la semana y −18% en el año.",
+   "impacto": "negativo",
+   "magnitud": "medio",
+   "explicacion": "La brecha es la diferencia entre el dólar oficial y el que se compra con bonos o acciones (el CCL). Cuando se agranda muestra que la gente busca cubrirse de una devaluación, y eso pone nervioso al mercado y encarece las tasas que pagan los bancos.",
+   "fuente": "Infobae",
+   "url": "https://www.infobae.com/economia/2026/11/20/los-bonos-argentinos-siguen-en-caida-libre-y-el-riesgo-pais-se-dispara-sobre-los-1000-puntos-basicos/",
+   "fecha": "20-nov"
+  },
+  {
+   "bloque": "Argentina",
+   "titulo": "El BCRA tuvo que reforzar con efectivo la garantía de un REPO de USD 6.000 millones",
+   "detalle": "Como cayeron los bonos que respaldan el préstamo, el BCRA tuvo que poner más garantía. Las reservas siguen sin recomponerse y el Tesoro necesitaría comprarle dólares al BCRA para pagar los vencimientos de enero.",
+   "impacto": "negativo",
+   "magnitud": "medio",
+   "explicacion": "Un REPO es un préstamo de bancos internacionales al BCRA con bonos como garantía. Si los bonos bajan hay que poner más garantía, y eso deja ver que los dólares para pagar la deuda están justos, algo que el mercado castiga.",
+   "fuente": "Infobae",
+   "url": "https://www.infobae.com/economia/2026/11/21/de-400-a-mas-de-1000-puntos-en-solo-cuatro-meses-que-explica-la-escalada-del-riesgo-pais-y-el-derrumbe-de-los-bonos-argentinos/",
+   "fecha": "21-nov"
+  },
+  {
+   "bloque": "EE.UU. y global",
+   "titulo": "El S&P 500 entró en corrección: peor semana en 18 meses",
+   "detalle": "El viernes cayó 3,7%, séptima baja seguida, y el Nasdaq borró la suba del año, por dudas sobre la inversión en inteligencia artificial. La aversión al riesgo llegó a todo lo emergente y Argentina fue de lo más castigado.",
+   "impacto": "negativo",
+   "magnitud": "alto",
+   "explicacion": "Una corrección es una caída de más de 10% desde el máximo. Cuando Wall Street cae fuerte, los fondos venden primero lo más riesgoso, como las acciones argentinas, aunque el problema no sea de Argentina.",
+   "fuente": "NPR",
+   "url": "https://www.npr.org/2026/11/20/g-s1-154797/nasdaq-sp500-stock-market-ai-sink-negative",
+   "fecha": "20-nov"
+  }
+ ],
+ "tecnico": {
+  "tendencia": "bajista",
+  "tendencia_texto": "desde junio: de 58.14 (17-jun) a 25.29 (20-nov)",
+  "frase": "Está en el mínimo del año, 25.29, justo debajo de 25.89, un soporte que perdió el viernes y que ahora funciona como techo.",
+  "techo": {
+   "nivel": 25.89,
+   "si": "Si cierra dos días seguidos arriba de 25.89, la pérdida del viernes habrá sido una trampa y puede buscar 29.00."
+  },
+  "piso": {
+   "nivel": 25.03,
+   "si": "Si cierra debajo de 25.03, el mínimo del viernes, sigue la caída sin ningún piso marcado abajo."
+  },
+  "texto": "Tendencia bajista desde 58.14 (17-jun), con máximos y mínimos más bajos todos los días de la semana: máximos 29.385, 28.88, 28.86, 28.24 y 26.58; mínimos 28.175, 27.69, 27.31, 26.05 y 25.03. El lunes 16 perdió en cierre la resistencia de 29.00 (el piso del rango de noviembre) y el viernes 20 perdió el soporte de 25.89 – 26.06, que pasa a ser resistencia. El 25.03 no es un soporte medido: es solo el mínimo del viernes, el precio más bajo de las 300 ruedas. Precio 16% debajo de la EMA20 (30.17) y 42% debajo de la SMA200 (43.76). RSI 21,6: sobreventa profunda y sin divergencia (se perdió el 20-nov).",
+  "niveles": [
+   {
+    "tipo": "Resistencia 2",
+    "nivel": 29.0,
+    "que": "Piso del rango de noviembre, roto el 16-nov. Reacciones: 15-sep-2025, 3-oct-2025 y 17-nov-2026. La directriz bajista pasa cerca (28.51 el 23-nov)."
+   },
+   {
+    "tipo": "Resistencia 1",
+    "nivel": 25.89,
+    "que": "Ex soporte: mínimo de swing del 19-sep-2025, reacciones 19-sep y 2-oct-2025. Perdido en cierre el 20-nov; ese día el rebote llegó a 26.58 y fue rechazado."
+   },
+   {
+    "tipo": "Mínimo del viernes",
+    "nivel": 25.03,
+    "que": "No es un soporte medido: mínimo del 20-nov y de toda la serie de 300 ruedas."
+   }
+  ]
+ },
+ "agenda": [
+  {
+   "dia": "Lun 23",
+   "evento": "Feriado en Argentina (Día de la Soberanía)",
+   "por_que": "Sin mercado local; Wall Street abrió y GGAL rebotó con el S&P 500."
+  },
+  {
+   "dia": "Mar 24",
+   "evento": "Llamado a licitación del Tesoro",
+   "por_que": "El Tesoro anuncia qué bonos y letras ofrece el jueves. Con el riesgo país sobre 1.000, importa cuánto debe pagar para renovar."
+  },
+  {
+   "dia": "Mar 24",
+   "evento": "Resultados del 3er trimestre de Grupo Galicia (fecha estimada, después del cierre)",
+   "por_que": "Mora, ganancias y la pérdida en bonos del trimestre. Es el dato propio más importante del mes para GGAL; fecha no confirmada por la empresa."
+  },
+  {
+   "dia": "Mié 25",
+   "evento": "EE.UU.: PCE de octubre, PIB del 3er trimestre y Libro Beige de la Fed",
+   "por_que": "Inflación que mira la Fed antes de la reunión del 9-dic, donde el mercado da por hecha otra suba de tasa. Un dato alto presiona tasas y emergentes."
+  },
+  {
+   "dia": "Jue 26",
+   "evento": "Licitación del Tesoro argentino. Wall Street cerrado (Acción de Gracias)",
+   "por_que": "Cuánto renueva el Tesoro y a qué tasa mide la confianza en la deuda en pesos. GGAL no cotiza en Nueva York ese día."
+  },
+  {
+   "dia": "Vie 27",
+   "evento": "Wall Street cierra temprano",
+   "por_que": "Media rueda con poco volumen: los movimientos pueden ser bruscos."
+  },
+  {
+   "dia": "Lun 30",
+   "evento": "Liquidación de la licitación del Tesoro",
+   "por_que": "Día en que se pagan y emiten los títulos licitados el jueves."
+  }
+ ],
+ "escenarios": [
+  {
+   "nombre": "Sigue la baja",
+   "sesgo": "bajista",
+   "gatillo": "1 cierre < 25.03",
+   "lectura": "A favor de la tendencia, un cierre alcanza. Sería mínimo nuevo de la serie sin ningún soporte medido abajo."
+  },
+  {
+   "nombre": "Pausa en mínimos",
+   "sesgo": "rango",
+   "gatillo": "cierres entre 25.03 y 25.89",
+   "lectura": "Con el RSI en 21,6 y afuera más calmo, es lo más probable a corto: una pausa dentro de la baja, no un cambio de tendencia."
+  },
+  {
+   "nombre": "Falsa rotura",
+   "sesgo": "alcista",
+   "gatillo": "2 cierres > 25.89",
+   "lectura": "Contra la tendencia: pide dos cierres seguidos. Dejaría la pérdida del viernes como trampa; el próximo techo es 29.00, a +15%."
+  }
+ ],
+ "panorama": {
+  "donde": "GGAL cerró la semana en 25.29, el precio más bajo del último año. Quedó entre el mínimo del viernes, 25.03, y la resistencia de 25.89, que hasta el jueves era su soporte. La resistencia siguiente es 29.00.",
+  "factores": [
+   {
+    "factor": "Riesgo país",
+    "dato": "1.070",
+    "efecto": "negativo",
+    "explica": "Mide cuánto más que EE.UU. paga Argentina para endeudarse. Pasó de 400 en julio a más de 1.000: los bancos tienen bonos en cartera y los inversores de afuera salen de todo lo argentino."
+   },
+   {
+    "factor": "Wall Street",
+    "dato": "SPY −8,6%",
+    "efecto": "negativo",
+    "explica": "La peor semana en 18 meses por dudas sobre la inteligencia artificial. Cuando el mercado grande cae, los fondos venden primero lo más riesgoso, y los ADR argentinos están en esa lista."
+   },
+   {
+    "factor": "Dólar y brecha",
+    "dato": "$1.580 · brecha 13,6%",
+    "efecto": "negativo",
+    "explica": "El dólar oficial hace récords y el CCL se aleja. Muestra que se busca cobertura ante una devaluación, lo que sube las tasas y frena el crédito, que es el negocio de un banco."
+   },
+   {
+    "factor": "Tasa 10 años EE.UU.",
+    "dato": "4,95%",
+    "efecto": "neutro",
+    "explica": "Bajó en la semana porque el pánico llevó plata a los bonos del Tesoro, pero sigue cerca de 5% y la Fed sigue subiendo tasas: el dinero para emergentes sigue caro."
+   }
+  ],
+  "mirar": [
+   {
+    "que": "Si cierra debajo de 25.03",
+    "por_que": "Mínimo nuevo de la serie, a favor de la tendencia: con un cierre alcanza y abajo no hay ningún piso marcado."
+   },
+   {
+    "que": "Si cierra dos días arriba de 25.89",
+    "por_que": "El ex soporte recuperado dejaría la caída del viernes como trampa. Es contra la tendencia: con un solo cierre no alcanza."
+   },
+   {
+    "que": "El balance de Galicia",
+    "por_que": "Mora, ganancias y pérdida en bonos del tercer trimestre. Es la primera noticia propia de la empresa en semanas en que se movió solo con el mercado."
+   },
+   {
+    "que": "Riesgo país y licitación del jueves",
+    "por_que": "Si el riesgo país no baja de 1.000 y el Tesoro paga caro para renovar, la presión sobre los bancos sigue."
+   }
+  ],
+  "glosario": [
+   {
+    "termino": "Soporte",
+    "que": "Un precio donde antes la acción dejó de bajar porque aparecieron compradores."
+   },
+   {
+    "termino": "Resistencia",
+    "que": "Un precio donde antes la acción dejó de subir porque aparecieron vendedores; un soporte perdido suele pasar a ser resistencia."
+   },
+   {
+    "termino": "Cierre",
+    "que": "El último precio del día en Nueva York (18:00 hora argentina): es el que cuenta para decir si un nivel se rompió."
+   },
+   {
+    "termino": "Riesgo país",
+    "que": "La tasa extra que pagan los bonos argentinos sobre los de EE.UU., en puntos: 1.000 puntos son 10% por año de más."
+   },
+   {
+    "termino": "RSI",
+    "que": "Un indicador de 0 a 100 de la fuerza de las subas y bajas recientes; debajo de 30 se dice que la acción está sobrevendida."
+   }
+  ]
+ },
+ "notas": "Corrida del martes 24 (el lunes 23 fue feriado en Argentina); reintento de la corrida de las 11:04, que se cortó a los 35 minutos dejando solo las velas. Faltan los informes de cierre del 17 y 18-nov y la apertura del 16-nov: se usaron los cierres del 16, 19 y 20-nov y la apertura del 19-nov. El cierre oficial del 20-nov es 25.29 (el informe de cierre leyó 25.26 con la vela abierta); EMA20 30.17 y RSI 21,6 recalculados con el cierre oficial. Dividendo: no se encontró pago en noviembre de 2026; buscado como 'Grupo Galicia dividendo noviembre 2026' y 'Grupo Financiero Galicia cash dividend payment November 2026'. Los avisos a la SEC muestran que el dividendo de 2026 se pagó en tres cuotas y la última fue en septiembre. Mora: buscada como 'Galicia mora Naranja X noviembre 2026' y 'bancos argentinos acciones mora noviembre 2026', sin dato nuevo de la semana. Fabián Kon: buscado, sin declaraciones en la semana. Normas del BCRA para bancos: buscadas, sin cambios de encajes en noviembre. Fecha de resultados del 3er trimestre: el 24-nov sale de calendarios de terceros, no de la empresa. Brasil sin bloque propio: EWZ cayó con el resto (−11,4%) y no se encontró una noticia brasileña que lo explique aparte. Lunes 23: GGAL y ARGT rebotaron con Wall Street (S&P 500 +4,7%), fuera de la semana del reporte.",
+ "velas_fuente": "Velas diarias del ADR (apertura, maximo, minimo, cierre, volumen). Promedio de 20 dias, RSI14 y volumen relativo calculados en la pagina.",
+ "velas": [
+  [
+   "2026-07-02",
+   49.92,
+   50.72,
+   49.225,
+   50.37,
+   810422
+  ],
+  [
+   "2026-07-06",
+   50.81,
+   53.5,
+   50.41,
+   53.02,
+   1365405
+  ],
+  [
+   "2026-07-07",
+   52.53,
+   53.64,
+   50.92,
+   51.1,
+   572775
+  ],
+  [
+   "2026-07-08",
+   50.13,
+   51.46,
+   49.99,
+   50.25,
+   1485647
+  ],
+  [
+   "2026-07-09",
+   50.38,
+   50.4849,
+   48.67,
+   49.39,
+   617481
+  ],
+  [
+   "2026-07-10",
+   50.36,
+   53.855,
+   49.955,
+   53.73,
+   1808483
+  ],
+  [
+   "2026-07-13",
+   53.82,
+   54.035,
+   51.41,
+   51.41,
+   747095
+  ],
+  [
+   "2026-07-14",
+   52.66,
+   53.095,
+   50.65,
+   50.8,
+   1164074
+  ],
+  [
+   "2026-07-15",
+   50.83,
+   53.19,
+   50.79,
+   52.67,
+   1614688
+  ],
+  [
+   "2026-07-16",
+   52.23,
+   52.27,
+   49.76,
+   50.18,
+   1234816
+  ],
+  [
+   "2026-07-17",
+   49.42,
+   50.01,
+   48.45,
+   49.94,
+   1119567
+  ],
+  [
+   "2026-07-20",
+   49.58,
+   50.46,
+   48.97,
+   49.95,
+   667537
+  ],
+  [
+   "2026-07-21",
+   50.5,
+   51.63,
+   50.18,
+   50.94,
+   774507
+  ],
+  [
+   "2026-07-22",
+   51.92,
+   53.34,
+   51.67,
+   53.24,
+   1688772
+  ],
+  [
+   "2026-07-23",
+   52.66,
+   52.8,
+   50.11,
+   50.15,
+   756127
+  ],
+  [
+   "2026-07-24",
+   50.17,
+   51.48,
+   49.04,
+   49.3,
+   774887
+  ],
+  [
+   "2026-07-27",
+   49.72,
+   50.48,
+   49.43,
+   50,
+   328996
+  ],
+  [
+   "2026-07-28",
+   49.33,
+   49.655,
+   47.9,
+   49.19,
+   953983
+  ],
+  [
+   "2026-07-29",
+   48.585,
+   50.25,
+   48.185,
+   49.15,
+   665409
+  ],
+  [
+   "2026-07-30",
+   49.04,
+   51.685,
+   48.635,
+   51.61,
+   750311
+  ],
+  [
+   "2026-07-31",
+   52,
+   52.24,
+   49.72,
+   49.77,
+   642211
+  ],
+  [
+   "2026-08-03",
+   50.23,
+   50.79,
+   49.845,
+   50.51,
+   510500
+  ],
+  [
+   "2026-08-04",
+   51.02,
+   51.02,
+   48.695,
+   48.92,
+   757473
+  ],
+  [
+   "2026-08-05",
+   48.72,
+   49.75,
+   48.18,
+   48.36,
+   660357
+  ],
+  [
+   "2026-08-06",
+   48.08,
+   48.54,
+   46.595,
+   46.73,
+   695934
+  ],
+  [
+   "2026-08-07",
+   47.26,
+   47.515,
+   45.58,
+   46.18,
+   714738
+  ],
+  [
+   "2026-08-10",
+   46.18,
+   46.59,
+   45.53,
+   46.42,
+   573602
+  ],
+  [
+   "2026-08-11",
+   46.9,
+   47.75,
+   43.87,
+   44.53,
+   1263445
+  ],
+  [
+   "2026-08-12",
+   44.41,
+   44.825,
+   43.6,
+   44.22,
+   765889
+  ],
+  [
+   "2026-08-13",
+   44.18,
+   45.305,
+   43.53,
+   44.99,
+   800023
+  ],
+  [
+   "2026-08-14",
+   45.15,
+   45.2099,
+   43.37,
+   43.37,
+   596551
+  ],
+  [
+   "2026-08-17",
+   43.72,
+   43.99,
+   43,
+   43.42,
+   505215
+  ],
+  [
+   "2026-08-18",
+   43,
+   43.32,
+   41.8,
+   42.12,
+   920226
+  ],
+  [
+   "2026-08-19",
+   42,
+   42.82,
+   40.89,
+   41.47,
+   885805
+  ],
+  [
+   "2026-08-20",
+   42.59,
+   42.59,
+   40.6,
+   41,
+   1895423
+  ],
+  [
+   "2026-08-21",
+   41.18,
+   42.44,
+   41.13,
+   41.45,
+   1758005
+  ],
+  [
+   "2026-08-24",
+   41.12,
+   44,
+   41.12,
+   43.45,
+   1215477
+  ],
+  [
+   "2026-08-25",
+   43.66,
+   44.28,
+   42.5,
+   44.2,
+   796405
+  ],
+  [
+   "2026-08-26",
+   44.36,
+   45.2,
+   43.415,
+   43.91,
+   1005410
+  ],
+  [
+   "2026-08-27",
+   43.99,
+   44.405,
+   42.63,
+   42.91,
+   690253
+  ],
+  [
+   "2026-08-28",
+   43.04,
+   43.335,
+   41.69,
+   42.24,
+   787490
+  ],
+  [
+   "2026-08-31",
+   42.5,
+   44.57,
+   42.5,
+   43.75,
+   1095737
+  ],
+  [
+   "2026-09-01",
+   43.35,
+   45.08,
+   42.92,
+   44.29,
+   752689
+  ],
+  [
+   "2026-09-02",
+   44.28,
+   45.14,
+   43.975,
+   45.01,
+   793526
+  ],
+  [
+   "2026-09-03",
+   44.72,
+   46.09,
+   44.02,
+   44.63,
+   615791
+  ],
+  [
+   "2026-09-04",
+   44.56,
+   44.9481,
+   43.82,
+   44.36,
+   481940
+  ],
+  [
+   "2026-09-08",
+   44.6,
+   44.67,
+   43.5,
+   44.12,
+   761880
+  ],
+  [
+   "2026-09-09",
+   43.99,
+   44.785,
+   43.0806,
+   44.49,
+   425550
+  ],
+  [
+   "2026-09-10",
+   43.63,
+   45.72,
+   43.63,
+   44.72,
+   1017818
+  ],
+  [
+   "2026-09-11",
+   45,
+   45.42,
+   43.165,
+   43.86,
+   739390
+  ],
+  [
+   "2026-09-14",
+   43.48,
+   43.87,
+   42.65,
+   42.96,
+   773802
+  ],
+  [
+   "2026-09-15",
+   42.7,
+   43.075,
+   41.94,
+   42.14,
+   689556
+  ],
+  [
+   "2026-09-16",
+   42.19,
+   42.86,
+   41.58,
+   42.27,
+   364905
+  ],
+  [
+   "2026-09-17",
+   43,
+   43.09,
+   42.365,
+   42.62,
+   379014
+  ],
+  [
+   "2026-09-18",
+   42.2,
+   42.425,
+   41.5,
+   41.76,
+   524697
+  ],
+  [
+   "2026-09-21",
+   42.05,
+   42.2,
+   41.33,
+   41.76,
+   456205
+  ],
+  [
+   "2026-09-22",
+   41.54,
+   41.918,
+   40.275,
+   41.25,
+   929594
+  ],
+  [
+   "2026-09-23",
+   41.11,
+   42.01,
+   39.93,
+   39.99,
+   1022555
+  ],
+  [
+   "2026-09-24",
+   39.83,
+   40.44,
+   39.28,
+   39.59,
+   940052
+  ],
+  [
+   "2026-09-25",
+   40,
+   40,
+   38.74,
+   38.74,
+   605698
+  ],
+  [
+   "2026-09-28",
+   38.09,
+   38.53,
+   36.73,
+   36.98,
+   1079477
+  ],
+  [
+   "2026-09-29",
+   37.02,
+   37.83,
+   36.56,
+   37.02,
+   729993
+  ],
+  [
+   "2026-09-30",
+   37.15,
+   38.04,
+   36.685,
+   37.24,
+   850192
+  ],
+  [
+   "2026-10-01",
+   37,
+   37.225,
+   35.21,
+   36.07,
+   1697295
+  ],
+  [
+   "2026-10-02",
+   36.17,
+   36.68,
+   35.655,
+   35.89,
+   848794
+  ],
+  [
+   "2026-10-05",
+   37.2,
+   38.615,
+   37.2,
+   38.25,
+   1823913
+  ],
+  [
+   "2026-10-06",
+   38.5,
+   38.84,
+   38.05,
+   38.18,
+   1398868
+  ],
+  [
+   "2026-10-07",
+   37.62,
+   37.65,
+   36.77,
+   37.05,
+   941879
+  ],
+  [
+   "2026-10-08",
+   36.51,
+   38.04,
+   36.51,
+   36.76,
+   1111671
+  ],
+  [
+   "2026-10-09",
+   37.07,
+   37.5987,
+   36.45,
+   36.81,
+   805732
+  ],
+  [
+   "2026-10-12",
+   36.82,
+   37.15,
+   36.57,
+   36.78,
+   376283
+  ],
+  [
+   "2026-10-13",
+   36.945,
+   37.63,
+   36.57,
+   36.79,
+   859347
+  ],
+  [
+   "2026-10-14",
+   36.24,
+   36.63,
+   35.46,
+   35.55,
+   701547
+  ],
+  [
+   "2026-10-15",
+   35.3,
+   36.575,
+   34.7,
+   36.47,
+   941303
+  ],
+  [
+   "2026-10-16",
+   36.61,
+   36.68,
+   35.55,
+   36.02,
+   584411
+  ],
+  [
+   "2026-10-19",
+   36.07,
+   36.275,
+   34.57,
+   35.09,
+   906898
+  ],
+  [
+   "2026-10-20",
+   34.92,
+   36.45,
+   34.92,
+   35.46,
+   1217207
+  ],
+  [
+   "2026-10-21",
+   35.8,
+   36.83,
+   35.67,
+   36.82,
+   1308571
+  ],
+  [
+   "2026-10-22",
+   36.2,
+   36.43,
+   35.35,
+   36.12,
+   1377610
+  ],
+  [
+   "2026-10-23",
+   35.7,
+   38.06,
+   35.64,
+   37.91,
+   996142
+  ],
+  [
+   "2026-10-26",
+   35.84,
+   35.9,
+   33.66,
+   35.35,
+   1981805
+  ],
+  [
+   "2026-10-27",
+   35.86,
+   36.33,
+   34.92,
+   35.14,
+   1154211
+  ],
+  [
+   "2026-10-28",
+   34.97,
+   35.185,
+   33.3935,
+   33.84,
+   1185504
+  ],
+  [
+   "2026-10-29",
+   34.04,
+   34.53,
+   33.08,
+   33.73,
+   1281585
+  ],
+  [
+   "2026-10-30",
+   33.11,
+   33.42,
+   32.0202,
+   32.3,
+   1467387
+  ],
+  [
+   "2026-11-02",
+   32.62,
+   32.84,
+   30.79,
+   31.48,
+   1139076
+  ],
+  [
+   "2026-11-03",
+   31.25,
+   31.83,
+   30.72,
+   31.48,
+   1054220
+  ],
+  [
+   "2026-11-04",
+   31.76,
+   32.6,
+   30.65,
+   30.95,
+   1417493
+  ],
+  [
+   "2026-11-05",
+   30.87,
+   30.87,
+   29.43,
+   29.9,
+   1668904
+  ],
+  [
+   "2026-11-06",
+   30.19,
+   31.03,
+   29.31,
+   29.44,
+   839421
+  ],
+  [
+   "2026-11-09",
+   29.56,
+   30.56,
+   29.26,
+   30.4,
+   727264
+  ],
+  [
+   "2026-11-10",
+   30.14,
+   30.15,
+   29.35,
+   29.91,
+   335391
+  ],
+  [
+   "2026-11-11",
+   29.96,
+   30.19,
+   29.42,
+   29.87,
+   660548
+  ],
+  [
+   "2026-11-12",
+   29.46,
+   30.811,
+   28.52,
+   29.04,
+   1097452
+  ],
+  [
+   "2026-11-13",
+   28.95,
+   30.07,
+   28.62,
+   29.75,
+   891911
+  ],
+  [
+   "2026-11-16",
+   29.33,
+   29.385,
+   28.175,
+   28.2,
+   788771
+  ],
+  [
+   "2026-11-17",
+   28.345,
+   28.88,
+   27.69,
+   28.53,
+   1505369
+  ],
+  [
+   "2026-11-18",
+   28.35,
+   28.86,
+   27.31,
+   27.78,
+   1411467
+  ],
+  [
+   "2026-11-19",
+   28.01,
+   28.24,
+   26.05,
+   26.07,
+   1226416
+  ],
+  [
+   "2026-11-20",
+   25.04,
+   26.58,
+   25.03,
+   25.29,
+   1697694
+  ]
+ ]
+}
