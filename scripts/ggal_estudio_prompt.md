@@ -193,10 +193,25 @@ desplaza a uno de los dos. Se calcula con las barras (punto 4) y va solo al info
 - **Cada corrida califica todo de nuevo.** Candidatos: los swings y toques de las
   velas que traiga la serie. El mapa del informe anterior **no** es fuente: una
   linea que estaba y ya no pasa los criterios, sale, y se dice en "Entro y salio".
-  Si la serie no alcanza hacia un lado (precio en minimos o maximos de las 300
-  velas), ese lado queda vacio y se dice: **mejor un lado vacio que una linea sin
-  fundamento.**
-- A mas de 5% del precio, una sola linea por lado (el gatillo de fondo).
+  **Si un lado queda vacio en diario, se busca en el semanal.** (Desde el 2026-11-25,
+  a pedido de Tobias: "marcame los soportes". Ese dia el ADR perforo el minimo de las
+  300 velas diarias, 25.03, y el mapa quedo sin soportes cuando mas falta hacian.)
+  - `setResolution('1W')`, verificá `resolution() === '1W'` y armá `B` igual que en
+    diario (300 velas semanales, desde 2021). Corré **la misma funcion** `niveles(B)`,
+    sin cambiarle nada, y usá solo el lado que estaba vacio.
+  - De ese lado van **hasta 2 lineas**: las dos mas cercanas al precio de
+    `soportes.todas` (o `resistencias.todas`), separadas entre si 5% o mas. Aca no
+    corre "una sola linea a mas de 5%": en el semanal casi todo esta lejos.
+  - Se dibujan como cualquier otra (`Soporte N` / `Resistencia N`, mismo color). En
+    la columna "Que es" va **"(semanal)"** y las fechas de las reacciones semanales.
+  - Volvé a `setResolution('1D')` y verificá `1D` antes de dibujar.
+  - Si el semanal tampoco trae nada de ese lado, el lado queda vacio y se dice:
+    **mejor un lado vacio que una linea sin fundamento.**
+  - Probado el 2026-11-25 con el ADR en 25.05: el semanal dio 23.53 (minimos de
+    swing del 26-feb-2024 y 5-ago-2024) y 19.13 (swing del 18-dic-2023, reaccion
+    fuerte).
+- A mas de 5% del precio, una sola linea por lado (el gatillo de fondo), salvo en
+  el caso del semanal de arriba.
 - **La cuenta, siempre con esta funcion** (probada el 2026-11-11 contra los cierres
   de oct-nov: de las veces que el precio llego a una linea, aguanto en cierre el 70%,
   contra 67% con los criterios viejos y 53% exigiendo solo 2 reacciones a cualquier vela). No la
@@ -249,7 +264,7 @@ desplaza a uno de los dos. Se calcula con las barras (punto 4) y va solo al info
       const fin = []; let lejos = false;
       for (const c of el) { if (fin.length === 3) break;
         if (Math.abs(c.L / P - 1) > 0.05) { if (lejos) continue; lejos = true; } fin.push(c); }
-      return fin; };
+      fin.todas = el; return fin; }; // todas: para el caso del semanal (2026-11-25)
     return { resistencias: lado(true), soportes: lado(false) };
   }
   ```
